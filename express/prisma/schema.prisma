@@ -25,6 +25,7 @@ model profile {
   gender   String
   preferences String
   bio String
+  content String
   tag Json
   age Int
   image Json

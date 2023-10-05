@@ -19,11 +19,38 @@ const createProfile = async (req) => {
 };
 
 const getProfile = async (req) => {
-    const { user } = req.body;
+    const { user } = req.params;
     const profile = await prisma.profile.findUnique({
         where: { user },
     });
     return profile;
 };
 
+const updateProfile = async (req) => {
+    const { gender, preferences, bio, tag, age, image, user } = req.body;
+    const profile = await prisma.profile.update({
+        where: { user },
+        data: {
+            gender,
+            preferences,
+            bio,
+            tag,
+            age,
+            image,
+        },
+    });
+    return profile;
+};
+
+const deleteProfile = async (req) => {
+    const { user } = req.body;
+    const profile = await prisma.profile.delete({
+        where: { user },
+    });
+    return profile;
+};
+
 exports.createProfile = createProfile;
+exports.getProfile = getProfile;
+exports.updateProfile = updateProfile;
+exports.deleteProfile = deleteProfile;
