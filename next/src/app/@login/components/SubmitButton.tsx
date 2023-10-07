@@ -1,4 +1,5 @@
 "use client";
+
 import { experimental_useFormStatus as useFormStatus } from "react-dom";
 
 function Button({
@@ -12,8 +13,16 @@ function Button({
 
   console.log(pending);
   return (
-    <button type="submit" className={className} aria-disabled={pending}>
-      {children}
+    <button
+      type="submit"
+      className={className + "flex justify-center"}
+      aria-disabled={pending}
+    >
+      {pending ? (
+        <div className="animate-spin w-8 h-8 bg-slate-950 mx-auto"></div>
+      ) : (
+        children
+      )}
     </button>
   );
 }
