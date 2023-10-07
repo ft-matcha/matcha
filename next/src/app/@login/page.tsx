@@ -1,11 +1,11 @@
-"use client";
-
 import Input from "./components/Input";
 import SubmitButton from "./components/SubmitButton";
 
 function Page() {
-  const onSubmit = (data: FormData) => {
-    console.log(data);
+  const onSubmit = async (data: FormData) => {
+    "use server";
+    let cnt = 0;
+    while (cnt < 1000000) ++cnt;
   };
 
   return (
