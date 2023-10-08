@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const createUser = async (req) => {
     const { firstName, lastName, email, uid, upass } = req.body;
     console.log(req.body);
-    const password = crypto.createHmac('sha256', process.env.secret).update(upass).digest('hex');
+    const password = crypto.createHash('sha256', process.env.secret).update(upass).digest('hex');
     const User = await prisma.user.create({
         data: {
             email,
@@ -18,8 +18,7 @@ const createUser = async (req) => {
     return User;
 };
 
-const getUser = async (req) => {
-    const { uid } = req.params;
+const getUser = async (uid) => {
     if (!uid) return undefined;
     const User = await prisma.user.findUnique({
         where: { uid },
@@ -29,13 +28,14 @@ const getUser = async (req) => {
 
 const updateUser = async (req) => {
     const { firstName, lastName, email, uid, upass } = req.body;
+    const password = crypto.createHash('sha256', process.env.secret).update(upass).digest('hex');
     const User = await prisma.user.update({
         where: { uid },
         data: {
             email,
             firstName,
             lastName,
-            upass,
+            upass: password,
         },
     });
     return User;
@@ -49,7 +49,21 @@ const deleteUser = async (req) => {
     return User;
 };
 
+const bodyCheck = (body, before) => {
+    const password = crypto.createHash('sha256', process.env.secret).update(body.upass).digest('hex');
+    if (
+        body.firstName === before.firstName &&
+        body.lastName === before.lastName &&
+        body.email === before.email &&
+        password === before.upass
+    ) {
+        return true;
+    }
+    return false;
+};
+
 exports.createUser = createUser;
 exports.getUser = getUser;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
+exports.bodyCheck = bodyCheck;

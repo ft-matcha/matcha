@@ -4,17 +4,40 @@ const profileController = require('../controllers/profile-controllers');
 
 router.get('/:uid', async (req, res) => {
     const user = await profileController.getProfile(req);
-    res.json(user);
+    if (!user) {
+        res.json({
+            success: false,
+            error: { message: 'Profile not found' },
+        });
+    }
+    res.json({
+        success: true,
+        user,
+    });
 });
 
 router.post('/', async (req, res) => {
     const target = await profileController.getProfile(req);
     if (target) {
-        res.json({ message: 'Profile already exists' });
+        res.json({
+            success: false,
+            error: { message: 'Profile already exists' },
+        });
     } else {
         const user = await profileController.createProfile(req);
-        res.json(user);
+        res.json({
+            success: true,
+            user: user,
+        });
     }
+});
+
+router.post('/update', async (req, res) => {
+    const user = await profileController.updateProfile(req);
+    res.json({
+        success: true,
+        user: user,
+    });
 });
 
 module.exports = router;

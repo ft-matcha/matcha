@@ -27,16 +27,22 @@ router.post('/email', (req, res) => {
     const mailOptions = {
         to: email,
         subject: 'Email Verification',
-        text: `Click the following link to verify your email: http://localhost:3000/verify/${verificationToken}`,
+        text: `Click the following link to verify your email: http://localhost:9000/verify/${verificationToken}`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
             console.log(error);
-            res.send('Error sending email.');
+            res.json({
+                success: false,
+                error: { message: 'Email not sent' },
+            });
         } else {
             console.log('Email sent: ' + info.response);
-            res.send('Email sent. Check your inbox.');
+            res.json({
+                success: true,
+                error: { message: 'Email sent' },
+            });
         }
     });
 });
@@ -44,7 +50,11 @@ router.post('/email', (req, res) => {
 router.get('/:token', (req, res) => {
     const token = req.params.token;
 
-    res.send('Email verified successfully!');
+    res.cookie('verification', token);
+    res.json({
+        success: true,
+        message: 'Email verified',
+    });
 });
 
 module.exports = router;

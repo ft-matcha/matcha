@@ -17,6 +17,7 @@ CREATE TABLE `profile` (
     `gender` VARCHAR(191) NOT NULL,
     `preferences` VARCHAR(191) NOT NULL,
     `bio` VARCHAR(191) NOT NULL,
+    `content` VARCHAR(191) NOT NULL,
     `tag` JSON NOT NULL,
     `age` INTEGER NOT NULL,
     `image` JSON NOT NULL,
