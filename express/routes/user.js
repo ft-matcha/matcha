@@ -27,7 +27,7 @@ router.post('/', async (req, res) => {
             error: { message: 'User already exists' },
         });
     } else {
-        const user = await userController.createUser(req);
+        const user = await userController.createUser(req.body);
         res.json({
             success: true,
             user: user,
@@ -40,13 +40,20 @@ router.get('/', async (req, res) => {
 
     if (user) {
         const userData = jwt.verify(user);
-        const userTest = await prisma.user.findMany({ where: { id: userData.id } });
+        console.log(userData);
+        const userTest = await userController.getUser(userData.uid);
         if (userTest) {
             res.status(200).json({
                 success: true,
                 user: userData,
             });
+        } else {
+            res.status(401).json({
+                success: false,
+                error: { message: 'User not found' },
+            });
         }
+        return;
     }
     res.status(401).json({
         success: false,
@@ -69,7 +76,7 @@ router.post('/update', async (req, res) => {
         });
         return;
     }
-    const user = await userController.updateUser(req);
+    const user = await userController.updateUser(req.body);
     res.json({
         success: true,
         user: user,

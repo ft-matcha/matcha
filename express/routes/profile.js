@@ -9,6 +9,7 @@ router.get('/:uid', async (req, res) => {
             success: false,
             error: { message: 'Profile not found' },
         });
+        return;
     }
     res.json({
         success: true,

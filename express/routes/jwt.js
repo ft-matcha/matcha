@@ -5,8 +5,8 @@ const secret = 'asdsadafdfsdgsfgggsag';
 module.exports = {
     sign: (user) => {
         const payload = {
-            id: user.id,
-            pass: user.pass,
+            uid: user.uid,
+            upass: user.upass,
         };
 
         return jwt.sign(payload, secret, {
@@ -20,8 +20,8 @@ module.exports = {
             decoded = jwt.verify(token, secret);
             return {
                 status: true,
-                id: decoded.id,
-                pass: decoded.pass,
+                uid: decoded.uid,
+                upass: decoded.upass,
             };
         } catch (err) {
             return {

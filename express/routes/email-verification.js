@@ -1,7 +1,8 @@
 const nodemailer = require('nodemailer');
 const express = require('express');
 const router = express.Router();
-
+let linkStore = {};
+const crypto = require('crypto');
 const transporter = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
@@ -10,24 +11,21 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-// router.get('/register', (req, res) => {
-//     res.send(`
-//     <form method="POST" action="/verification/register">
-//       <input type="email" name="email" placeholder="Email" required>
-//       <input type="submit" value="Register">
-//     </form>
-//   `);
-// });
-
 router.post('/email', (req, res) => {
     const email = req.body.email;
+    linkStore = {};
 
     console.log(email);
-    const verificationToken = Math.random().toString(36).substr(2, 10);
+    const linkToken = crypto.randomBytes(20).toString('hex');
+
+    linkStore[linkToken] = {
+        email,
+        expiration: Date.now() + 30000,
+    };
     const mailOptions = {
         to: email,
         subject: 'Email Verification',
-        text: `Click the following link to verify your email: http://localhost:9000/verify/${verificationToken}`,
+        text: `Click the following link to verify your email: http://localhost:9000/verify/${linkToken}`,
     };
 
     transporter.sendMail(mailOptions, (error, info) => {
@@ -41,7 +39,7 @@ router.post('/email', (req, res) => {
             console.log('Email sent: ' + info.response);
             res.json({
                 success: true,
-                error: { message: 'Email sent' },
+                message: 'Email sent',
             });
         }
     });
@@ -50,11 +48,16 @@ router.post('/email', (req, res) => {
 router.get('/:token', (req, res) => {
     const token = req.params.token;
 
-    res.cookie('verification', token);
-    res.json({
-        success: true,
-        message: 'Email verified',
-    });
+    const linkData = linkStore[token];
+    if (!linkData) {
+        res.json({
+            success: false,
+            error: { message: 'Invalid link' },
+        });
+        return;
+    }
+    res.cookie('verify', token);
+    res.redirect('http://localhost:3000');
 });
 
 module.exports = router;

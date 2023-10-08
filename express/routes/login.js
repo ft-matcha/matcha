@@ -5,8 +5,8 @@ const router = express.Router();
 const crypto = require('crypto');
 const jwt = require('./jwt');
 
-router.get('/:uid/:upass', async (req, res) => {
-    const { uid, upass } = req.params;
+router.post('/', async (req, res) => {
+    const { uid, upass } = req.body;
     const password = crypto.createHash('sha256', process.env.secret).update(upass).digest('hex');
     const User = await prisma.user.findUnique({
         where: { uid },
