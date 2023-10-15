@@ -29,6 +29,6 @@ model profile {
   tag Json
   age Int
   image Json
-  userId Int
+  userId Int @unique
   user user  @relation(fields: [userId], references: [id])
 }

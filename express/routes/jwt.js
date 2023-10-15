@@ -40,7 +40,7 @@ module.exports = {
         const getAsync = token.cookie('refresh', token);
 
         try {
-            const data = await getAsync(userId); // refresh token 가져오기
+            const data = await getAsync(userId);
             if (token === data) {
                 try {
                     jwt.verify(token, secret);

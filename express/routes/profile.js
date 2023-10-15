@@ -1,43 +1,46 @@
 const express = require('express');
 const router = express.Router();
 const profileController = require('../controllers/profile-controllers');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
 router.get('/:uid', async (req, res) => {
-    const user = await profileController.getProfile(req);
-    if (!user) {
+    const profile = await profileController.getProfile(req.params.uid);
+    if (!profile) {
         res.json({
             success: false,
             error: { message: 'Profile not found' },
         });
-        return;
+    } else {
+        res.json({
+            success: true,
+            profile,
+        });
     }
-    res.json({
-        success: true,
-        user,
-    });
 });
 
-router.post('/', async (req, res) => {
-    const target = await profileController.getProfile(req);
-    if (target) {
+router.post('/', upload.single('image'), async (req, res) => {
+    const target = await profileController.getProfile(req.body.user);
+    console.log(target);
+    if (target.length !== 0) {
         res.json({
             success: false,
             error: { message: 'Profile already exists' },
         });
     } else {
-        const user = await profileController.createProfile(req);
+        const profile = await profileController.createProfile(req);
         res.json({
             success: true,
-            user: user,
+            profile: profile,
         });
     }
 });
 
 router.post('/update', async (req, res) => {
-    const user = await profileController.updateProfile(req);
+    const profile = await profileController.updateProfile(req);
     res.json({
         success: true,
-        user: user,
+        profile: profile,
     });
 });
 

@@ -53,12 +53,12 @@ router.get('/', async (req, res) => {
                 error: { message: 'User not found' },
             });
         }
-        return;
+    } else {
+        res.status(401).json({
+            success: false,
+            error: { message: 'Unauthorized' },
+        });
     }
-    res.status(401).json({
-        success: false,
-        error: { message: 'Unauthorized' },
-    });
 });
 
 router.post('/update', async (req, res) => {
@@ -68,19 +68,35 @@ router.post('/update', async (req, res) => {
             success: false,
             error: { message: 'User not found' },
         });
-        return;
     } else if (userController.bodyCheck(req.body, before)) {
         res.json({
             success: false,
             error: { message: 'Nothing to update' },
         });
-        return;
+    } else {
+        const user = await userController.updateUser(req.body);
+        res.json({
+            success: true,
+            user: user,
+        });
     }
-    const user = await userController.updateUser(req.body);
-    res.json({
-        success: true,
-        user: user,
-    });
+});
+
+router.post('/delete', async (req, res) => {
+    const data = await userController.getUser(req.body.uid);
+    console.log(data);
+    if (!data) {
+        res.json({
+            success: false,
+            error: { message: 'User not found' },
+        });
+    } else {
+        const user = await userController.deleteUser(data);
+        res.json({
+            success: true,
+            user: user,
+        });
+    }
 });
 
 module.exports = router;

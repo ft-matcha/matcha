@@ -54,10 +54,10 @@ router.get('/:token', (req, res) => {
             success: false,
             error: { message: 'Invalid link' },
         });
-        return;
+    } else {
+        res.cookie('verify', token);
+        res.redirect('http://localhost:3000');
     }
-    res.cookie('verify', token);
-    res.redirect('http://localhost:3000');
 });
 
 module.exports = router;

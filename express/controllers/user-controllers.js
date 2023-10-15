@@ -1,10 +1,10 @@
 const PrismaClient = require('@prisma/client').PrismaClient;
+const profileController = require('./profile-controllers');
 
 const prisma = new PrismaClient();
 const crypto = require('crypto');
 const createUser = async (body) => {
     const { firstName, lastName, email, uid, upass } = body;
-    console.log(body);
     const password = crypto.createHash('sha256', process.env.secret).update(upass).digest('hex');
     const User = await prisma.user.create({
         data: {
@@ -21,7 +21,8 @@ const createUser = async (body) => {
 const getUser = async (uid) => {
     if (!uid) return undefined;
     const User = await prisma.user.findUnique({
-        where: { uid },
+        where: { uid: uid },
+        include: { profile: true },
     });
     return User;
 };
@@ -41,10 +42,25 @@ const updateUser = async (body) => {
     return User;
 };
 
-const deleteUser = async (req) => {
-    const { uid } = req.body;
+const updateProfile = async (profile) => {
+    await prisma.user.update({
+        where: { id: profile.userId },
+        data: {
+            profile: {
+                connect: {
+                    id: profile.id,
+                },
+            },
+        },
+    });
+};
+
+const deleteUser = async (data) => {
+    if (data.profile.length !== 0) {
+        await profileController.deleteProfile(data.uid);
+    }
     const User = await prisma.user.delete({
-        where: { uid },
+        where: { uid: data.uid },
     });
     return User;
 };
@@ -67,3 +83,4 @@ exports.getUser = getUser;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
 exports.bodyCheck = bodyCheck;
+exports.updateProfile = updateProfile;
