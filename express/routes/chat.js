@@ -1,18 +1,20 @@
-// const express = require('express');
-// const router = express.Router();
+const socketIo = require('socket.io');
+const http = require('http');
 
-// module.exports = (io) => {
-//     router.get('/', (req, res) => {
-//         io.on('connection', (socket) => {
-//             console.log('a user connected');
-//             socket.on('disconnect', () => {
-//                 console.log('a user disconnected');
-//             });
-//             socket.on('chat message', (msg) => {
-//                 socket.emit('chat message', msg);
-//             });
-//         });
-//     });
+const chatSocket = (server) => {
+    const io = socketIo(server);
 
-//     return router;
-// };
+    io.on('connection', (socket) => {
+        console.log('a user connected');
+        socket.on('disconnect', () => {
+            console.log('a user disconnected');
+        });
+        socket.on('chat message', (msg) => {
+            socket.emit('chat message', msg);
+        });
+    });
+
+    return io;
+};
+
+module.exports = chatSocket;
