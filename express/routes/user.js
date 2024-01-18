@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const userController = require('../controllers/user-controllers');
-const jwt = require('./jwt');
+const jwt = require('../utils/jwt');
 
 router.get('/:uid', async (req, res) => {
     const user = await userController.getUser(req.params.uid);

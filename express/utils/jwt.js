@@ -1,17 +1,19 @@
-// jwt-util.js
+const PrismaClient = require('@prisma/client').PrismaClient;
+const prisma = new PrismaClient();
 const jwt = require('jsonwebtoken');
-const secret = 'asdsadafdfsdgsfgggsag';
+const secret = process.env.secret;
 
 module.exports = {
     sign: (user) => {
         const payload = {
-            uid: user.uid,
-            upass: user.upass,
+            id: user.uid,
+            email: user.email,
+            firstName: user.firstName,
+            lastName: user.lastName,
         };
-
         return jwt.sign(payload, secret, {
             algorithm: 'HS256', // 암호화 알고리즘
-            expiresIn: '1h', // 유효기간
+            expiresIn: '5m', // 유효기간
         });
     },
     verify: (token) => {
@@ -20,8 +22,7 @@ module.exports = {
             decoded = jwt.verify(token, secret);
             return {
                 status: true,
-                uid: decoded.uid,
-                upass: decoded.upass,
+                decoded,
             };
         } catch (err) {
             return {
@@ -37,10 +38,8 @@ module.exports = {
         });
     },
     refreshVerify: async (token, userId) => {
-        const getAsync = token.cookie('refresh', token);
-
         try {
-            const data = await getAsync(userId);
+            const data = await userController.getRefresh(userId);
             if (token === data) {
                 try {
                     jwt.verify(token, secret);

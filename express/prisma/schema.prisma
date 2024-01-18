@@ -17,7 +17,8 @@ model user {
   lastName String
   uid String  @unique
   upass String
-  profile profile[]
+  refresh String
+  profile profile?
 }
 
 model profile {

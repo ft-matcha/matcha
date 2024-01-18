@@ -22,7 +22,7 @@ router.get('/:uid', async (req, res) => {
 router.post('/', upload.single('image'), async (req, res) => {
     const target = await profileController.getProfile(req.body.user);
     console.log(target);
-    if (target.length !== 0) {
+    if (target) {
         res.json({
             success: false,
             error: { message: 'Profile already exists' },

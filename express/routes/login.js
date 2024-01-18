@@ -1,35 +1,18 @@
-const PrismaClient = require('@prisma/client').PrismaClient;
-const prisma = new PrismaClient();
 const express = require('express');
 const router = express.Router();
-const crypto = require('crypto');
-const jwt = require('./jwt');
-
+const userController = require('../controllers/user-controllers');
+const jwt = require('../utils/jwt');
+const { verifyJWT } = require('../controllers/jwt-controller');
 router.post('/', async (req, res) => {
-    const { uid, upass } = req.body;
-    const password = crypto.createHash('sha256', process.env.secret).update(upass).digest('hex');
-    const User = await prisma.user.findUnique({
-        where: { uid },
-    });
-
-    if (!User) {
-        res.json({
-            success: false,
-            error: { message: 'User not found' },
-        });
-    } else if (User.upass === password) {
-        res.status(200).cookie('login', jwt.sign(User));
-        const cookie = req.cookies['login'];
-        res.json({
-            success: true,
-            cookie: cookie,
-        });
+    const response = await userController.checkPassword(req.body);
+    if (response.success === false) {
+        res.status(401).json(response);
     } else {
-        res.json({
-            success: false,
-            error: { message: 'Incorrect password' },
-        });
+        console.log(response);
+        res.status(201).json({ success: true, accessToken: response.accessToken, refreshToken: response.refreshToken });
     }
 });
+
+router.get('/verify', verifyJWT);
 
 module.exports = router;

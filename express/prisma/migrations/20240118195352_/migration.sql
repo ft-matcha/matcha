@@ -6,6 +6,7 @@ CREATE TABLE `user` (
     `lastName` VARCHAR(191) NOT NULL,
     `uid` VARCHAR(191) NOT NULL,
     `upass` VARCHAR(191) NOT NULL,
+    `refresh` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `user_uid_key`(`uid`),
     PRIMARY KEY (`id`)
@@ -23,6 +24,7 @@ CREATE TABLE `profile` (
     `image` JSON NOT NULL,
     `userId` INTEGER NOT NULL,
 
+    UNIQUE INDEX `profile_userId_key`(`userId`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
