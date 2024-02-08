@@ -1,0 +1,71 @@
+version: '3'
+
+services:
+    mysql:
+        image: mysql
+        build: ./mysql
+        container_name: mysql
+        restart: always
+        expose:
+            - '3306'
+        networks:
+            - matcha_network
+        env_file:
+            - .env
+
+    back:
+        image: back
+        build: ./back
+        container_name: back
+        restart: always
+        networks:
+            - matcha_network
+        ports:
+            - '8000:8000'
+        volumes:
+            - back:/app
+        env_file:
+            - .env
+        depends_on:
+            - mysql
+            - redis
+            - elasticsearch
+
+    redis:
+        image: redis
+        build: ./redis
+        container_name: redis
+        restart: always
+        networks:
+            - matcha_network
+        expose:
+            - '6379'
+        env_file:
+            - .env
+
+    elasticsearch:
+        image: elasticsearch
+        build: ./elasticsearch
+        container_name: elasticsearch
+        restart: always
+        networks:
+            - matcha_network
+        expose:
+            - '9200'
+        environment:
+            - discovery.type=single-node
+        env_file:
+            - .env
+
+networks:
+    matcha_network:
+        driver: bridge
+
+volumes:
+    back:
+        name: back
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ./back
