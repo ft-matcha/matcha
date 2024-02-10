@@ -3,20 +3,20 @@ const crud = require('../lib/crud');
 const Profile = new crud('profile');
 
 const createProfile = async (body: any) => {
+    const { gender, preferences, biography, tag, age, image, region } = body;
     try {
-        const { gender, preferences, content, biography, tag, age, image, email } = body;
+        const email = 'srdn45@gmail.com';
         const userData = await userController.getUser(email);
         const profile = await Profile.create({
-            data: {
-                gender,
-                preferences,
-                biography,
-                content,
-                tag,
-                age,
-                image,
-                userId: userData.id,
-            },
+            gender,
+            preferences,
+            biography,
+            tag: JSON.stringify(tag),
+            age,
+            image: JSON.stringify(image),
+            viewList: JSON.stringify([]),
+            userId: userData.id,
+            region,
         });
         return profile;
     } catch (error: any) {

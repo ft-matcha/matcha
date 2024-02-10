@@ -14,7 +14,7 @@ const User = new crud('user');
 const crypto = require('crypto');
 const jwt = require('../utils/jwt');
 const redis = require('../lib/redisClient');
-const redisClient = redis.getClient();
+const elastic = require('../lib/elastic');
 const profileController = require('./profile-controllers');
 const createUser = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -26,6 +26,11 @@ const createUser = (body) => __awaiter(void 0, void 0, void 0, function* () {
             lastName,
             password: cryptoPass,
         });
+        const elasticData = yield elastic.index('user', {
+            email,
+            firstName,
+            lastName,
+        });
         return user;
     }
     catch (error) {
@@ -35,12 +40,14 @@ const createUser = (body) => __awaiter(void 0, void 0, void 0, function* () {
 });
 const getUser = (email) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const user = yield User.readOne(email);
+        const user = yield User.readOne({
+            where: { email },
+            include: { profile: true },
+        });
         return user;
     }
     catch (error) {
-        console.error('DB read failed: ' + error.stack);
-        return error;
+        throw error;
     }
 });
 const updateUser = (body) => __awaiter(void 0, void 0, void 0, function* () {
@@ -82,7 +89,7 @@ const login = (body) => __awaiter(void 0, void 0, void 0, function* () {
             console.log('Login success');
             const accessToken = jwt.sign(user);
             const refreshToken = jwt.refresh();
-            yield redisClient.set(email, refreshToken);
+            yield redis.set(email, refreshToken);
             return {
                 success: true,
                 accessToken,

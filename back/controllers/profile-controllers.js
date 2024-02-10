@@ -12,20 +12,20 @@ const userController = require('./user-controllers');
 const crud = require('../lib/crud');
 const Profile = new crud('profile');
 const createProfile = (body) => __awaiter(void 0, void 0, void 0, function* () {
+    const { gender, preferences, biography, tag, age, image, region } = body;
     try {
-        const { gender, preferences, content, biography, tag, age, image, email } = body;
+        const email = 'srdn45@gmail.com';
         const userData = yield userController.getUser(email);
         const profile = yield Profile.create({
-            data: {
-                gender,
-                preferences,
-                biography,
-                content,
-                tag,
-                age,
-                image,
-                userId: userData.id,
-            },
+            gender,
+            preferences,
+            biography,
+            tag: JSON.stringify(tag),
+            age,
+            image: JSON.stringify(image),
+            viewList: JSON.stringify([]),
+            userId: userData.id,
+            region,
         });
         return profile;
     }

@@ -11,8 +11,8 @@ const options = {
     key: fs.readFileSync(path.join(__dirname, 'ssl', 'server.key')),
     cert: fs.readFileSync(path.join(__dirname, 'ssl', 'server.crt')),
 };
-const dotenv = require('dotenv');
-dotenv.config({ path: path.join(__dirname, '../.env') });
+// const dotenv = require('dotenv');
+// dotenv.config({ path: path.join(__dirname, '../.env') });
 const Crud = require('./lib/crud');
 new Crud().migrate();
 const routers = require('./routers/index');

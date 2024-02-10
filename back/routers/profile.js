@@ -10,7 +10,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const profileController = require('../controllers/profile-controllers');
-const createProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const create = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield profileController.createProfile(req.body);
         res.status(201).json(response);
@@ -20,7 +20,7 @@ const createProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(500).json({ success: false, error: { message: 'createProfile failed : server error' } });
     }
 });
-const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+const update = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield profileController.updateProfile(req.body);
         res.status(201).json(response);
@@ -30,5 +30,5 @@ const updateProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         res.status(500).json({ success: false, error: { message: 'updateProfile failed : server error' } });
     }
 });
-exports.createProfile = createProfile;
-exports.updateProfile = updateProfile;
+exports.create = create;
+exports.update = update;

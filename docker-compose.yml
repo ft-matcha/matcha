@@ -50,10 +50,23 @@ services:
         restart: always
         networks:
             - matcha_network
-        expose:
-            - '9200'
+        # expose:
+        ports:
+            - '9200:9200'
         environment:
             - discovery.type=single-node
+        env_file:
+            - .env
+
+    kibana:
+        image: kibana
+        build: ./kibana
+        container_name: kibana
+        restart: always
+        networks:
+            - matcha_network
+        ports:
+            - '5601:5601'
         env_file:
             - .env
 

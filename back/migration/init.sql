@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     UNIQUE INDEX `user_email_key`(`email`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
---
+
 CREATE TABLE IF NOT EXISTS `profile` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `gender` varchar(255) NOT NULL,
@@ -24,5 +24,4 @@ CREATE TABLE IF NOT EXISTS `profile` (
     UNIQUE INDEX `profile_userId_key`(`userId`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
---
 ALTER TABLE `profile` ADD FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;

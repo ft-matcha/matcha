@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express = require('express');
 const jwt = require('../utils/jwt');
 const verifyJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.headers.authorization) {
@@ -24,6 +23,7 @@ const verifyJWT = (req, res, next) => __awaiter(void 0, void 0, void 0, function
             next();
         }
     }
+    res.status(401).json({ success: false, message: 'token does not exist' });
 });
 const refreshJWT = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     console.log(req.headers);

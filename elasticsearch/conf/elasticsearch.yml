@@ -1,0 +1,5 @@
+instances:
+    - name: elasticsearch
+      dns: elasticsearch
+      ip: localhost
+      port: 9200

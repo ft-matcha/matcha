@@ -19,18 +19,21 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
-var _elastic_client, _elastic_isConnected;
-const { Client } = require('@elastic/elasticsearch');
+var _elastic_client, _elastic_isConnected, _elastic_index, _elastic_isIndexCreated;
+const { Client } = require('elastic');
 const esconfig = {
-    host: process.env.ES_HOST,
-    port: process.env.ES_PORT,
+    node: process.env.ES_NODE,
 };
 class elastic {
     constructor() {
         _elastic_client.set(this, void 0);
         _elastic_isConnected.set(this, void 0);
+        _elastic_index.set(this, void 0);
+        _elastic_isIndexCreated.set(this, void 0);
         __classPrivateFieldSet(this, _elastic_client, null, "f");
         __classPrivateFieldSet(this, _elastic_isConnected, false, "f");
+        __classPrivateFieldSet(this, _elastic_index, 'matcha', "f");
+        __classPrivateFieldSet(this, _elastic_isIndexCreated, false, "f");
     }
     getClient() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -39,17 +42,50 @@ class elastic {
                     return __classPrivateFieldGet(this, _elastic_client, "f");
                 }
                 else {
-                    __classPrivateFieldSet(this, _elastic_client, new Client(esconfig), "f");
+                    __classPrivateFieldSet(this, _elastic_client, yield new Client(esconfig), "f");
+                    if (__classPrivateFieldGet(this, _elastic_isIndexCreated, "f") == false) {
+                        yield this.createIndex(__classPrivateFieldGet(this, _elastic_index, "f"));
+                    }
                     __classPrivateFieldSet(this, _elastic_isConnected, true, "f");
+                    console.log('Elasticsearch connected');
                     return __classPrivateFieldGet(this, _elastic_client, "f");
                 }
             }
             catch (error) {
                 console.error('Elasticsearch connection failed: ' + error.stack);
-                return error;
+                throw error;
+            }
+        });
+    }
+    createIndex(index) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield __classPrivateFieldGet(this, _elastic_client, "f").indices.create({
+                    index,
+                });
+                return response;
+            }
+            catch (error) {
+                throw error;
+            }
+        });
+    }
+    index(id, document) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.getClient();
+                const response = yield __classPrivateFieldGet(this, _elastic_client, "f").index({
+                    index: __classPrivateFieldGet(this, _elastic_index, "f"),
+                    id: id,
+                    document: document,
+                });
+                return response;
+            }
+            catch (error) {
+                throw error;
             }
         });
     }
 }
-_elastic_client = new WeakMap(), _elastic_isConnected = new WeakMap();
-exports.elastic = new elastic();
+_elastic_client = new WeakMap(), _elastic_isConnected = new WeakMap(), _elastic_index = new WeakMap(), _elastic_isIndexCreated = new WeakMap();
+module.exports = new elastic();

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const auth = require('./auth');
+const profile = require('./profile');
 const express = require('express');
 const router = express.Router();
 const ApiDocs = require('../docs/index');
@@ -9,5 +10,6 @@ apiDocs.init();
 const { swaggerUI, specs, setUpOption } = apiDocs.getSwaggerOption();
 router.post('/login', auth.login);
 router.post('/signup', auth.signup);
+router.post('/profile/create', profile.create);
 router.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));
 module.exports = router;

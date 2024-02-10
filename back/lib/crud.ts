@@ -1,5 +1,6 @@
 const fs = require('fs');
-const mysql = require('mysql2/promise');
+import mysql from 'mysql2/promise';
+// const mysql = require('mysql2/promise');
 const dbConfig = {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -7,7 +8,20 @@ const dbConfig = {
     database: process.env.MYSQL_DATABASE,
     port: Number(process.env.MYSQL_PORT),
     connectionLimit: 10,
+    multipleStatements: true,
 };
+
+const model = {
+    gender: String,
+    preferences: String,
+    biography: String,
+    tag: JSON,
+    age: Number,
+    image: JSON,
+    viewList: JSON,
+    region: String,
+};
+
 const pool = mysql.createPool(dbConfig);
 
 class Crud {
@@ -20,13 +34,8 @@ class Crud {
     async migrate() {
         try {
             await this.getConnection();
-            const sqlScript = await fs.promises.readFile(__dirname + '/../migration/init.sql', 'utf-8');
-            const queries = sqlScript.split('--');
-            for (const query of queries) {
-                if (query.trim()) {
-                    await this.#connection.query(query);
-                }
-            }
+            const sql = await fs.promises.readFile(__dirname + '/../migration/init.sql', 'utf-8');
+            await this.#connection.query(sql);
             console.log('DB migration success');
             this.#connection.release();
         } catch (error: any) {
@@ -44,9 +53,9 @@ class Crud {
     }
 
     async create(data: JSON) {
-        await this.getConnection();
-        const sql = `INSERT INTO ${this.#table} SET ?`;
         try {
+            await this.getConnection();
+            const sql = `INSERT INTO ${this.#table} SET ?`;
             const response = await this.#connection.query(sql, data).JSON;
             this.#connection.release();
             return response;
@@ -56,17 +65,36 @@ class Crud {
             return error;
         }
     }
-    async readOne(email: string) {
-        await this.getConnection();
-        const sql = `SELECT * FROM ${this.#table} WHERE ? LIMIT 1`;
+
+    async readOne(data: any) {
         try {
-            const user = await this.#connection.query(sql, { email });
+            const { where, include } = data;
+            let sql = '';
+            if (include) {
+                const table = Object.keys(include);
+                const keys = Object.keys(model);
+                let columns = '';
+                keys.forEach((key) => {
+                    columns += `'${key}', ${table}.${key}`;
+                    if (keys.indexOf(key) !== keys.length - 1) columns += ', ';
+                });
+                sql = `
+                SELECT ${this.#table}.*, JSON_OBJECT(${columns}) AS ${table}
+                FROM ${this.#table}
+                LEFT JOIN ${table} ON ${this.#table}.id = ${table}.userId
+                WHERE ?;
+                `;
+            } else {
+                sql = `SELECT * FROM WHERE ?`;
+            }
+            await this.getConnection();
+            const user = await this.#connection.query(sql, where);
             this.#connection.release();
             return user[0][0];
         } catch (error: any) {
             console.error('DB read failed: ' + error.stack);
             if (this.#connection) this.#connection.release();
-            return error;
+            throw error;
         }
     }
     async read(data: any) {

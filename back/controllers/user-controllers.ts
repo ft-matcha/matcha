@@ -3,9 +3,8 @@ const User = new crud('user');
 const crypto = require('crypto');
 const jwt = require('../utils/jwt');
 const redis = require('../lib/redisClient');
-const redisClient = redis.getClient();
+const elastic = require('../lib/elastic');
 const profileController = require('./profile-controllers');
-
 const createUser = async (body: any) => {
     try {
         const { firstName, lastName, email, password } = body;
@@ -16,6 +15,12 @@ const createUser = async (body: any) => {
             lastName,
             password: cryptoPass,
         });
+        const elasticData = await elastic.index('user', {
+            email,
+            firstName,
+            lastName,
+        });
+
         return user;
     } catch (error: any) {
         console.error('user create failed: ' + error.stack);
@@ -25,11 +30,13 @@ const createUser = async (body: any) => {
 
 const getUser = async (email: string) => {
     try {
-        const user = await User.readOne(email);
+        const user = await User.readOne({
+            where: { email },
+            include: { profile: true },
+        });
         return user;
     } catch (error: any) {
-        console.error('DB read failed: ' + error.stack);
-        return error;
+        throw error;
     }
 };
 
@@ -72,7 +79,7 @@ const login = async (body: any) => {
             console.log('Login success');
             const accessToken = jwt.sign(user);
             const refreshToken = jwt.refresh();
-            await redisClient.set(email, refreshToken);
+            await redis.set(email, refreshToken);
             return {
                 success: true,
                 accessToken,

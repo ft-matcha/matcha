@@ -15,7 +15,7 @@ module.exports = {
                                     description: '성별',
                                     example: 'man',
                                 },
-                                preference: {
+                                preferences: {
                                     type: 'string',
                                     description: '선호 성별',
                                     example: 'woman',
@@ -28,7 +28,7 @@ module.exports = {
                                 tag: {
                                     type: 'String array',
                                     description: '태그',
-                                    example: "['#vegan', '#geek', '#piercing']",
+                                    example: '["#vegan", "#geek", "#piercing"]',
                                 },
                                 age: {
                                     type: 'number',
@@ -38,7 +38,12 @@ module.exports = {
                                 image: {
                                     type: 'String array',
                                     description: '프로필 사진',
-                                    example: "['https://picsum.photos/200/300', 'https://picsum.photos/200/300', 'https://picsum.photos/200/300']",
+                                    example: '["https://picsum.photos/200/300", "https://picsum.photos/200/300", "https://picsum.photos/200/300"]',
+                                },
+                                region: {
+                                    type: 'string',
+                                    description: '지역',
+                                    example: '서울',
                                 },
                             },
                         },

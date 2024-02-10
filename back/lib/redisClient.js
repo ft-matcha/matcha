@@ -38,16 +38,44 @@ class redisClient {
                 }
                 else {
                     __classPrivateFieldSet(this, _redisClient_client, yield redis.createClient({
-                        host: __classPrivateFieldGet(this, _redisClient_host, "f"),
-                        port: __classPrivateFieldGet(this, _redisClient_port, "f"),
+                        url: process.env.REDIS_URL,
                     }), "f");
+                    console.log('Redis connected');
                     __classPrivateFieldSet(this, _redisClient_connected, true, "f");
+                    __classPrivateFieldGet(this, _redisClient_client, "f").connect();
                     return __classPrivateFieldGet(this, _redisClient_client, "f");
                 }
             }
             catch (error) {
                 console.error('Redis connection failed: ' + error.stack);
-                return error;
+                throw error;
+            }
+        });
+    }
+    set(key, value) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.getClient();
+                yield __classPrivateFieldGet(this, _redisClient_client, "f").set(key, value);
+                yield __classPrivateFieldGet(this, _redisClient_client, "f").disconnect();
+            }
+            catch (error) {
+                console.error('Redis set failed: ' + error.stack);
+                throw error;
+            }
+        });
+    }
+    get(key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.getClient();
+                const response = yield __classPrivateFieldGet(this, _redisClient_client, "f").get(key);
+                yield __classPrivateFieldGet(this, _redisClient_client, "f").disconnect();
+                return response;
+            }
+            catch (error) {
+                console.error('Redis get failed: ' + error.stack);
+                throw error;
             }
         });
     }

@@ -19,9 +19,14 @@ var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (
     if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
     return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 var _Crud_connection, _Crud_table;
+Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require('fs');
-const mysql = require('mysql2/promise');
+const promise_1 = __importDefault(require("mysql2/promise"));
+// const mysql = require('mysql2/promise');
 const dbConfig = {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -29,8 +34,19 @@ const dbConfig = {
     database: process.env.MYSQL_DATABASE,
     port: Number(process.env.MYSQL_PORT),
     connectionLimit: 10,
+    multipleStatements: true,
 };
-const pool = mysql.createPool(dbConfig);
+const model = {
+    gender: String,
+    preferences: String,
+    biography: String,
+    tag: JSON,
+    age: Number,
+    image: JSON,
+    viewList: JSON,
+    region: String,
+};
+const pool = promise_1.default.createPool(dbConfig);
 class Crud {
     constructor(table) {
         _Crud_connection.set(this, void 0);
@@ -42,13 +58,8 @@ class Crud {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.getConnection();
-                const sqlScript = yield fs.promises.readFile(__dirname + '/../migration/init.sql', 'utf-8');
-                const queries = sqlScript.split('--');
-                for (const query of queries) {
-                    if (query.trim()) {
-                        yield __classPrivateFieldGet(this, _Crud_connection, "f").query(query);
-                    }
-                }
+                const sql = yield fs.promises.readFile(__dirname + '/../migration/init.sql', 'utf-8');
+                yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql);
                 console.log('DB migration success');
                 __classPrivateFieldGet(this, _Crud_connection, "f").release();
             }
@@ -70,9 +81,9 @@ class Crud {
     }
     create(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.getConnection();
-            const sql = `INSERT INTO ${__classPrivateFieldGet(this, _Crud_table, "f")} SET ?`;
             try {
+                yield this.getConnection();
+                const sql = `INSERT INTO ${__classPrivateFieldGet(this, _Crud_table, "f")} SET ?`;
                 const response = yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql, data).JSON;
                 __classPrivateFieldGet(this, _Crud_connection, "f").release();
                 return response;
@@ -85,12 +96,32 @@ class Crud {
             }
         });
     }
-    readOne(email) {
+    readOne(data) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.getConnection();
-            const sql = `SELECT * FROM ${__classPrivateFieldGet(this, _Crud_table, "f")} WHERE ? LIMIT 1`;
             try {
-                const user = yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql, { email });
+                const { where, include } = data;
+                let sql = '';
+                if (include) {
+                    const table = Object.keys(include);
+                    const keys = Object.keys(model);
+                    let columns = '';
+                    keys.forEach((key) => {
+                        columns += `'${key}', ${table}.${key}`;
+                        if (keys.indexOf(key) !== keys.length - 1)
+                            columns += ', ';
+                    });
+                    sql = `
+                SELECT ${__classPrivateFieldGet(this, _Crud_table, "f")}.*, JSON_OBJECT(${columns}) AS ${table}
+                FROM ${__classPrivateFieldGet(this, _Crud_table, "f")}
+                LEFT JOIN ${table} ON ${__classPrivateFieldGet(this, _Crud_table, "f")}.id = ${table}.userId
+                WHERE ?;
+                `;
+                }
+                else {
+                    sql = `SELECT * FROM WHERE ?`;
+                }
+                yield this.getConnection();
+                const user = yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql, where);
                 __classPrivateFieldGet(this, _Crud_connection, "f").release();
                 return user[0][0];
             }
@@ -98,7 +129,7 @@ class Crud {
                 console.error('DB read failed: ' + error.stack);
                 if (__classPrivateFieldGet(this, _Crud_connection, "f"))
                     __classPrivateFieldGet(this, _Crud_connection, "f").release();
-                return error;
+                throw error;
             }
         });
     }

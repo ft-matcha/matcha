@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 const profileController = require('../controllers/profile-controllers');
 
-const createProfile = async (req: Request, res: Response) => {
+const create = async (req: Request, res: Response) => {
     try {
         const response = await profileController.createProfile(req.body);
         res.status(201).json(response);
@@ -11,7 +11,7 @@ const createProfile = async (req: Request, res: Response) => {
     }
 };
 
-const updateProfile = async (req: Request, res: Response) => {
+const update = async (req: Request, res: Response) => {
     try {
         const response = await profileController.updateProfile(req.body);
         res.status(201).json(response);
@@ -21,7 +21,7 @@ const updateProfile = async (req: Request, res: Response) => {
     }
 };
 
-exports.createProfile = createProfile;
-exports.updateProfile = updateProfile;
+exports.create = create;
+exports.update = update;
 
 export {};

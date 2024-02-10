@@ -15,15 +15,37 @@ class redisClient {
                 return this.#client;
             } else {
                 this.#client = await redis.createClient({
-                    host: this.#host,
-                    port: this.#port,
+                    url: process.env.REDIS_URL,
                 });
+                console.log('Redis connected');
                 this.#connected = true;
+                this.#client.connect();
                 return this.#client;
             }
         } catch (error: any) {
             console.error('Redis connection failed: ' + error.stack);
-            return error;
+            throw error;
+        }
+    }
+    async set(key: string, value: string) {
+        try {
+            await this.getClient();
+            await this.#client.set(key, value);
+            await this.#client.disconnect();
+        } catch (error: any) {
+            console.error('Redis set failed: ' + error.stack);
+            throw error;
+        }
+    }
+    async get(key: string) {
+        try {
+            await this.getClient();
+            const response = await this.#client.get(key);
+            await this.#client.disconnect();
+            return response;
+        } catch (error: any) {
+            console.error('Redis get failed: ' + error.stack);
+            throw error;
         }
     }
 }

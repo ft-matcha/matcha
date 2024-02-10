@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-const express = require('express');
 const jwt = require('../utils/jwt');
 
 const verifyJWT = async (req: any, res: Response, next: any) => {
@@ -14,6 +13,7 @@ const verifyJWT = async (req: any, res: Response, next: any) => {
             next();
         }
     }
+    res.status(401).json({ success: false, message: 'token does not exist' });
 };
 
 const refreshJWT = async (req: any, res: Response) => {
