@@ -27,7 +27,8 @@ a, dl, dt, dd, ol, ul, li, form, label, table{
 html {
   height: 100%;
   width: 100%;
-  overflow: hidden;
+  overflow-y: scroll;
+  overscroll-behavior: none;
 }
 body{
   line-height: 1;

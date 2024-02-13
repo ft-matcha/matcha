@@ -1,5 +1,5 @@
 import App from '@/App';
-import { ApiContainer, LoginApi } from '@/api/api';
+import { ApiContainer, LoginApi, RegisterApi } from '@/api/api';
 import axios from 'axios';
 import React from 'react';
 import ModalProvider from '@/provider/ModalProvider';
@@ -8,7 +8,8 @@ import { Api } from '@/api/api-types';
 
 const apiInstanceObject: Record<string, any> = {
   loginApi: (apiInstance: Api.ApiInstance, baseUrl: string) => new LoginApi(apiInstance, baseUrl),
-  // 'user': UserApi,
+  registerApi: (apiInstance: Api.ApiInstance, baseUrl: string) =>
+    new RegisterApi(apiInstance, baseUrl),
 };
 
 const apiContainer = new ApiContainer(axios, apiInstanceObject);

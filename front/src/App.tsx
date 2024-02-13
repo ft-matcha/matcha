@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
+import { ModalContext } from '@/provider/ModalProvider';
 
 const Container = styled.div`
   min-height: 100%;
@@ -13,21 +14,8 @@ const Container = styled.div`
 `;
 
 function App() {
-  useEffect(() => {
-    const handleScroll = (e: any) => {
-      e.preventDefault();
-      window.scrollTo(0, window.scrollY + e.deltaY);
-      if (e.deltaX > 20) {
-        console.log('will be next page');
-      } else if (e.deltaX < -20) {
-        console.log('will be previous page');
-      }
-    };
-    window.addEventListener('wheel', handleScroll);
-    return () => {
-      window.removeEventListener('wheel', handleScroll);
-    };
-  }, []);
+  const { modalProp } = React.useContext(ModalContext);
+
   return (
     <>
       <Container>

@@ -1,5 +1,6 @@
-import { ModalProps } from '@/types';
-import { useEffect } from 'react';
+import { ModalContext } from '@/provider/ModalProvider';
+import { ModalBodyProps, ModalProps } from '@/types';
+import { useContext, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 const ModalWrapper = styled.div`
@@ -19,7 +20,7 @@ const ModalContainer = styled.div<ModalProps>`
   min-height: 200px;
   border: 1px solid;
   width: ${(props) => (props.width ? props.width : 'fit-content')};
-  z-index: 100;
+  z-index: 10000;
   @media screen and (max-width: 768px) {
     max-width: 400px;
   }
@@ -46,31 +47,35 @@ const ModalOverlay = styled.div`
   background-color: ${({ theme }) => theme.backgroundOpacity};
 `;
 
-export const ModalBody = styled.div`
+export const ModalBody = styled.div<ModalBodyProps>`
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   width: 100%;
-  z-index: 100;
+  z-index: 50;
+  overflow-y: scroll;
+  height: 100%;
+  max-height: 150px;
 `;
 
 const Modal: React.FC<ModalProps> = (props) => {
-  const keyPress = (e: KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      props.onToggle && props.onToggle();
-    }
-  };
+  const ref = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    const html = document.documentElement;
-    html.style.overflow = 'hidden';
+    const keyPress = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        props.onToggle && props.onToggle();
+      }
+    };
     window.addEventListener('keydown', keyPress);
     return () => {
-      html.style.overflow = 'auto';
       window.removeEventListener('keydown', keyPress);
     };
   }, []);
+
   return (
-    <ModalWrapper>
+    <ModalWrapper ref={ref}>
       <ModalOverlay />
       <ModalContainer {...props}>{props.children}</ModalContainer>
     </ModalWrapper>

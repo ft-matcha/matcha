@@ -13,14 +13,14 @@ export default function Login() {
 
   return (
     <Form
-      onSubmit={(e) => {
+      onSubmit={async (e) => {
         e.preventDefault();
         const data = new FormData(e.currentTarget);
         const obj: Record<string, FormDataEntryValue> = {};
         for (let [key, value] of data.entries()) {
           obj[key] = value;
         }
-        console.log(api.call('login', obj));
+        console.log(await api.call('get', 'login', obj, 'https://randomuser.me/api'));
       }}
     >
       <div>

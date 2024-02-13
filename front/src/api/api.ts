@@ -3,15 +3,18 @@ import { responsePipe } from '@/api/apiWrapper';
 
 export class ApiCall {
   private readonly apiInstance: Api.ApiInstance;
-  constructor(apiInstance: Api.ApiInstance) {
+  protected readonly baseUrl: string;
+
+  constructor(apiInstance: Api.ApiInstance, url: string) {
     this.apiInstance = apiInstance;
+    this.baseUrl = url;
   }
 
   getInstance() {
     return this.apiInstance;
   }
 
-  callApi(type: any, url: string, params: any) {
+  callApi(type: string, url: string, params: any) {
     switch (type) {
       case 'post':
         return this.getInstance().post(url, params);
@@ -20,19 +23,7 @@ export class ApiCall {
     }
   }
 
-  fetchApi(type: any, params: any, url?: string): any {
-    throw new Error('if you want to use fetchApi implements this method');
-  }
-}
-
-export class LoginApi extends ApiCall {
-  private readonly baseUrl: string;
-  constructor(apiInstance: Api.ApiInstance, url: string) {
-    super(apiInstance);
-    this.baseUrl = url;
-  }
-
-  fetchApi(type: string, params: { id: string; password: string }, url?: string) {
+  fetchApi(type: string, params: any, url?: string) {
     if (url) {
       return this.callApi(type, url, params);
     }
@@ -40,17 +31,29 @@ export class LoginApi extends ApiCall {
   }
 }
 
+export class LoginApi extends ApiCall {
+  constructor(apiInstance: Api.ApiInstance, url: string) {
+    super(apiInstance, url);
+  }
+}
+
+export class RegisterApi extends ApiCall {
+  constructor(apiInstance: Api.ApiInstance, url: string) {
+    super(apiInstance, url);
+  }
+}
+
 export class ApiContainer {
   [key: string]: ApiCall | Function | string | Record<string, ApiCall>;
   private userToken = '';
   private apiContainer: Record<string, ApiCall> = {};
+
   constructor(apiInstance: Api.ApiInstance, api: Record<string, Function>) {
-    // this.loginApi = new LoginApi(apiInstance, 'https://localhost:3000');
     Object.entries(api).forEach(([key, value]) => {
       if (typeof value === 'function') {
         const temp = (value as (apiInstance: Api.ApiInstance, url: string) => ApiCall)(
           apiInstance,
-          'https://randomuser.me/api',
+          `http://localhost:3000/api/v0/${key.replace('Api', '')}`,
         );
         if (temp instanceof ApiCall) {
           this[key] = temp;
@@ -60,21 +63,31 @@ export class ApiContainer {
     });
   }
 
-  run(target: string, dataParams: any, method: string, url?: string) {
-    if (url) {
-      return (this.apiContainer[target + 'Api'] as ApiCall).fetchApi(method, dataParams, url);
-    } else {
-      return (this.apiContainer[target + 'Api'] as ApiCall).fetchApi(method, dataParams);
-    }
+  setBearerTokenInHeader(dataParams: Record<string, any>) {
+    return {
+      headers: {
+        Authorization: `bearer ${this.userToken}`,
+      },
+      body: {
+        ...dataParams,
+      },
+    };
   }
 
-  async call(target: string, dataParams: any) {
-    const result = this.run(target, dataParams, 'get');
+  run(method: string, target: string, dataParams: any, url?: string) {
+    return (this.apiContainer[target + 'Api'] as ApiCall).fetchApi(method, dataParams, url);
+  }
+
+  setToken(token: string) {
+    this.userToken = token;
+  }
+
+  async call(type: string, target: string, dataParams: any, url?: string) {
+    const result = this.run(type, target, this.setBearerTokenInHeader(dataParams), url);
     if (result instanceof Promise) {
       const response = await responsePipe(result as Promise<Api.BackendResponse>);
-      if (target + 'Api' === 'loginApi' && response.token) {
-        console.log(response);
-        this.userToken = response.token;
+      if (target === 'login' && response.token) {
+        this.setToken(response.token);
       }
       return response;
     }

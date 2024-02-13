@@ -53,11 +53,38 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
         }
       }
     };
+
     window.addEventListener('keydown', onKeyDown);
     return () => {
       window.removeEventListener('keydown', onKeyDown);
     };
   }, []);
+
+  useEffect(() => {
+    if (!modalProp.toggle) {
+      return;
+    }
+    const onScroll = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const html = document.querySelector('html') as HTMLElement;
+      html.style.overflowY = 'hidden';
+    };
+
+    const onRemoveScroll = () => {
+      setTimeout(() => {
+        const html = document.querySelector('html') as HTMLElement;
+        html.style.overflowY = 'auto';
+      }, 1000);
+      window.removeEventListener('scroll', onScroll);
+    };
+    window.addEventListener('scroll', onScroll);
+    return () => {
+      onRemoveScroll();
+    };
+  }, [modalProp.toggle]); 
+
+ 
 
   return (
     <>

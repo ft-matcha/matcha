@@ -12,6 +12,11 @@ export interface ModalProps {
   height?: string;
   children: React.ReactNode;
   onToggle?: (props?: any) => void;
+  onScroll?: (e: WheelEvent) => void;
+}
+
+export interface ModalBodyProps {
+  onScroll?: (e: WheelEvent) => void;
 }
 
 export interface CardProps {
