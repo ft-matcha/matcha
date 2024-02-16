@@ -10,6 +10,7 @@ interface InputProps {
   required?: boolean;
   type?: string;
   name?: string;
+  notFocus?: boolean;
   children?: React.ReactNode;
 }
 
@@ -19,11 +20,14 @@ const InputContainer = styled.input<InputProps>`
   background: transparent;
 `;
 
-const Input: React.FC<InputProps> = ({ onChange, ...rest }) => {
+const Input: React.FC<InputProps> = ({ onChange, notFocus, ...rest }) => {
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    ref.current ? ref.current.focus() : null;
+    if (notFocus) {
+      return;
+    }
+    ref.current && ref.current.focus();
   }, []);
 
   return <InputContainer onChange={onChange} ref={ref} {...rest} />;
