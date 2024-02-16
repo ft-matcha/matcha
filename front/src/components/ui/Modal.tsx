@@ -20,6 +20,7 @@ const ModalContainer = styled.div<ModalProps>`
   min-height: 200px;
   border: 1px solid;
   width: ${(props) => (props.width ? props.width : 'fit-content')};
+  height: ${(props) => (props.height ? props.height : 'fit-content')};
   z-index: 10000;
   @media screen and (max-width: 768px) {
     max-width: 400px;
@@ -48,6 +49,7 @@ const ModalOverlay = styled.div`
 `;
 
 export const ModalBody = styled.div<ModalBodyProps>`
+  margin-top: 40px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -55,8 +57,8 @@ export const ModalBody = styled.div<ModalBodyProps>`
   width: 100%;
   z-index: 50;
   overflow-y: scroll;
-  height: 100%;
-  max-height: 150px;
+  height: ${(props) => (props.height ? props.height : '100%')};
+  max-height: 480px;
 `;
 
 const Modal: React.FC<ModalProps> = (props) => {

@@ -6,13 +6,13 @@ export namespace Api {
 
   interface BackendResponse {
     ok?: boolean;
-    data?: Record<string, string>;
+    data?: Record<string, any>;
   }
 
   interface LoginResponse {
-    // ok: boolean;
+    refreshToken: string;
     data: {
-      token?: string;
+      accessToken?: string;
       id?: string;
       name?: string;
       email?: string;

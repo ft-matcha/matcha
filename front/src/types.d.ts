@@ -17,6 +17,7 @@ export interface ModalProps {
 
 export interface ModalBodyProps {
   onScroll?: (e: WheelEvent) => void;
+  height?: string;
 }
 
 export interface CardProps {

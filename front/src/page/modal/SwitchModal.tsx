@@ -13,7 +13,7 @@ export const ModalChild: React.FC<ModalProviderProps> = ({ children, header, set
       <ModalHeader>
         <h2>{header}</h2>
       </ModalHeader>
-      <ModalBody>{children}</ModalBody>
+      <ModalBody> {children}</ModalBody>
     </Modal>
   );
 };

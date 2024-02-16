@@ -9,6 +9,7 @@ interface FormProps {
 
 const FormContainer = styled.form<FormProps>`
   width: ${({ width }) => (width ? width : '300px')};
+  height: ${({ height }) => (height ? height : '100%')};
 `;
 
 const Form: React.FC<FormProps> = ({ children, onSubmit, ...rest }) => {

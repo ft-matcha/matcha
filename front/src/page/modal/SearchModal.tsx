@@ -15,7 +15,7 @@ const SearchModal = () => {
       const { results } = (await api.call(
         'get',
         'register',
-        data,
+        { text: data },
         'https://randomuser.me/api',
       )) as any;
       setPrint(([...prev]: any) => {
@@ -71,13 +71,13 @@ const SearchModal = () => {
       >
         {/* {text} */}
         {print?.map((item: any, index: number) => (
-          <span key={item.id.value + index}>{item.name.first + item.name.last}</span>
-        ))}
-        {print?.map((item: any, index: number) => (
-          <span key={item.id.value + '100' + index}>{item.name.first + item.name.last}</span>
-        ))}
-        {print?.map((item: any, index: number) => (
-          <span key={item.id.value + '200' + index}>{item.name.first + item.name.last}</span>
+          <>
+            <span key={item.id.value + index}>{item.name.first + item.name.last}</span>
+            <span key={item.id.value + '100' + index}>{item.name.first + item.name.last}</span>
+            <span key={item.id.value + '200' + index}>{item.name.first + item.name.last}</span>
+            <span key={item.id.value + '300' + index}>{item.name.first + item.name.last}</span>
+            <span key={item.id.value + '400' + index}>{item.name.first + item.name.last}</span>
+          </>
         ))}
       </ModalBody>
     </Modal>

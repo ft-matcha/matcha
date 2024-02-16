@@ -1,5 +1,6 @@
 import type { Api } from '@/api/api-types';
 import { responsePipe } from '@/api/apiWrapper';
+import { getToken, setToken } from '@/utils/token';
 
 export class ApiCall {
   private readonly apiInstance: Api.ApiInstance;
@@ -15,6 +16,7 @@ export class ApiCall {
   }
 
   callApi(type: string, url: string, params: any) {
+    console.log(params);
     switch (type) {
       case 'post':
         return this.getInstance().post(url, params);
@@ -43,20 +45,22 @@ export class RegisterApi extends ApiCall {
   }
 }
 
+interface ApiContainerProps {
+  apiInstance: Api.ApiInstance;
+  apiInstanceObject: Record<string, Function>;
+}
 export class ApiContainer {
-  [key: string]: ApiCall | Function | string | Record<string, ApiCall>;
-  private userToken = '';
+  [key: string]: ApiCall | Function | string | Record<string, ApiCall> | boolean;
   private apiContainer: Record<string, ApiCall> = {};
 
-  constructor(apiInstance: Api.ApiInstance, api: Record<string, Function>) {
-    Object.entries(api).forEach(([key, value]) => {
+  constructor({ apiInstance, apiInstanceObject }: ApiContainerProps) {
+    Object.entries(apiInstanceObject).forEach(([key, value]) => {
       if (typeof value === 'function') {
         const temp = (value as (apiInstance: Api.ApiInstance, url: string) => ApiCall)(
           apiInstance,
           `http://localhost:3000/api/v0/${key.replace('Api', '')}`,
         );
         if (temp instanceof ApiCall) {
-          this[key] = temp;
           (this.apiContainer as Record<string, ApiCall>)[key] = temp as ApiCall;
         }
       }
@@ -64,9 +68,11 @@ export class ApiContainer {
   }
 
   setBearerTokenInHeader(dataParams: Record<string, any>) {
+    const token = getToken('accessToken');
     return {
+      // withCredentials: true,
       headers: {
-        Authorization: `bearer ${this.userToken}`,
+        Authorization: token && `bearer ${token}`,
       },
       body: {
         ...dataParams,
@@ -78,18 +84,18 @@ export class ApiContainer {
     return (this.apiContainer[target + 'Api'] as ApiCall).fetchApi(method, dataParams, url);
   }
 
-  setToken(token: string) {
-    this.userToken = token;
-  }
-
   async call(type: string, target: string, dataParams: any, url?: string) {
-    const result = this.run(type, target, this.setBearerTokenInHeader(dataParams), url);
-    if (result instanceof Promise) {
-      const response = await responsePipe(result as Promise<Api.BackendResponse>);
-      if (target === 'login' && response.token) {
-        this.setToken(response.token);
+    try {
+      const result = this.run(type, target, this.setBearerTokenInHeader(dataParams), url);
+      if (result instanceof Promise) {
+        const response = await responsePipe(result as Promise<Api.BackendResponse>);
+        return response;
       }
-      return response;
+    } catch (e) {
+      console.log(e);
+      // if (target === 'login') {
+      //   return { success: false, error: { message: 'Login failed' } };
+      // }
     }
   }
 }
