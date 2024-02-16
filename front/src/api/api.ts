@@ -9,6 +9,7 @@ export class ApiCall {
   constructor(apiInstance: Api.ApiInstance, url: string) {
     this.apiInstance = apiInstance;
     this.baseUrl = url;
+    console.log(this.baseUrl);
   }
 
   getInstance() {
@@ -16,7 +17,6 @@ export class ApiCall {
   }
 
   callApi(type: string, url: string, params: any) {
-    console.log(params);
     switch (type) {
       case 'post':
         return this.getInstance().post(url, params);

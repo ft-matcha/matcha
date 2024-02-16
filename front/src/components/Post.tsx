@@ -21,7 +21,6 @@ const PostTabContainer = styled.div`
   display: flex;
   position: sticky;
   top: 0;
-  z-index: 1000;
   height: 80px;
   line-height: 40px;
   flex-direction: row;
@@ -83,11 +82,11 @@ const Post = () => {
     <>
       <PostContainer>
         <PostTabContainer>
-          <PostTab onClick={() => setTab(false)}>first</PostTab>
-          <PostTab onClick={() => setTab(true)}>second</PostTab>
+          <PostTab onClick={() => setTab(false)}>user</PostTab>
+          <PostTab onClick={() => setTab(true)}>other</PostTab>
         </PostTabContainer>
         <PostBody>
-          <CardList data={tab ? test : test2} />
+          <CardList data={!tab ? test : test2} />
         </PostBody>
       </PostContainer>
     </>
