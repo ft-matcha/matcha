@@ -4,6 +4,9 @@ CREATE TABLE IF NOT EXISTS `user` (
     `email` varchar(255) NOT NULL,
     `firstName` varchar(255) NOT NULL,
     `lastName` varchar(255) NOT NULL,
+    `phone` varchar(255) NOT NULL,
+    `address` varchar(255) NOT NULL,
+    `status` varchar(255) NOT NULL,
 
     UNIQUE INDEX `user_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -12,14 +15,14 @@ CREATE TABLE IF NOT EXISTS `user` (
 CREATE TABLE IF NOT EXISTS `profile` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `gender` varchar(255) NOT NULL,
-    `preferences` varchar(255) NOT NULL,
+    `preferences` JSON NOT NULL,
     `biography` varchar(255) NOT NULL,
     `tag` JSON NOT NULL,
     `age` INTEGER NOT NULL,
     `image` JSON NOT NULL,
     `viewList` JSON NOT NULL,
-    `userId` INTEGER NOT NULL,
     `region` varchar(255) NOT NULL,
+    `userId` INTEGER NOT NULL,
     
     UNIQUE INDEX `profile_userId_key`(`userId`),
     PRIMARY KEY (`id`)

@@ -8,25 +8,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-var _Crud_connection, _Crud_table;
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs = require('fs');
-const promise_1 = __importDefault(require("mysql2/promise"));
-// const mysql = require('mysql2/promise');
+const mysql = require('mysql2/promise');
 const dbConfig = {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -46,22 +30,20 @@ const model = {
     viewList: JSON,
     region: String,
 };
-const pool = promise_1.default.createPool(dbConfig);
+const pool = mysql.createPool(dbConfig);
 class Crud {
     constructor(table) {
-        _Crud_connection.set(this, void 0);
-        _Crud_table.set(this, void 0);
-        __classPrivateFieldSet(this, _Crud_connection, null, "f");
-        __classPrivateFieldSet(this, _Crud_table, table, "f");
+        this.connection = null;
+        this.table = table;
     }
     migrate() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.getConnection();
                 const sql = yield fs.promises.readFile(__dirname + '/../migration/init.sql', 'utf-8');
-                yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql);
+                yield this.connection.query(sql);
                 console.log('DB migration success');
-                __classPrivateFieldGet(this, _Crud_connection, "f").release();
+                this.connection.release();
             }
             catch (error) {
                 console.error('DB migration failed: ' + error.stack);
@@ -71,8 +53,8 @@ class Crud {
     getConnection() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                __classPrivateFieldSet(this, _Crud_connection, yield pool.getConnection(), "f");
-                return __classPrivateFieldGet(this, _Crud_connection, "f");
+                this.connection = yield pool.getConnection();
+                return this.connection;
             }
             catch (error) {
                 throw error;
@@ -83,16 +65,16 @@ class Crud {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.getConnection();
-                const sql = `INSERT INTO ${__classPrivateFieldGet(this, _Crud_table, "f")} SET ?`;
-                const response = yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql, data).JSON;
-                __classPrivateFieldGet(this, _Crud_connection, "f").release();
+                const sql = `INSERT INTO ${this.table} SET ?`;
+                const response = yield this.connection.query(sql, data).JSON;
+                this.connection.release();
                 return response;
             }
             catch (error) {
                 console.error('DB create failed: ' + error.stack);
-                if (__classPrivateFieldGet(this, _Crud_connection, "f"))
-                    __classPrivateFieldGet(this, _Crud_connection, "f").release();
-                return error;
+                if (this.connection)
+                    this.connection.release();
+                throw error;
             }
         });
     }
@@ -111,24 +93,24 @@ class Crud {
                             columns += ', ';
                     });
                     sql = `
-                SELECT ${__classPrivateFieldGet(this, _Crud_table, "f")}.*, JSON_OBJECT(${columns}) AS ${table}
-                FROM ${__classPrivateFieldGet(this, _Crud_table, "f")}
-                LEFT JOIN ${table} ON ${__classPrivateFieldGet(this, _Crud_table, "f")}.id = ${table}.userId
+                SELECT ${this.table}.*, JSON_OBJECT(${columns}) AS ${table}
+                FROM ${this.table}
+                LEFT JOIN ${table} ON ${this.table}.id = ${table}.userId
                 WHERE ?;
                 `;
                 }
                 else {
-                    sql = `SELECT * FROM WHERE ?`;
+                    sql = `SELECT * FROM ${this.table} WHERE ?`;
                 }
                 yield this.getConnection();
-                const user = yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql, where);
-                __classPrivateFieldGet(this, _Crud_connection, "f").release();
+                const user = yield this.connection.query(sql, where);
+                this.connection.release();
                 return user[0][0];
             }
             catch (error) {
                 console.error('DB read failed: ' + error.stack);
-                if (__classPrivateFieldGet(this, _Crud_connection, "f"))
-                    __classPrivateFieldGet(this, _Crud_connection, "f").release();
+                if (this.connection)
+                    this.connection.release();
                 throw error;
             }
         });
@@ -136,16 +118,16 @@ class Crud {
     read(data) {
         return __awaiter(this, void 0, void 0, function* () {
             yield this.getConnection();
-            const sql = `SELECT * FROM ${__classPrivateFieldGet(this, _Crud_table, "f")}`;
+            const sql = `SELECT * FROM ${this.table}`;
             try {
-                const users = yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql, data);
-                __classPrivateFieldGet(this, _Crud_connection, "f").release();
+                const users = yield this.connection.query(sql, data);
+                this.connection.release();
                 return users[0];
             }
             catch (error) {
                 console.error('DB read failed: ' + error.stack);
-                if (__classPrivateFieldGet(this, _Crud_connection, "f"))
-                    __classPrivateFieldGet(this, _Crud_connection, "f").release();
+                if (this.connection)
+                    this.connection.release();
                 return error;
             }
         });
@@ -155,15 +137,15 @@ class Crud {
             try {
                 const { data, where } = body;
                 yield this.getConnection();
-                const sql = `UPDATE ${__classPrivateFieldGet(this, _Crud_table, "f")} SET ? WHERE ?`;
-                const response = yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql, data, where);
-                __classPrivateFieldGet(this, _Crud_connection, "f").release();
+                const sql = `UPDATE ${this.table} SET ? WHERE ?`;
+                const response = yield this.connection.query(sql, data, where);
+                this.connection.release();
                 return response;
             }
             catch (error) {
                 console.error('DB update failed: ' + error.stack);
-                if (__classPrivateFieldGet(this, _Crud_connection, "f"))
-                    __classPrivateFieldGet(this, _Crud_connection, "f").release();
+                if (this.connection)
+                    this.connection.release();
                 return error;
             }
         });
@@ -172,17 +154,16 @@ class Crud {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.getConnection();
-                const sql = `DELETE FROM ${__classPrivateFieldGet(this, _Crud_table, "f")} WHERE email = ${email}`;
-                const response = yield __classPrivateFieldGet(this, _Crud_connection, "f").query(sql);
+                const sql = `DELETE FROM ${this.table} WHERE email = ${email}`;
+                const response = yield this.connection.query(sql);
             }
             catch (error) {
                 console.error('DB delete failed: ' + error.stack);
-                if (__classPrivateFieldGet(this, _Crud_connection, "f"))
-                    __classPrivateFieldGet(this, _Crud_connection, "f").release();
+                if (this.connection)
+                    this.connection.release();
                 return error;
             }
         });
     }
 }
-_Crud_connection = new WeakMap(), _Crud_table = new WeakMap();
 module.exports = Crud;

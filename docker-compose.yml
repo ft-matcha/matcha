@@ -24,6 +24,7 @@ services:
             - '8000:8000'
         volumes:
             - back:/app
+            - ./certs:/app/certs
         env_file:
             - .env
         depends_on:
@@ -50,25 +51,14 @@ services:
         restart: always
         networks:
             - matcha_network
-        # expose:
         ports:
             - '9200:9200'
         environment:
             - discovery.type=single-node
-        env_file:
-            - .env
-
-    kibana:
-        image: kibana
-        build: ./kibana
-        container_name: kibana
-        restart: always
-        networks:
-            - matcha_network
-        ports:
-            - '5601:5601'
-        env_file:
-            - .env
+        volumes:
+            - type: bind
+              source: ./elasticsearch/config/
+              target: /config
 
 networks:
     matcha_network:
@@ -82,3 +72,4 @@ volumes:
             type: none
             o: bind
             device: ./back
+            read_only: true

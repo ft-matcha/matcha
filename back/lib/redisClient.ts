@@ -31,7 +31,6 @@ class redisClient {
         try {
             await this.getClient();
             await this.#client.set(key, value);
-            await this.#client.disconnect();
         } catch (error: any) {
             console.error('Redis set failed: ' + error.stack);
             throw error;

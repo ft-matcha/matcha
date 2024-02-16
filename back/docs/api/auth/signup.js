@@ -30,6 +30,16 @@ module.exports = {
                                     description: 'password',
                                     example: '1523',
                                 },
+                                phone: {
+                                    type: 'string',
+                                    description: 'phone',
+                                    example: '010-1234-5678',
+                                },
+                                address: {
+                                    type: 'string',
+                                    description: 'address',
+                                    example: '서울시 강남구',
+                                },
                             },
                         },
                     },
@@ -48,12 +58,9 @@ module.exports = {
                                         description: '성공여부',
                                         example: true,
                                     },
-                                    error: {
+                                    body: {
                                         type: 'object',
-                                        description: '에러',
-                                        example: {
-                                            message: '에러메시지',
-                                        },
+                                        description: '회원정보',
                                     },
                                 },
                             },

@@ -18,19 +18,26 @@ const elastic = require('../lib/elastic');
 const profileController = require('./profile-controllers');
 const createUser = (body) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { firstName, lastName, email, password } = body;
+        const { firstName, lastName, email, password, phone, address } = body;
         const cryptoPass = crypto.createHash('sha256', process.env.secret).update(password).digest('hex');
         const user = yield User.create({
             email,
             firstName,
             lastName,
             password: cryptoPass,
+            phone,
+            address,
+            status: 'NOT_VERIFIED',
         });
-        const elasticData = yield elastic.index('user', {
+        const elasticData = yield elastic.create(email, {
             email,
             firstName,
             lastName,
+            phone,
+            address,
         });
+        user.accessToken = jwt.sign(user);
+        user.refreshToken = jwt.refresh();
         return user;
     }
     catch (error) {
@@ -38,12 +45,13 @@ const createUser = (body) => __awaiter(void 0, void 0, void 0, function* () {
         throw error;
     }
 });
-const getUser = (email) => __awaiter(void 0, void 0, void 0, function* () {
+const getUser = (email, include) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield User.readOne({
             where: { email },
-            include: { profile: true },
+            include: include ? include : undefined,
         });
+        console.log(user);
         return user;
     }
     catch (error) {
@@ -87,14 +95,10 @@ const login = (body) => __awaiter(void 0, void 0, void 0, function* () {
         }
         else if (user.password === cryptoPass) {
             console.log('Login success');
-            const accessToken = jwt.sign(user);
-            const refreshToken = jwt.refresh();
-            yield redis.set(email, refreshToken);
-            return {
-                success: true,
-                accessToken,
-                refreshToken,
-            };
+            user.accessToken = jwt.sign(user);
+            user.refreshToken = jwt.refresh();
+            yield redis.set(email, user.refreshToken);
+            return user;
         }
         else {
             console.log('Incorrect password');
@@ -108,19 +112,8 @@ const login = (body) => __awaiter(void 0, void 0, void 0, function* () {
         throw error;
     }
 });
-const getRefresh = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    // const data = await prisma.user.findUnique({
-    //     where: { uid: userId },
-    // });
-    // if (!data) {
-    //     console.log('User not found');
-    //     return undefined;
-    // }
-    // return data.refresh;
-});
 exports.createUser = createUser;
 exports.getUser = getUser;
 exports.updateUser = updateUser;
 exports.deleteUser = deleteUser;
 exports.login = login;
-exports.getRefresh = getRefresh;

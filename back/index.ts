@@ -15,6 +15,8 @@ const options = {
 // dotenv.config({ path: path.join(__dirname, '../.env') });
 const Crud = require('./lib/crud');
 new Crud().migrate();
+const elastic = require('./lib/elastic');
+elastic.createIndex('matcha');
 const routers = require('./routers/index');
 app.use(bodyParser.json());
 app.use('/api/v1', routers);

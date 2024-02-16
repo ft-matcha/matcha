@@ -57,7 +57,6 @@ class redisClient {
             try {
                 yield this.getClient();
                 yield __classPrivateFieldGet(this, _redisClient_client, "f").set(key, value);
-                yield __classPrivateFieldGet(this, _redisClient_client, "f").disconnect();
             }
             catch (error) {
                 console.error('Redis set failed: ' + error.stack);

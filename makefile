@@ -12,15 +12,12 @@ down :
 push :
 	docker compose push
 
-fargate :
-	docker compose -f docker-compose-fargate.yml build
-	docker compose -f docker-compose-fargate.yml push
-	
 db :
 	rm -rf db/*
 
-fclean :
+fclean : down
 	docker compose down --rmi all
+	# docker volume rm $(docker volume ls -q) -f
 	docker system prune --volumes --force --all
 
 re :

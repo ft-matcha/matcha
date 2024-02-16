@@ -8,47 +8,38 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __classPrivateFieldSet = (this && this.__classPrivateFieldSet) || function (receiver, state, value, kind, f) {
-    if (kind === "m") throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
-};
-var __classPrivateFieldGet = (this && this.__classPrivateFieldGet) || function (receiver, state, kind, f) {
-    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-};
-var _elastic_client, _elastic_isConnected, _elastic_index, _elastic_isIndexCreated;
+Object.defineProperty(exports, "__esModule", { value: true });
 const { Client } = require('elastic');
+const fs = require('fs');
 const esconfig = {
     node: process.env.ES_NODE,
+    auth: {
+        username: 'elastic',
+        password: '1523',
+    },
+    // tls: {
+    //     ca: fs.readFileSync('/app/certs/http_ca.crt'),
+    //     rejectUnauthorized: false,
+    // },
+    // openssl s_client -connect elasticsearch:9200 -servername elasticsearch -showcerts -quiet | openssl x509 -fingerprint -sha256 -noout -in /dev/stdin
 };
 class elastic {
     constructor() {
-        _elastic_client.set(this, void 0);
-        _elastic_isConnected.set(this, void 0);
-        _elastic_index.set(this, void 0);
-        _elastic_isIndexCreated.set(this, void 0);
-        __classPrivateFieldSet(this, _elastic_client, null, "f");
-        __classPrivateFieldSet(this, _elastic_isConnected, false, "f");
-        __classPrivateFieldSet(this, _elastic_index, 'matcha', "f");
-        __classPrivateFieldSet(this, _elastic_isIndexCreated, false, "f");
+        this.client = null;
+        this.isConnected = false;
+        this.index = 'matcha';
     }
     getClient() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (__classPrivateFieldGet(this, _elastic_isConnected, "f")) {
-                    return __classPrivateFieldGet(this, _elastic_client, "f");
+                if (this.isConnected) {
+                    return this.client;
                 }
                 else {
-                    __classPrivateFieldSet(this, _elastic_client, yield new Client(esconfig), "f");
-                    if (__classPrivateFieldGet(this, _elastic_isIndexCreated, "f") == false) {
-                        yield this.createIndex(__classPrivateFieldGet(this, _elastic_index, "f"));
-                    }
-                    __classPrivateFieldSet(this, _elastic_isConnected, true, "f");
-                    console.log('Elasticsearch connected');
-                    return __classPrivateFieldGet(this, _elastic_client, "f");
+                    console.log(esconfig);
+                    this.client = yield new Client(esconfig);
+                    this.isConnected = true;
+                    return this.client;
                 }
             }
             catch (error) {
@@ -60,22 +51,29 @@ class elastic {
     createIndex(index) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield __classPrivateFieldGet(this, _elastic_client, "f").indices.create({
+                yield this.getClient();
+                const exists = yield this.client.indices.exists({ index });
+                if (exists) {
+                    console.error('Index already exists');
+                    return;
+                }
+                const response = yield this.client.indices.create({
                     index,
                 });
                 return response;
             }
             catch (error) {
-                throw error;
+                console.error('Elasticsearch createIndex failed: ' + error.stack);
+                return error;
             }
         });
     }
-    index(id, document) {
+    create(id, document) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 yield this.getClient();
-                const response = yield __classPrivateFieldGet(this, _elastic_client, "f").index({
-                    index: __classPrivateFieldGet(this, _elastic_index, "f"),
+                const response = yield this.client.index({
+                    index: this.index,
                     id: id,
                     document: document,
                 });
@@ -86,6 +84,38 @@ class elastic {
             }
         });
     }
+    get(id) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.getClient();
+                const response = yield this.client.get({
+                    index: this.index,
+                    id: id,
+                });
+                return response;
+            }
+            catch (error) {
+                throw error;
+            }
+        });
+    }
+    search(key, query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                yield this.getClient();
+                var match = {};
+                match[key] = query;
+                const response = yield this.client.search({
+                    query: {
+                        match,
+                    },
+                });
+                return response;
+            }
+            catch (error) {
+                throw error;
+            }
+        });
+    }
 }
-_elastic_client = new WeakMap(), _elastic_isConnected = new WeakMap(), _elastic_index = new WeakMap(), _elastic_isIndexCreated = new WeakMap();
 module.exports = new elastic();

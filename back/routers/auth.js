@@ -8,6 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __rest = (this && this.__rest) || function (s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const jwt = require('../utils/jwt');
 const express = require('express');
@@ -20,11 +31,15 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res.status(401).json(response);
         }
         else {
-            res.status(201).json(response);
+            const { password, refreshToken } = response, userWithoutPassword = __rest(response, ["password", "refreshToken"]);
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
+            res.status(201).json({
+                success: true,
+                data: userWithoutPassword,
+            });
         }
     }
     catch (error) {
-        console.error('login failed: ' + error.stack);
         res.status(500).json({ success: false, error: { messgae: 'login failed : server error' } });
     }
 });
@@ -32,9 +47,15 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const user = yield userController.getUser(req.body.email);
         if (!user) {
-            console.log('signUp success');
             const response = yield userController.createUser(req.body);
-            res.status(201).json(response);
+            console.log('signUp success');
+            const user = yield userController.getUser(req.body.email);
+            const { password, refreshToken } = user, userWithoutPassword = __rest(user, ["password", "refreshToken"]);
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
+            res.status(201).json({
+                success: true,
+                data: userWithoutPassword,
+            });
         }
         else {
             console.log('User already exists');
