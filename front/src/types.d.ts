@@ -4,6 +4,7 @@ export interface InputContainerProps {
   name: string;
   placeholder?: string;
   required?: boolean;
+  notFocus?: boolean;
   children?: React.ReactNode;
 }
 
