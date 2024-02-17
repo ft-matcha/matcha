@@ -33,7 +33,7 @@ class Crud {
     async migrate() {
         try {
             await this.getConnection();
-            const sql = await fs.promises.readFile(__dirname + '/../migration/init.sql', 'utf-8');
+            const sql = await fs.promises.readFile(__dirname + '/../sql/init.sql', 'utf-8');
             await this.connection.query(sql);
             console.log('DB migration success');
             this.connection.release();
@@ -67,27 +67,10 @@ class Crud {
 
     async readOne(data: any) {
         try {
-            const { where, include } = data;
-            let sql = '';
-            if (include) {
-                const table = Object.keys(include);
-                const keys = Object.keys(model);
-                let columns = '';
-                keys.forEach((key) => {
-                    columns += `'${key}', ${table}.${key}`;
-                    if (keys.indexOf(key) !== keys.length - 1) columns += ', ';
-                });
-                sql = `
-                SELECT ${this.table}.*, JSON_OBJECT(${columns}) AS ${table}
-                FROM ${this.table}
-                LEFT JOIN ${table} ON ${this.table}.id = ${table}.userId
-                WHERE ?;
-                `;
-            } else {
-                sql = `SELECT * FROM ${this.table} WHERE ?`;
-            }
+            const { where } = data;
+            const sql = fs.readFileSync(__dirname + '/../sql/readone.sql', 'utf-8');
             await this.getConnection();
-            const user = await this.connection.query(sql, where);
+            const user = await this.connection.query(sql, [this.table, where]);
             this.connection.release();
             return user[0][0];
         } catch (error: any) {
@@ -96,11 +79,11 @@ class Crud {
             throw error;
         }
     }
-    async read(data: any) {
+    async read() {
         await this.getConnection();
         const sql = `SELECT * FROM ${this.table}`;
         try {
-            const users = await this.connection.query(sql, data);
+            const users = await this.connection.query(sql);
             this.connection.release();
             return users[0];
         } catch (error: any) {
@@ -113,8 +96,8 @@ class Crud {
         try {
             const { data, where } = body;
             await this.getConnection();
-            const sql = `UPDATE ${this.table} SET ? WHERE ?`;
-            const response = await this.connection.query(sql, data, where);
+            const sql = `UPDATE ?? SET ? WHERE ?`;
+            const response = await this.connection.query(sql, [this.table, data, where]);
             this.connection.release();
             return response;
         } catch (error: any) {
@@ -126,8 +109,8 @@ class Crud {
     async delete(email: string) {
         try {
             await this.getConnection();
-            const sql = `DELETE FROM ${this.table} WHERE email = ${email}`;
-            const response = await this.connection.query(sql);
+            const sql = `DELETE FROM ?? WHERE ?`;
+            const response = await this.connection.query(sql, [this.table, { email: email }]);
         } catch (error: any) {
             console.error('DB delete failed: ' + error.stack);
             if (this.connection) this.connection.release();

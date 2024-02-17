@@ -9,11 +9,13 @@ const login = async (req: any, res: any) => {
         if (response.success === false) {
             res.status(401).json(response);
         } else {
-            const { password, refreshToken, ...userWithoutPassword } = response;
+            const { accessToken, refreshToken } = response;
             res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
             res.status(201).json({
                 success: true,
-                data: userWithoutPassword,
+                data: {
+                    accessToken,
+                },
             });
         }
     } catch (error: any) {
@@ -27,12 +29,11 @@ const signup = async (req: any, res: any) => {
         if (!user) {
             const response = await userController.createUser(req.body);
             console.log('signUp success');
-            const user = await userController.getUser(req.body.email);
-            const { password, refreshToken, ...userWithoutPassword } = user;
+            const { refreshToken, accessToken } = response;
             res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
             res.status(201).json({
                 success: true,
-                data: userWithoutPassword,
+                data: { accessToken },
             });
         } else {
             console.log('User already exists');

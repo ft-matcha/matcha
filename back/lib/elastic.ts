@@ -3,10 +3,10 @@ const fs = require('fs');
 
 const esconfig = {
     node: process.env.ES_NODE,
-    auth: {
-        username: 'elastic',
-        password: '1523',
-    },
+    // auth: {
+    //     username: 'elastic',
+    //     password: '1523',
+    // },
     // tls: {
     //     ca: fs.readFileSync('/app/certs/http_ca.crt'),
     //     rejectUnauthorized: false,

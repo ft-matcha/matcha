@@ -24,7 +24,6 @@ services:
             - '8000:8000'
         volumes:
             - back:/app
-            - ./certs:/app/certs
         env_file:
             - .env
         depends_on:
@@ -55,10 +54,12 @@ services:
             - '9200:9200'
         environment:
             - discovery.type=single-node
-        volumes:
-            - type: bind
-              source: ./elasticsearch/config/
-              target: /config
+            - ES_NETWORK_BIND_HOST="back:8000"
+            - xpack.security.enabled=false
+        env_file:
+            - .env
+        # volumes:
+        #     - certs:/usr/share/elasticsearch/config/certs
 
 networks:
     matcha_network:
@@ -72,4 +73,10 @@ volumes:
             type: none
             o: bind
             device: ./back
-            read_only: true
+    certs:
+        name: certs
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: ./certs

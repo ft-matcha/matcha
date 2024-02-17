@@ -1,26 +1,28 @@
 const redis = require('redis');
 
 class redisClient {
-    #host = process.env.REDIS_HOST;
-    #port = process.env.REDIS_PORT;
-    #connected;
-    #client: any;
+    private host = process.env.REDIS_HOST;
+    private port = process.env.REDIS_PORT;
+    private url = process.env.REDIS_URL;
+    private connected;
+    private client: any;
     constructor() {
-        this.#connected = false;
-        this.#client = null;
+        this.connected = false;
+        this.client = null;
     }
     async getClient() {
         try {
-            if (this.#connected) {
-                return this.#client;
+            if (this.connected) {
+                return this.client;
             } else {
-                this.#client = await redis.createClient({
-                    url: process.env.REDIS_URL,
+                console.log(this.url);
+                this.client = await redis.createClient({
+                    url: this.url,
                 });
                 console.log('Redis connected');
-                this.#connected = true;
-                this.#client.connect();
-                return this.#client;
+                this.connected = true;
+                this.client.connect();
+                return this.client;
             }
         } catch (error: any) {
             console.error('Redis connection failed: ' + error.stack);
@@ -30,7 +32,7 @@ class redisClient {
     async set(key: string, value: string) {
         try {
             await this.getClient();
-            await this.#client.set(key, value);
+            await this.client.set(key, value);
         } catch (error: any) {
             console.error('Redis set failed: ' + error.stack);
             throw error;
@@ -39,8 +41,7 @@ class redisClient {
     async get(key: string) {
         try {
             await this.getClient();
-            const response = await this.#client.get(key);
-            await this.#client.disconnect();
+            const response = await this.client.get(key);
             return response;
         } catch (error: any) {
             console.error('Redis get failed: ' + error.stack);

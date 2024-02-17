@@ -26,9 +26,13 @@ const createUser = async (body: any) => {
             phone,
             address,
         });
-        user.accessToken = jwt.sign(user);
-        user.refreshToken = jwt.refresh();
-        return user;
+        const userData = await getUser(email);
+        const accessToken = await jwt.sign(userData);
+        const refreshToken = await jwt.refresh();
+        return {
+            accessToken,
+            refreshToken,
+        };
     } catch (error: any) {
         console.error('user create failed: ' + error.stack);
         throw error;
@@ -39,9 +43,7 @@ const getUser = async (email: string, include?: any) => {
     try {
         const user = await User.readOne({
             where: { email },
-            include: include ? include : undefined,
         });
-        console.log(user);
         return user;
     } catch (error: any) {
         throw error;
@@ -85,10 +87,13 @@ const login = async (body: any) => {
             };
         } else if (user.password === cryptoPass) {
             console.log('Login success');
-            user.accessToken = jwt.sign(user);
-            user.refreshToken = jwt.refresh();
-            await redis.set(email, user.refreshToken);
-            return user;
+            const accessToken = jwt.sign(user);
+            const refreshToken = jwt.refresh();
+            await redis.set(email, refreshToken);
+            return {
+                accessToken,
+                refreshToken,
+            };
         } else {
             console.log('Incorrect password');
             return {
