@@ -12,6 +12,17 @@ const FormContainer = styled.form<FormProps>`
   height: ${({ height }) => (height ? height : '100%')};
 `;
 
+export const formHandler = (target: HTMLFormElement) => {
+  const data = new FormData(target);
+  const obj: Record<string, FormDataEntryValue> = {};
+  for (let [key, value] of data.entries()) {
+    if (value) {
+      obj[key] = value;
+    }
+  }
+  return obj;
+};
+
 const Form: React.FC<FormProps> = ({ children, onSubmit, ...rest }) => {
   return (
     <FormContainer onSubmit={onSubmit} {...rest}>

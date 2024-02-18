@@ -45,10 +45,12 @@ export class RegisterApi extends ApiCall {
   }
 }
 
+
 interface ApiContainerProps {
   apiInstance: Api.ApiInstance;
   apiInstanceObject: Record<string, Function>;
 }
+
 export class ApiContainer {
   [key: string]: ApiCall | Function | string | Record<string, ApiCall> | boolean;
   private apiContainer: Record<string, ApiCall> = {};
@@ -65,6 +67,7 @@ export class ApiContainer {
         }
       }
     });
+    console.log(this);
   }
 
   setBearerTokenInHeader(dataParams: Record<string, any>) {

@@ -1,10 +1,12 @@
-import Card, { CardBody, CardFooter } from '@/components/ui/Card';
 import Post from '@/components/Post';
+import { Outlet } from 'react-router';
 
 const Main = () => {
   return (
     <>
-      <Post />
+      <Post>
+        <Outlet />
+      </Post>
     </>
   );
 };
