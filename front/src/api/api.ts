@@ -22,6 +22,8 @@ export class ApiCall {
         return this.getInstance().post(url, params);
       case 'get':
         return this.getInstance().get(url, params);
+      case 'put':
+        return this.getInstance().put(url, params);
     }
   }
 

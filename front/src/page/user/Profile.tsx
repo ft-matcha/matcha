@@ -8,8 +8,6 @@ import styled from 'styled-components';
 import { userGender } from '../../data/AuthData';
 import FormContainer, { formHandler } from '@/components/ui/Form';
 import { Link } from 'react-router-dom';
-import LabelContainer from '@/components/LabelContainer';
-import Span from '@/components/ui/Span';
 import SwitchContainer from '@/components/SwitchContainer';
 import Input from '@/components/ui/input';
 
@@ -35,9 +33,15 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    const result = api.call('get', 'profile', {
-      withCredentials: true,
-    });
+    const result = api.call(
+      'get',
+      'profile',
+      {
+        withCredentials: true,
+      },
+      'https://randomuser.me/api',
+    );
+    console.log(result);
     const success = (pos: any) => {
       const crd = pos.coords;
       setLocation({ latitude: crd.latitude, longitude: crd.longitude });
@@ -47,14 +51,14 @@ const Profile = () => {
     };
     navigator.geolocation.watchPosition(success, error, options);
   }, []);
-  // if api connected placeholder = profile.data
 
   return (
     <StyledProfile
       onSubmit={(e) => {
         e.preventDefault();
         const obj = formHandler(e.currentTarget);
-        console.log(obj);
+        const result = api.call('put', 'profile', obj);
+        console.log(result);
       }}
     >
       <div style={{ width: '100%', height: '40px', fontSize: '22px' }}>

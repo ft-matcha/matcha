@@ -3,11 +3,12 @@ import { StyledButton } from '@/components/ui/Button';
 import { StyledProfile } from '@/page/user/Profile';
 import { NavLink } from 'react-router-dom';
 
-const PostContainer = styled.section`
+const PostContainer = styled.section<{ gridArea?: string }>`
   min-height: 200px;
   width: 100%;
   max-width: 100%;
   height: fit-content;
+  grid-area: ${({ gridArea }) => (gridArea ? gridArea : 'main')};
   .active {
     background: ${({ theme }) => theme.backgroundHover};
     color: ${({ theme }) => theme.colorHover};
@@ -63,15 +64,15 @@ const PostBody = styled.section`
   }
 `;
 
-const Post = ({ children }: { children: React.ReactNode }) => {
+const Post = ({ gridArea, children }: { gridArea?: string; children: React.ReactNode }) => {
   return (
     <>
-      <PostContainer>
+      <PostContainer gridArea={gridArea}>
         <PostTabContainer>
-          <PostTab to="profile" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
-            Profile
+          <PostTab to="recommend" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
+            For you
           </PostTab>
-          <PostTab to="">other</PostTab>
+          <PostTab to="other">Following</PostTab>
         </PostTabContainer>
         <PostBody>{children}</PostBody>
       </PostContainer>
