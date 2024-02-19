@@ -8,6 +8,10 @@ import styled from 'styled-components';
 import { userGender } from '../../data/AuthData';
 import FormContainer, { formHandler } from '@/components/ui/Form';
 import { Link } from 'react-router-dom';
+import LabelContainer from '@/components/LabelContainer';
+import Span from '@/components/ui/Span';
+import SwitchContainer from '@/components/SwitchContainer';
+import Input from '@/components/ui/input';
 
 export const StyledProfile = styled(FormContainer)`
   display: flex;
@@ -17,7 +21,8 @@ export const StyledProfile = styled(FormContainer)`
   margin-top: 55px;
   border-top: 1px;
   flex-direction: column;
-  justify-content: center;
+  width: 100%;
+  min-height: 600px;
 `;
 
 const Profile = () => {
@@ -30,7 +35,7 @@ const Profile = () => {
   };
 
   useEffect(() => {
-    api.call('get', 'profile', {
+    const result = api.call('get', 'profile', {
       withCredentials: true,
     });
     const success = (pos: any) => {
@@ -52,18 +57,13 @@ const Profile = () => {
         console.log(obj);
       }}
     >
-      <div style={{ width: '100%', height: '40px' }}>
+      <div style={{ width: '100%', height: '40px', fontSize: '22px' }}>
         <h1>Change Profile</h1>
       </div>
-
       {userRegister.map((item) => {
-        return (
-          item.id !== 'password' && (
-            <InputContainer {...item} required={true} key={`user_${item.id}`} />
-          )
-        );
+        if (item.name === 'password') return null;
+        return <SwitchContainer key={'profile_' + item.name} {...item} required={false} />;
       })}
-
       <Select id="gender" name="gender">
         {userGender.map((item: string) => (
           <option value={item} key={`gender_key${item}`}>
@@ -71,9 +71,22 @@ const Profile = () => {
           </option>
         ))}
       </Select>
-      <span>
-        {location.latitude} {location.longitude}
-      </span>
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <Input
+          name="latitud"
+          id="latitude"
+          type="text"
+          readOnly={true}
+          value={location.latitude + ''}
+        />
+        <Input
+          name="longitude"
+          id="longitude"
+          type="text"
+          readOnly={true}
+          value={location.longitude + ''}
+        />
+      </div>
       <div>
         <Button>Update</Button>
         <Link to="change_password">

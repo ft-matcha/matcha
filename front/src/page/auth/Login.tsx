@@ -16,11 +16,6 @@ export default function Login() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // const data = new FormData(e.currentTarget);
-    // const obj: Record<string, FormDataEntryValue> = {};
-    // for (let [key, value] of data.entries()) {
-    //   obj[key] = value;
-    // }
     const obj = formHandler(e.currentTarget);
     const result = await api.call('get', 'login', obj, 'https://randomuser.me/api');
     if (result?.success) {
