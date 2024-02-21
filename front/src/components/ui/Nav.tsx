@@ -4,7 +4,7 @@ import styled from 'styled-components';
 const NavContainer = styled.nav<{ gridArea: string }>`
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 10px;
   gridarea: ${({ gridArea }) => gridArea};
   padding-top: 15px;
 `;
