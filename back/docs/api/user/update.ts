@@ -1,23 +1,60 @@
-module.exports = {
-    '/profile/update': {
-        post: {
-            tags: ['profile'],
-            summary: '프로필 변경',
-            description: '프로필 변경(gender, preference, biography, tag, age, image)',
+export default {
+    '/user': {
+        put: {
+            tags: ['user'],
+            summary: '프로필 및 유저 정보 변경',
+            description:
+                '프로필 변경(password, firstName, lastName, phone, address, status, gender, preferences, biography, tag, age, image, viewList)',
+            security: [
+                {
+                    bearerAuth: [],
+                },
+            ],
             requestBody: {
                 content: {
                     'application/json': {
                         schema: {
                             properties: {
+                                password: {
+                                    type: 'string',
+                                    description: '비밀번호',
+                                    example: '1523',
+                                },
+                                firstName: {
+                                    type: 'string',
+                                    description: '이름',
+                                    example: 'Lee',
+                                },
+                                lastName: {
+                                    type: 'string',
+                                    description: '성',
+                                    example: 'eunryong',
+                                },
+                                phone: {
+                                    type: 'string',
+                                    description: '전화번호',
+                                    example: '010-1234-5678',
+                                },
+                                address: {
+                                    type: 'string',
+                                    description: '주소',
+                                    example: '서울시 강남구',
+                                },
+                                status: {
+                                    type: 'string',
+                                    description: '상태',
+                                    example: 'Active',
+                                },
+
                                 gender: {
                                     type: 'string',
                                     description: '성별',
                                     example: 'man',
                                 },
-                                preference: {
-                                    type: 'string',
+                                preferences: {
+                                    type: 'string array',
                                     description: '선호 성별',
-                                    example: 'woman',
+                                    example: ['woman'],
                                 },
                                 biography: {
                                     type: 'string',
@@ -27,7 +64,7 @@ module.exports = {
                                 tag: {
                                     type: 'String array',
                                     description: '태그',
-                                    example: "['#vegan', '#geek', '#piercing']",
+                                    example: ['#vegan', '#geek', '#piercing'],
                                 },
                                 age: {
                                     type: 'number',
@@ -37,8 +74,11 @@ module.exports = {
                                 image: {
                                     type: 'String array',
                                     description: '프로필 사진',
-                                    example:
-                                        "['https://picsum.photos/200/300', 'https://picsum.photos/200/300', 'https://picsum.photos/200/300']",
+                                    example: [
+                                        'https://picsum.photos/200/300',
+                                        'https://picsum.photos/200/300',
+                                        'https://picsum.photos/200/300',
+                                    ],
                                 },
                             },
                         },
@@ -47,7 +87,7 @@ module.exports = {
             },
             responses: {
                 201: {
-                    description: '프로필 변경 성공',
+                    description: '프로필 및 유저정보 변경 성공',
                     content: {
                         'application/json': {
                             schema: {
@@ -58,10 +98,16 @@ module.exports = {
                                         description: '성공여부',
                                         example: true,
                                     },
-                                    profile: {
+                                    data: {
                                         type: 'object',
                                         description: '프로필 정보',
                                         example: {
+                                            email: 'srdn45@gmail.com',
+                                            firstName: 'Lee',
+                                            lastName: 'eunryong',
+                                            address: '서울시 강남구',
+                                            phone: '010-1234-5678',
+                                            status: 'Active',
                                             gender: 'man',
                                             preference: 'woman',
                                             biography: '안녕하세요',
@@ -76,7 +122,7 @@ module.exports = {
                     },
                 },
                 401: {
-                    description: '프로필 변경 실패',
+                    description: '프로필 및 유저정보 변경 실패',
                     content: {
                         'application/json': {
                             schema: {
@@ -93,7 +139,7 @@ module.exports = {
                                             message: {
                                                 type: 'string',
                                                 description: '에러메세지',
-                                                example: 'Profile already exists',
+                                                example: '프로필 및 유저정보 변경 실패 : 서버 에러',
                                             },
                                         },
                                     },

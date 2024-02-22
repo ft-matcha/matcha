@@ -58,8 +58,6 @@ services:
             - xpack.security.enabled=false
         env_file:
             - .env
-        # volumes:
-        #     - certs:/usr/share/elasticsearch/config/certs
 
 networks:
     matcha_network:
@@ -73,10 +71,10 @@ volumes:
             type: none
             o: bind
             device: ./back
-    certs:
-        name: certs
-        driver: local
-        driver_opts:
-            type: none
-            o: bind
-            device: ./certs
+    # certs:
+    #     name: certs
+    #     driver: local
+    #     driver_opts:
+    #         type: none
+    #         o: bind
+    #         device: ./certs

@@ -1,10 +1,8 @@
-const redis = require('redis');
+import { createClient } from 'redis';
 
 class redisClient {
-    private host = process.env.REDIS_HOST;
-    private port = process.env.REDIS_PORT;
-    private url = process.env.REDIS_URL;
     private connected;
+    private static url = process.env.REDIS_URL;
     private client: any;
     constructor() {
         this.connected = false;
@@ -15,13 +13,9 @@ class redisClient {
             if (this.connected) {
                 return this.client;
             } else {
-                console.log(this.url);
-                this.client = await redis.createClient({
-                    url: this.url,
-                });
-                console.log('Redis connected');
+                this.client = createClient({ url: redisClient.url });
                 this.connected = true;
-                this.client.connect();
+                await this.client.connect();
                 return this.client;
             }
         } catch (error: any) {
@@ -48,6 +42,15 @@ class redisClient {
             throw error;
         }
     }
+    async del(key: string) {
+        try {
+            await this.getClient();
+            await this.client.del(key);
+        } catch (error: any) {
+            console.error('Redis del failed: ' + error.stack);
+            throw error;
+        }
+    }
 }
 
-module.exports = new redisClient();
+export default new redisClient();

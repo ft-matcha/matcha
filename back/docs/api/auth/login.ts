@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     '/login': {
         post: {
             tags: ['auth'],
@@ -36,6 +36,13 @@ module.exports = {
                                         type: 'boolean',
                                         description: '성공여부',
                                         example: true,
+                                    },
+                                    body: {
+                                        type: 'object',
+                                        description: '회원정보',
+                                        example: {
+                                            accessToken: 'JWT',
+                                        },
                                     },
                                 },
                             },

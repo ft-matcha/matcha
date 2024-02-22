@@ -1,9 +1,25 @@
-module.exports = {
-    '/user': {
+export default {
+    '/user/{email}': {
         get: {
-            tag: ['user'],
+            tags: ['user'],
             summary: 'Get user info',
             description: 'Get user info',
+            security: [
+                {
+                    bearerAuth: [],
+                },
+            ],
+            parameters: [
+                {
+                    in: 'path',
+                    name: 'email',
+                    required: true,
+                    schema: {
+                        type: 'string',
+                    },
+                    description: '유저 이메일',
+                },
+            ],
             responses: {
                 200: {
                     description: 'Get user info success',

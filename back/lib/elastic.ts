@@ -1,5 +1,5 @@
-const { Client } = require('elastic');
-const fs = require('fs');
+import { Client } from 'elastic';
+import fs from 'fs';
 
 const esconfig = {
     node: process.env.ES_NODE,
@@ -27,7 +27,6 @@ class elastic {
             if (this.isConnected) {
                 return this.client;
             } else {
-                console.log(esconfig);
                 this.client = await new Client(esconfig);
                 this.isConnected = true;
                 return this.client;
@@ -54,7 +53,7 @@ class elastic {
             return error;
         }
     }
-    async create(id: string, document: JSON) {
+    async create<T>(id: string, document: T) {
         try {
             await this.getClient();
             const response = await this.client.index({
@@ -79,6 +78,19 @@ class elastic {
             throw error;
         }
     }
+    async update(email: string, data: any) {
+        try {
+            await this.getClient();
+            const response = await this.client.update({
+                index: this.index,
+                id: email,
+                doc: data,
+            });
+            return response;
+        } catch (error: any) {
+            throw error;
+        }
+    }
     async search(key: string, query: string) {
         try {
             await this.getClient();
@@ -96,5 +108,4 @@ class elastic {
     }
 }
 
-module.exports = new elastic();
-export {};
+export default new elastic();

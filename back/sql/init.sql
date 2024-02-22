@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `phone` varchar(255) NOT NULL,
     `address` varchar(255) NOT NULL,
     `status` varchar(255) NOT NULL,
+    `verified` BOOLEAN NOT NULL,
 
     UNIQUE INDEX `user_email_key`(`email`),
     PRIMARY KEY (`id`)
@@ -21,7 +22,6 @@ CREATE TABLE IF NOT EXISTS `profile` (
     `age` INTEGER NOT NULL,
     `image` JSON NOT NULL,
     `viewList` JSON NOT NULL,
-    `region` varchar(255) NOT NULL,
     `userId` INTEGER NOT NULL,
     
     UNIQUE INDEX `profile_userId_key`(`userId`),

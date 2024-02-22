@@ -1,30 +1,29 @@
-const swaggerUI = require('swagger-ui-express');
-const swaggerJsDoc = require('swagger-jsdoc');
-const Swagger = require('../lib/swagger');
-const auth = require('./api/auth/index');
-const jwt = require('./api/jwt/index');
-const profile = require('./api/profile/index');
-const user = require('./api/user/index');
+import swaggerUI from 'swagger-ui-express';
+import swaggerJsDoc from 'swagger-jsdoc';
+import Swagger from '../lib/swagger';
+import auth from './api/auth/index';
+import jwt from './api/jwt/index';
+import user from './api/user/index';
+
 class ApiDocs {
-    #apiDocsOptions;
-    #swagger;
+    private apiDocsOptions;
+    private swagger;
 
     constructor() {
-        this.#apiDocsOptions = {
+        this.apiDocsOptions = {
             ...user,
             ...auth,
-            ...profile,
             ...jwt,
         };
-        this.#swagger = new Swagger();
+        this.swagger = new Swagger();
     }
 
     init() {
-        this.#swagger.addAPI(this.#apiDocsOptions);
+        this.swagger.addAPI(this.apiDocsOptions);
     }
 
     getSwaggerOption() {
-        const { apiOption, setUpOption } = this.#swagger.getOption();
+        const { apiOption, setUpOption } = this.swagger.getOption();
 
         const specs = swaggerJsDoc(apiOption);
 
@@ -35,5 +34,5 @@ class ApiDocs {
         };
     }
 }
-module.exports = ApiDocs;
-export {};
+
+export default new ApiDocs();

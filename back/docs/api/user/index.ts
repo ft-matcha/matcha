@@ -1,6 +1,6 @@
-const get = require('./get.js');
-// const update = require('./update.js');
-module.exports = {
+import get from './get';
+import update from './update';
+export default {
     ...get,
-    // ...update,
+    ...update,
 };

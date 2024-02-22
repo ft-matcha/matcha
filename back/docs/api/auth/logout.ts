@@ -1,28 +1,17 @@
 export default {
-    '/refresh': {
+    '/logout': {
         get: {
-            tags: ['JWT'],
-            summary: '토큰 재발급',
-            description: '토큰 재발급',
+            tags: ['auth'],
+            summary: '로그아웃',
+            description: '로그아웃',
             security: [
                 {
                     bearerAuth: [],
                 },
             ],
-            parameters: [
-                {
-                    in: 'header',
-                    name: 'refresh',
-                    required: true,
-                    schema: {
-                        type: 'string',
-                    },
-                    description: '리프레시 토큰',
-                },
-            ],
             responses: {
                 200: {
-                    description: '토큰 재발급 성공',
+                    description: '로그아웃 성공',
                     content: {
                         'application/json': {
                             schema: {
@@ -33,23 +22,13 @@ export default {
                                         description: '성공여부',
                                         example: true,
                                     },
-                                    accessToken: {
-                                        type: 'string',
-                                        description: 'accessToken',
-                                        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
-                                    },
-                                    refreshToken: {
-                                        type: 'string',
-                                        description: 'refreshToken',
-                                        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
-                                    },
                                 },
                             },
                         },
                     },
                 },
                 401: {
-                    description: '토큰 재발급 실패',
+                    description: '로그아웃 실패',
                     content: {
                         'application/json': {
                             schema: {
@@ -60,10 +39,12 @@ export default {
                                         description: '성공여부',
                                         example: false,
                                     },
-                                    message: {
-                                        type: 'string',
-                                        description: '에러 메시지',
-                                        example: '토큰이 만료되었습니다.',
+                                    error: {
+                                        type: 'object',
+                                        description: '에러',
+                                        example: {
+                                            message: 'User not found',
+                                        },
                                     },
                                 },
                             },

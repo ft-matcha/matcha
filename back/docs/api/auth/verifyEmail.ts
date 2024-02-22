@@ -1,9 +1,9 @@
 export default {
-    '/refresh': {
+    '/email/{code}': {
         get: {
-            tags: ['JWT'],
-            summary: '토큰 재발급',
-            description: '토큰 재발급',
+            tags: ['auth'],
+            summary: '이메일 전송',
+            description: '이메일 전송',
             security: [
                 {
                     bearerAuth: [],
@@ -11,18 +11,18 @@ export default {
             ],
             parameters: [
                 {
-                    in: 'header',
-                    name: 'refresh',
+                    in: 'path',
+                    name: 'code',
                     required: true,
                     schema: {
                         type: 'string',
                     },
-                    description: '리프레시 토큰',
+                    description: '인증코드',
                 },
             ],
             responses: {
                 200: {
-                    description: '토큰 재발급 성공',
+                    description: '이메일 전송 성공',
                     content: {
                         'application/json': {
                             schema: {
@@ -33,23 +33,13 @@ export default {
                                         description: '성공여부',
                                         example: true,
                                     },
-                                    accessToken: {
-                                        type: 'string',
-                                        description: 'accessToken',
-                                        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
-                                    },
-                                    refreshToken: {
-                                        type: 'string',
-                                        description: 'refreshToken',
-                                        example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9',
-                                    },
                                 },
                             },
                         },
                     },
                 },
                 401: {
-                    description: '토큰 재발급 실패',
+                    description: '이메일 전송 실패',
                     content: {
                         'application/json': {
                             schema: {
@@ -60,10 +50,12 @@ export default {
                                         description: '성공여부',
                                         example: false,
                                     },
-                                    message: {
-                                        type: 'string',
-                                        description: '에러 메시지',
-                                        example: '토큰이 만료되었습니다.',
+                                    error: {
+                                        type: 'object',
+                                        description: '에러',
+                                        example: {
+                                            message: 'User not found',
+                                        },
                                     },
                                 },
                             },

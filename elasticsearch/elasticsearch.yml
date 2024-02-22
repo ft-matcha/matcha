@@ -1,5 +1,0 @@
-cluster.name: 'docker-cluster'
-network.host: 0.0.0.0
-bootstrap.memory_lock: true
-# xpack.security.enrollment.enabled: true
-xpack.security.enabled: false

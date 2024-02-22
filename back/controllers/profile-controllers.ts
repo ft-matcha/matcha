@@ -1,22 +1,19 @@
-const userController = require('./user-controllers');
-const crud = require('../lib/crud');
+import crud from '../lib/crud';
+import userControllers from './user-controllers';
 const Profile = new crud('profile');
 
-const createProfile = async (body: any) => {
-    const { gender, preferences, biography, tag, age, image, region } = body;
+const createProfile = async (userId: number, body: any) => {
+    const { gender, preferences, biography, tag, age, image } = body;
     try {
-        const email = 'srdn45@gmail.com';
-        const userData = await userController.getUser(email);
         const profile = await Profile.create({
             gender,
-            preferences,
+            preferences: preferences,
             biography,
-            tag: JSON.stringify(tag),
+            tag: tag,
             age,
-            image: JSON.stringify(image),
-            viewList: JSON.stringify([]),
-            userId: userData.id,
-            region,
+            image: image,
+            viewList: '[]',
+            userId: userId,
         });
         return profile;
     } catch (error: any) {
@@ -24,39 +21,34 @@ const createProfile = async (body: any) => {
     }
 };
 
-const getProfile = async (email: string) => {
-    const user = await userController.getUser(email);
-    if (!user) return undefined;
-    return user.profile;
-};
-
-const updateProfile = async (body: any) => {
-    const { gender, preferences, biography, content, tag, age, image, email } = body;
-    const userData = await userController.getUser(email);
-    const profile = await Profile.update({
-        where: { userId: userData.id },
-        data: {
-            gender,
-            preferences,
-            biography,
-            content,
-            tag,
-            age,
-            image,
-        },
+const getProfile = async (userId: Number) => {
+    const profile = await Profile.readOne({
+        where: { userId: userId },
     });
     return profile;
 };
 
+const updateProfile = async (email: string, body: any) => {
+    const userData = await userControllers.getUser(email);
+    const profile = await getProfile(userData.id);
+    if (profile !== undefined) {
+        const profile = await Profile.update({
+            where: { userId: userData.id },
+            data: body,
+        });
+        return profile;
+    } else {
+        const profile = await createProfile(userData.id, body);
+        return profile;
+    }
+};
+
 const deleteProfile = async (userId: string) => {
-    const userData = await userController.getUser(userId);
+    const userData = await userControllers.getUser(userId);
     const profile = await Profile.delete({
         where: { userId: userData.id },
     });
     return profile;
 };
 
-exports.createProfile = createProfile;
-exports.getProfile = getProfile;
-exports.updateProfile = updateProfile;
-exports.deleteProfile = deleteProfile;
+export default { createProfile, getProfile, updateProfile, deleteProfile };

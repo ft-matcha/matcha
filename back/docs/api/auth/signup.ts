@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     '/signup': {
         post: {
             tags: ['auth'],
@@ -60,6 +60,9 @@ module.exports = {
                                     body: {
                                         type: 'object',
                                         description: '회원정보',
+                                        example: {
+                                            accessToken: 'JWT',
+                                        },
                                     },
                                 },
                             },
