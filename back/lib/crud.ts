@@ -1,5 +1,5 @@
-const fs = require('fs');
-const mysql = require('mysql2/promise');
+import fs from 'fs';
+import mysql from 'mysql2/promise';
 const dbConfig = {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -10,30 +10,30 @@ const dbConfig = {
     multipleStatements: true,
 };
 
-const model = {
-    gender: String,
-    preferences: String,
-    biography: String,
-    tag: JSON,
-    age: Number,
-    image: JSON,
-    viewList: JSON,
-    region: String,
-};
-
+interface update {
+    data: updateData;
+    where: {
+        [key: string]: string;
+    };
+}
+interface updateData {
+    [key: string]: string | number | boolean | object | undefined;
+}
+interface createData {
+    [key: string]: string | number | boolean | object | undefined;
+}
 const pool = mysql.createPool(dbConfig);
-
-class Crud {
-    private connection: any;
-    private table: any;
+class crud {
+    private connection: mysql.PoolConnection | undefined;
+    private table: string;
     constructor(table: string) {
-        this.connection = null;
+        this.getConnection();
         this.table = table;
     }
     async migrate() {
         try {
-            await this.getConnection();
-            const sql = await fs.promises.readFile(__dirname + '/../migration/init.sql', 'utf-8');
+            this.connection = await this.getConnection();
+            const sql = await fs.promises.readFile(__dirname + '/../sql/init.sql', 'utf-8');
             await this.connection.query(sql);
             console.log('DB migration success');
             this.connection.release();
@@ -44,18 +44,20 @@ class Crud {
 
     async getConnection() {
         try {
-            this.connection = await pool.getConnection();
-            return this.connection;
+            return await pool.getConnection();
         } catch (error: any) {
             throw error;
         }
     }
-
-    async create(data: JSON) {
+    async create(data: createData) {
         try {
-            await this.getConnection();
-            const sql = `INSERT INTO ${this.table} SET ?`;
-            const response = await this.connection.query(sql, data).JSON;
+            this.connection = await this.getConnection();
+            Object.keys(data).forEach((key) => {
+                if (typeof data[key] === 'object') data[key] = JSON.stringify(data[key]);
+            });
+            const sql = fs.readFileSync(__dirname + '/../sql/create.sql', 'utf-8');
+            console.log(this.connection.format(sql, [this.table, data]));
+            const response = await this.connection.query(sql, [this.table, data]);
             this.connection.release();
             return response;
         } catch (error: any) {
@@ -65,42 +67,25 @@ class Crud {
         }
     }
 
-    async readOne(data: any) {
+    async readOne(data: any): Promise<any> {
         try {
-            const { where, include } = data;
-            let sql = '';
-            if (include) {
-                const table = Object.keys(include);
-                const keys = Object.keys(model);
-                let columns = '';
-                keys.forEach((key) => {
-                    columns += `'${key}', ${table}.${key}`;
-                    if (keys.indexOf(key) !== keys.length - 1) columns += ', ';
-                });
-                sql = `
-                SELECT ${this.table}.*, JSON_OBJECT(${columns}) AS ${table}
-                FROM ${this.table}
-                LEFT JOIN ${table} ON ${this.table}.id = ${table}.userId
-                WHERE ?;
-                `;
-            } else {
-                sql = `SELECT * FROM ${this.table} WHERE ?`;
-            }
-            await this.getConnection();
-            const user = await this.connection.query(sql, where);
+            const { where } = data;
+            const sql = fs.readFileSync(__dirname + '/../sql/readone.sql', 'utf-8');
+            this.connection = await this.getConnection();
+            const [row] = await this.connection.query<mysql.RowDataPacket[]>(sql, [this.table, where]);
             this.connection.release();
-            return user[0][0];
+            return row[0];
         } catch (error: any) {
             console.error('DB read failed: ' + error.stack);
             if (this.connection) this.connection.release();
             throw error;
         }
     }
-    async read(data: any) {
-        await this.getConnection();
+    async read() {
+        this.connection = await this.getConnection();
         const sql = `SELECT * FROM ${this.table}`;
         try {
-            const users = await this.connection.query(sql, data);
+            const users = await this.connection.query(sql);
             this.connection.release();
             return users[0];
         } catch (error: any) {
@@ -109,12 +94,19 @@ class Crud {
             return error;
         }
     }
-    async update(body: any) {
+
+    async update(body: update) {
         try {
             const { data, where } = body;
-            await this.getConnection();
-            const sql = `UPDATE ${this.table} SET ? WHERE ?`;
-            const response = await this.connection.query(sql, data, where);
+            Object.keys(data).forEach((key) => {
+                if (data[key] === undefined) delete data[key];
+                if (typeof data[key] === 'object') data[key] = JSON.stringify(data[key]);
+            });
+            if (Object.keys(data).length === 0) throw new Error('No data to update');
+            this.connection = await this.getConnection();
+            const sql = fs.readFileSync(__dirname + '/../sql/update.sql', 'utf-8');
+            console.log(this.connection.format(sql, [this.table, data, where]));
+            const response = await this.connection.query(sql, [this.table, data, where]);
             this.connection.release();
             return response;
         } catch (error: any) {
@@ -123,11 +115,11 @@ class Crud {
             return error;
         }
     }
-    async delete(email: string) {
+    async delete<T>(where: T) {
         try {
-            await this.getConnection();
-            const sql = `DELETE FROM ${this.table} WHERE email = ${email}`;
-            const response = await this.connection.query(sql);
+            this.connection = await this.getConnection();
+            const sql = `DELETE FROM ?? WHERE ?`;
+            const response = await this.connection.query(sql, [this.table, where]);
         } catch (error: any) {
             console.error('DB delete failed: ' + error.stack);
             if (this.connection) this.connection.release();
@@ -136,5 +128,4 @@ class Crud {
     }
 }
 
-module.exports = Crud;
-export {};
+export default crud;

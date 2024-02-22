@@ -1,13 +1,17 @@
-"use strict";
-module.exports = {
-    '/user': {
+export default {
+    '/email': {
         get: {
-            tag: ['user'],
-            summary: 'Get user info',
-            description: 'Get user info',
+            tags: ['auth'],
+            summary: '이메일 전송',
+            description: '이메일 전송',
+            security: [
+                {
+                    bearerAuth: [],
+                },
+            ],
             responses: {
                 200: {
-                    description: 'Get user info success',
+                    description: '이메일 전송 성공',
                     content: {
                         'application/json': {
                             schema: {
@@ -18,24 +22,13 @@ module.exports = {
                                         description: '성공여부',
                                         example: true,
                                     },
-                                    user: {
-                                        type: 'object',
-                                        description: '유저 정보',
-                                        example: {
-                                            id: 'srdn45',
-                                            email: 'srdn45@gmail.com',
-                                            firstName: 'Lee',
-                                            lastName: 'eunryong',
-                                            profile: { 'profile info': 'profile info' },
-                                        },
-                                    },
                                 },
                             },
                         },
                     },
                 },
                 401: {
-                    description: 'Get user info fail',
+                    description: '이메일 전송 실패',
                     content: {
                         'application/json': {
                             schema: {
@@ -50,7 +43,7 @@ module.exports = {
                                         type: 'object',
                                         description: '에러',
                                         example: {
-                                            message: 'Profile not found',
+                                            message: 'User not found',
                                         },
                                     },
                                 },

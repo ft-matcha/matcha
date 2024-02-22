@@ -1,23 +1,31 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
+import redisClient from '../lib/redisClient';
 const secret = process.env.secret;
-const redisClient = require('../lib/redisClient');
-
-module.exports = {
-    sign: (user: any) => {
+interface payload {
+    email: string;
+    firstName: string;
+    lastName: string;
+}
+interface verify {
+    status: boolean;
+    decoded?: payload | string;
+    message?: string;
+}
+export default {
+    sign: (email: string) => {
         const payload = {
-            email: user.email,
-            firstName: user.firstName,
-            lastName: user.lastName,
+            email: email,
         };
+        if (!secret) throw new Error('secret not found');
         return jwt.sign(payload, secret, {
-            algorithm: 'HS256', // 암호화 알고리즘
-            expiresIn: '5m', // 유효기간
+            algorithm: 'HS256',
+            expiresIn: '30m',
         });
     },
     verify: (token: any) => {
-        let decoded = null;
         try {
-            decoded = jwt.verify(token, secret);
+            if (!secret) throw new Error('secret not found');
+            const decoded = jwt.verify(token, secret);
             return {
                 status: true,
                 decoded,
@@ -30,28 +38,31 @@ module.exports = {
         }
     },
     refresh: () => {
+        if (!secret) throw new Error('secret not found');
         return jwt.sign({}, secret, {
             algorithm: 'HS256',
             expiresIn: '14d',
         });
     },
-    refreshVerify: async (token: any, email: string) => {
+    refreshVerify: async (accessToken: string, refreshToken: string) => {
         try {
-            const data = await redisClient.get(email);
-            if (token === data) {
-                try {
-                    jwt.verify(token, secret);
-                    return true;
-                } catch (err) {
-                    return false;
-                }
+            const decoded = jwt.decode(accessToken);
+            const data = await redisClient.get(decoded.email);
+            if (refreshToken === data) {
+                if (!secret) throw new Error('secret not found');
+                jwt.verify(refreshToken, secret);
+                return {
+                    success: true,
+                    email: decoded.email,
+                };
             } else {
-                return false;
+                return {
+                    success: false,
+                    message: 'Invalid Token',
+                };
             }
-        } catch (err) {
-            return false;
+        } catch (err: any) {
+            return { success: false, message: err.message };
         }
     },
 };
-
-export {};

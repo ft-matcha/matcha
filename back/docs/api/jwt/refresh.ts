@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     '/refresh': {
         get: {
             tags: ['JWT'],
@@ -7,6 +7,17 @@ module.exports = {
             security: [
                 {
                     bearerAuth: [],
+                },
+            ],
+            parameters: [
+                {
+                    in: 'header',
+                    name: 'refresh',
+                    required: true,
+                    schema: {
+                        type: 'string',
+                    },
+                    description: '리프레시 토큰',
                 },
             ],
             responses: {

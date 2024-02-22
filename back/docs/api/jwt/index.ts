@@ -1,4 +1,4 @@
-const refresh = require('./refresh.js');
-module.exports = {
+import refresh from './refresh';
+export default {
     ...refresh,
 };
