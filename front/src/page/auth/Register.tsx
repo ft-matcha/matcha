@@ -1,5 +1,5 @@
 import Button from '@/components/ui/Button';
-import Form from '@/components/ui/Form';
+import Form, { formHandler } from '@/components/ui/Form';
 import InputContainer from '@/components/InputContainer';
 import { userGender, userRegister } from '@/data/AuthData';
 import { ModalContext } from '@/provider/ModalProvider';
@@ -10,20 +10,28 @@ import { useCookies } from 'react-cookie';
 import { deleteToken, getToken, setToken } from '@/utils/token';
 import useFunnel from '@/hooks/useFunnel';
 import { GenderForm } from '../user/ChangeProfile';
+import Select from '@/components/ui/Select';
 
 interface RegisterFormProps {
-  id?: string;
+  id: string;
+  firstName: string;
+  lastName: string;
   location?: string;
   gender: string;
 }
 
 const Register = () => {
-  const [Funnel, setStep] = useFunnel(['id', 'address', 'gender', 'complete'] as const, 'id');
+  const [Funnel, setStep] = useFunnel(
+    ['id', 'userinfo', 'address', 'gender', 'complete'] as const,
+    'id',
+  );
   const { modalProp, setModal } = useContext(ModalContext);
   const api = useContext(ApiContainers);
   const [_, setCookie] = useCookies(['refreshToken']);
   const [funnelForm, setFunnelForm] = useState<RegisterFormProps>({
     id: '',
+    firstName: '',
+    lastName: '',
     gender: 'male',
     location: '',
   });
@@ -45,29 +53,54 @@ const Register = () => {
   return (
     <Funnel>
       <Funnel.Step name="id">
-        <h3 onClick={() => setStep('address')}>가입방식</h3>
+        <h3 onClick={() => setStep('userinfo')}>가입방식</h3>
+      </Funnel.Step>
+      <Funnel.Step name="userinfo">
+        <Form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const data = formHandler(e.currentTarget);
+            setFunnelForm((prev) => ({ ...prev, ...data }));
+            setStep('address');
+          }}
+        >
+          <InputContainer
+            name="firstName"
+            id="firstName"
+            type="text"
+            required={true}
+          ></InputContainer>
+          <InputContainer
+            name="lastName"
+            id="lastName"
+            type="text"
+            required={true}
+          ></InputContainer>
+          <Button>다음</Button>
+        </Form>
       </Funnel.Step>
       <Funnel.Step name="address">
         <h3 onClick={() => setStep('gender')}>집주소</h3>
       </Funnel.Step>
       <Funnel.Step name="gender">
-        <select
-          value={funnelForm.gender}
+        <Select
           name="gender"
-          onChange={(e: any) => {
+          id="gender"
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
             const {
-              currenTarget: { value },
+              target: { value },
             } = e;
-            console.log(value);
-            // setFunnelForm((prev) => ({ ...prev, value }));
+            setFunnelForm((prev) => {
+              return { ...prev, gender: value };
+            });
           }}
         >
           {userGender.map((item) => (
-            <option key={`gender_${item}`} value={item}>
+            <option key={`gender_${item}`} value={item} selected={item === funnelForm.gender}>
               {item}
             </option>
           ))}
-        </select>
+        </Select>
         <button
           onClick={() => {
             setStep('complete');
