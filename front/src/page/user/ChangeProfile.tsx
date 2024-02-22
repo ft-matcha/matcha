@@ -1,7 +1,7 @@
 import Form from '@/components/ui/Form';
 
 const ChangeProfile = () => {
-  return <Form></Form>;
+  return <Form />;
 };
 
 export default ChangeProfile;

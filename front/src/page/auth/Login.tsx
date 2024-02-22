@@ -1,5 +1,5 @@
 import Button from '@/components/ui/Button';
-import Form from '@/components/ui/Form';
+import Form, { formHandler } from '@/components/ui/Form';
 import InputContainer from '@/components/InputContainer';
 import { userInfo } from '@/data/AuthData';
 import { ApiContainers } from '@/provider/ApiContainerProvider';
@@ -16,11 +16,7 @@ export default function Login() {
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const data = new FormData(e.currentTarget);
-    const obj: Record<string, FormDataEntryValue> = {};
-    for (let [key, value] of data.entries()) {
-      obj[key] = value;
-    }
+    const obj = formHandler(e.currentTarget);
     const result = await api.call('get', 'login', obj, 'https://randomuser.me/api');
     if (result?.success) {
       setCookie('refreshToken', result.refreshToken, { path: '/' });
@@ -34,7 +30,7 @@ export default function Login() {
 
   return (
     <Form onSubmit={onSubmit}>
-      <div>
+      <div id="header">
         <h1>Login</h1>
         <p>Enter your email below to login to your account</p>
       </div>

@@ -1,14 +1,18 @@
 import styled from 'styled-components';
-import Card, { CardBody, CardFooter, CardHeader } from '@/components/ui/Card';
-import { useState } from 'react';
-import CardList from '@/components/CardList';
 import { StyledButton } from '@/components/ui/Button';
+import { StyledProfile } from '@/page/user/Profile';
+import { NavLink } from 'react-router-dom';
 
-const PostContainer = styled.section`
+const PostContainer = styled.section<{ gridArea?: string }>`
   min-height: 200px;
   width: 100%;
   max-width: 100%;
   height: fit-content;
+  grid-area: ${({ gridArea }) => (gridArea ? gridArea : 'main')};
+  .active {
+    background: ${({ theme }) => theme.backgroundHover};
+    color: ${({ theme }) => theme.colorHover};
+  }
   @media screen and (max-width: 768px) {
     max-width: 400px;
   }
@@ -33,7 +37,7 @@ const PostTabContainer = styled.div`
   background: ${({ theme }) => theme.background};
 `;
 
-const PostTab = styled(StyledButton)`
+const PostTab = styled(NavLink)`
   display: grid;
   text-align: center;
   align-items: center;
@@ -41,53 +45,36 @@ const PostTab = styled(StyledButton)`
   width: 100%;
   font-size: 32px;
   line-height: 100%;
-  color: ${({ theme }) => theme.color};
   &:first-child {
     border-right: 1px solid;
   }
-  &::hover {
-    background-color: red;
-    transition: all 1s;
+  &:hover {
+    background: ${({ theme }) => theme.backgroundHover};
+    color: ${({ theme }) => theme.colorHover};
   }
 `;
 
 const PostBody = styled.section`
+  display: flex;
+  justify-content: center;
   width: calc(100% - 1px);
-  div {
-    width: 100%;
+  ${StyledProfile} {
+    margin-top: 25px;
     border-top: 1px solid;
-    margin: -1px 0 0 -1px;
-    &: first-child {
-      border-top: 0px;
-    }
   }
 `;
-const test = [
-  { header: 'test', body: 'test1_data 어떤게 실행되는 거예요?' },
-  { header: 'test', body: 'test1_data 이게 실행되는 거예요?' },
-];
-const test2 = [
-  { header: 'test2222222222222', body: 'test2_data 어떤게 실행되는 거예요?' },
-  { header: 'test2222222222222', body: 'test2_data 어떤게 실행되는 거예요?' },
-  { header: 'test2222222222222', body: 'test2_data 어떤게 실행되는 거예요?' },
-  { header: 'test2222222222222', body: 'test2_data 이게 실행되는 거예요?' },
-  { header: 'test2222222222222', body: 'test2_data 이게 실행되는 거예요?' },
-  { header: 'test2222222222222', body: 'test2_data 이게 실행되는 거예요?' },
-];
 
-const Post = () => {
-  const [tab, setTab] = useState(false);
-
+const Post = ({ gridArea, children }: { gridArea?: string; children: React.ReactNode }) => {
   return (
     <>
-      <PostContainer>
+      <PostContainer gridArea={gridArea}>
         <PostTabContainer>
-          <PostTab onClick={() => setTab(false)}>user</PostTab>
-          <PostTab onClick={() => setTab(true)}>other</PostTab>
+          <PostTab to="recommend" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
+            For you
+          </PostTab>
+          <PostTab to="other">Following</PostTab>
         </PostTabContainer>
-        <PostBody>
-          <CardList data={!tab ? test : test2} />
-        </PostBody>
+        <PostBody>{children}</PostBody>
       </PostContainer>
     </>
   );
