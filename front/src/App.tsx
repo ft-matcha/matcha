@@ -14,8 +14,6 @@ const Container = styled.div`
 `;
 
 function App() {
-  const { modalProp } = React.useContext(ModalContext);
-
   return (
     <>
       <Container>

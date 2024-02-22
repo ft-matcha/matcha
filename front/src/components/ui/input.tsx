@@ -21,7 +21,7 @@ const InputContainer = styled.input<InputProps>`
   min-height: 40px;
 `;
 
-const Input: React.FC<InputProps> = ({ onChange, notFocus, readOnly, ...rest }) => {
+const Input: React.FC<InputProps> = ({ onChange, notFocus, ...rest }) => {
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ const Input: React.FC<InputProps> = ({ onChange, notFocus, readOnly, ...rest }) 
     ref.current && ref.current.focus();
   }, []);
 
-  return <InputContainer onChange={onChange} ref={ref} readOnly={readOnly} {...rest} />;
+  return <InputContainer onChange={onChange} ref={ref} {...rest} />;
 };
 
 export default Input;
