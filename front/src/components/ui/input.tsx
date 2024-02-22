@@ -22,6 +22,7 @@ const InputContainer = styled.input<InputProps>`
 `;
 
 const Input: React.FC<InputProps> = ({ onChange, notFocus, readOnly, ...rest }) => {
+
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
