@@ -9,6 +9,7 @@ import { CookiesProvider } from 'react-cookie';
 
 const apiInstanceObject: Record<string, any> = {
   loginApi: (apiInstance: Api.ApiInstance, baseUrl: string) => new LoginApi(apiInstance, baseUrl),
+  // emailApi: (apiInstance: Api.ApiInstance, baseUrl: string) => new ApiCall(apiInstance, baseUrl),
   registerApi: (apiInstance: Api.ApiInstance, baseUrl: string) =>
     new RegisterApi(apiInstance, baseUrl),
   profileApi: (apiInstance: Api.ApiInstance, baseUrl: string) => new ApiCall(apiInstance, baseUrl),

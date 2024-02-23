@@ -11,19 +11,11 @@ import Button from '@/components/ui/Button';
 import { formHandler } from '@/components/ui/Form';
 import { userGender } from '@/data/AuthData';
 import { ApiContainer } from '@/api/api';
+import EmailStep from '@/page/auth/register/EmailStep';
 
 interface RegisterFormProps {
   [key: string]: string | boolean;
 }
-
-const uniqueEmail = async (api: ApiContainer, email: string) => {
-  console.log(email);
-  const result = await api.call('get', 'register', { email });
-  return Promise.resolve({
-    success: false,
-  });
-  // return result;
-};
 
 const userRegister = async (
   api: ApiContainer,
@@ -55,13 +47,13 @@ const Register = () => {
 
   const onSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
-    next?: 'id' | 'userinfo' | 'address' | 'gender' | 'complete',
+    nextStep?: 'id' | 'userinfo' | 'address' | 'gender' | 'complete',
   ) => {
     e.preventDefault();
-    if (next && funnelForm.emailValid) {
+    if (nextStep && funnelForm.emailValid) {
       const data = formHandler(e.currentTarget);
       setFunnelForm((prev) => ({ ...prev, ...data }));
-      setStep(next);
+      setStep(nextStep);
       return;
     }
     await userRegister(api, funnelForm, setCookie, setModal);
@@ -69,32 +61,11 @@ const Register = () => {
   return (
     <Funnel>
       <Funnel.Step name="id">
-        <Form onSubmit={(e) => onSubmit(e, 'userinfo')}>
-          <InputContainer name="email" id="email" type="email" required={true}>
-            <Button
-              onClick={async (e) => {
-                e.preventDefault();
-                const email = e.currentTarget.previousElementSibling;
-                const response = await uniqueEmail(api, email.value);
-                if (response?.success) {
-                  setFunnelForm((prev) => ({ ...prev, emailValid: true }));
-                } else if (email) {
-                  email.focus();
-                }
-              }}
-            >
-              중복 확인
-            </Button>
-          </InputContainer>
-          <InputContainer
-            notFocus={true}
-            name="password"
-            id="password"
-            type="password"
-            required={true}
-          />
-          <Button>다음</Button>
-        </Form>
+        <EmailStep<['id' | 'userinfo' | 'address' | 'gender' | 'complete']>
+          api={api}
+          onSubmit={onSubmit}
+          setForm={setFunnelForm}
+        />
       </Funnel.Step>
       <Funnel.Step name="userinfo">
         <Form onSubmit={(e) => onSubmit(e, 'address')}>
@@ -128,7 +99,6 @@ const Register = () => {
       </Funnel.Step>
       <Funnel.Step name="complete">
         <Form onSubmit={onSubmit}>
-          <h3>가입완료</h3>
           <Button>done</Button>
         </Form>
       </Funnel.Step>

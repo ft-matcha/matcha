@@ -4,20 +4,15 @@ const StyledSelect = styled.select``;
 
 const Select = ({
   children,
-  name,
-  id,
-  onChange,
+  ...rest
 }: {
   children: React.ReactNode;
   name: string;
   id: string;
   onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  default?: string;
 }) => {
-  return (
-    <StyledSelect name={name} id={id} onChange={onChange}>
-      {children}
-    </StyledSelect>
-  );
+  return <StyledSelect {...rest}>{children}</StyledSelect>;
 };
 
 export default Select;

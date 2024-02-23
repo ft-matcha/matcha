@@ -24,11 +24,7 @@ const Step = <T extends readonly string[]>({ children }: StepProps<T>) => {
   return <>{children}</>;
 };
 
-const useFunnel = <T extends readonly string[]>(
-  steps: T,
-  defaultStep: T[number],
-  forwardRef?: ForwardedRef<T>,
-) => {
+const useFunnel = <T extends readonly string[]>(steps: T, defaultStep: T[number]) => {
   const [step, setStep] = useState(defaultStep);
 
   const FunnelElement = Object.assign(

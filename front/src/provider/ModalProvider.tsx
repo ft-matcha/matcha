@@ -1,5 +1,5 @@
 import Login from '@/page/auth/Login';
-import Register from '@/page/auth/Register';
+import Register from '@/page/auth/register/Register';
 import SearchModal from '@/page/modal/SearchModal';
 import { ModalChild } from '@/page/modal/SwitchModal';
 import { ModalProps } from '@/types';
@@ -34,23 +34,21 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
         });
         return;
       }
-      if (!modalProp.toggle) {
-        if (e.key === 'k' && e.metaKey) {
-          setModal({
-            modalType: 'searchModal',
-            toggle: true,
-          });
-        } else if (e.key === 'k' && e.ctrlKey) {
-          setModal({
-            modalType: 'loginModal',
-            toggle: true,
-          });
-        } else if (e.key === 'l' && e.ctrlKey) {
-          setModal({
-            modalType: 'signUpModal',
-            toggle: true,
-          });
-        }
+      if (e.key === 'k' && e.metaKey) {
+        setModal({
+          modalType: 'searchModal',
+          toggle: true,
+        });
+      } else if (e.key === 'k' && e.ctrlKey) {
+        setModal({
+          modalType: 'loginModal',
+          toggle: true,
+        });
+      } else if (e.key === 'l' && e.ctrlKey) {
+        setModal({
+          modalType: 'signUpModal',
+          toggle: true,
+        });
       }
     };
 
@@ -82,9 +80,7 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
     return () => {
       onRemoveScroll();
     };
-  }, [modalProp.toggle]); 
-
- 
+  }, [modalProp.toggle]);
 
   return (
     <>
