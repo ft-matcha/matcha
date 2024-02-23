@@ -1,7 +1,5 @@
 import Main from '@/page/Main';
-import Login from '@/page/auth/Login';
-import Register from '@/page/auth/Register';
-import ChangeProfile from '@/page/user/ChangeProfile';
+import Recommend from '@/page/recommend/Recommend';
 import Profile from '@/page/user/Profile';
 import { ApiProvider } from '@/provider/ApiContainerProvider';
 
@@ -21,8 +19,12 @@ const routes = createBrowserRouter([
             element: <Profile />,
           },
           {
-            path: 'me',
-            element: <ChangeProfile />,
+            path: 'liked',
+            element: <Recommend />,
+          },
+          {
+            path: 'recommend',
+            element: <Recommend />,
           },
         ],
       },

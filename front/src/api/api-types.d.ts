@@ -4,7 +4,7 @@ export namespace Api {
     password: string;
   }
 
-  interface BackendResponse {
+  interface BackendResponse extends Record<string, any> {
     ok?: boolean;
     data?: Record<string, any>;
   }

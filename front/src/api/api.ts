@@ -17,6 +17,7 @@ export class ApiCall {
   }
 
   callApi(type: string, url: string, params: any) {
+    console.log(params);
     switch (type) {
       case 'post':
         return this.getInstance().post(url, params);
@@ -47,7 +48,6 @@ export class RegisterApi extends ApiCall {
   }
 }
 
-
 interface ApiContainerProps {
   apiInstance: Api.ApiInstance;
   apiInstanceObject: Record<string, Function>;
@@ -72,28 +72,36 @@ export class ApiContainer {
     console.log(this);
   }
 
-  setBearerTokenInHeader(dataParams: Record<string, any>) {
+  setBearerTokenInHeader(type: 'get' | 'post' | 'put', dataParams: Record<string, any> | null) {
     const token = getToken('accessToken');
-    return {
+    const obj: Record<string, Record<string, string | null> | boolean | string> = {
       // withCredentials: true,
       headers: {
         Authorization: token && `bearer ${token}`,
       },
-      body: {
-        ...dataParams,
-      },
     };
+    if (!dataParams) return obj;
+    switch (type) {
+      case 'get':
+        obj.params = { ...dataParams };
+        return obj;
+      case 'post':
+      case 'put':
+        obj.body = { ...dataParams };
+        return obj;
+    }
   }
 
   run(method: string, target: string, dataParams: any, url?: string) {
     return (this.apiContainer[target + 'Api'] as ApiCall).fetchApi(method, dataParams, url);
   }
 
-  async call(type: string, target: string, dataParams: any, url?: string) {
+  async call(type: 'get' | 'post' | 'put', target: string, dataParams?: any, url?: string) {
     try {
-      const result = this.run(type, target, this.setBearerTokenInHeader(dataParams), url);
+      const result = this.run(type, target, this.setBearerTokenInHeader(type, dataParams), url);
       if (result instanceof Promise) {
         const response = await responsePipe(result as Promise<Api.BackendResponse>);
+        console.log(response);
         return response;
       }
     } catch (e) {
