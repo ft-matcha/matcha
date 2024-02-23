@@ -56,14 +56,21 @@ const getUserMany = async (id: number[]) => {
 
 const updateUser = async (email: string, body: any) => {
     try {
+        const userData = await getUser(email);
         if (body.password) {
             if (!process.env.secret) throw new Error('secret not found');
             const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(body.password).digest('hex');
             body.password = cryptoPass;
         }
+        Object.keys(body).forEach((key) => {
+            console.log(body[key] === userData[key], typeof body[key], typeof userData[key]);
+            if (body[key] === undefined) delete body[key];
+            if (body[key] === userData[key]) delete body[key];
+        });
         const user = await User.update({
             where: { email },
             data: body,
+            include: { profile: true },
         });
         return user;
     } catch (error: any) {
