@@ -1,6 +1,29 @@
 import userControllers from '../controllers/user-controllers';
 import profileControllers from '../controllers/profile-controllers';
 import elastic from '../lib/elastic';
+
+const checkEmail = async (req: any, res: any) => {
+    console.log(req.query);
+    try {
+        if (req.query['email']) {
+            const response = await userControllers.getUser(req.query.email);
+            if (response === undefined) {
+                res.status(200).json({ success: true });
+                return;
+            }
+            res.status(404).json({
+                success: false,
+                error: { message: 'User already exists' },
+            });
+        } else {
+            res.status(400).json({ success: false, error: { message: 'Invalid email' } });
+        }
+    } catch (error: any) {
+        console.error('checkEmail failed: ' + error.stack);
+        res.status(500).json({ success: false, error: { message: 'checkEmail failed : server error' } });
+    }
+};
+
 const get = async (req: any, res: any) => {
     try {
         const response = await userControllers.getUser(req.params.email);
@@ -53,4 +76,4 @@ const update = async (req: any, res: any) => {
     }
 };
 
-export default { get, update };
+export default { checkEmail, get, update };

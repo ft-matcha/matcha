@@ -33,12 +33,22 @@ const createUser = async (body: any) => {
     }
 };
 
-const getUser = async (email: string, include?: any) => {
+const getUser = async (email: string | number) => {
     try {
         const user = await User.readOne({
             where: { email },
+            include: { profile: true },
         });
         return user;
+    } catch (error: any) {
+        throw error;
+    }
+};
+
+const getUserMany = async (id: number[]) => {
+    try {
+        const users = await User.read(id);
+        return users;
     } catch (error: any) {
         throw error;
     }
@@ -95,12 +105,12 @@ const login = async (body: any) => {
             const accessToken = jwt.sign(user.email);
             const refreshToken = await jwt.refresh();
             if (user.verified === false) {
-                user.update({
+                User.update({
                     where: { email },
                     data: { status: 'NOT_VERIFIED' },
                 });
             } else {
-                user.update({
+                User.update({
                     where: { email },
                     data: { status: 'ACTIVE' },
                 });
@@ -149,4 +159,5 @@ export default {
     deleteUser,
     login,
     logout,
+    getUserMany,
 };

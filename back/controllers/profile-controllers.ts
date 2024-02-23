@@ -12,7 +12,7 @@ const createProfile = async (userId: number, body: any) => {
             tag: tag,
             age,
             image: image,
-            viewList: '[]',
+            viewList: [],
             userId: userId,
         });
         return profile;

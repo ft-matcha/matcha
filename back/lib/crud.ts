@@ -13,7 +13,7 @@ const dbConfig = {
 interface update {
     data: updateData;
     where: {
-        [key: string]: string;
+        [key: string]: string | number;
     };
 }
 interface updateData {
@@ -69,10 +69,19 @@ class crud {
 
     async readOne(data: any): Promise<any> {
         try {
-            const { where } = data;
+            const { where, include } = data;
+            let table = [this.table];
+            if (include) {
+                Object.keys(include).forEach((key) => {
+                    if (include[key] === true) table.push(key);
+                });
+            }
             const sql = fs.readFileSync(__dirname + '/../sql/readone.sql', 'utf-8');
             this.connection = await this.getConnection();
+            console.log(table);
+            console.log(this.connection.format(sql, [table, where]));
             const [row] = await this.connection.query<mysql.RowDataPacket[]>(sql, [this.table, where]);
+            console.log(row[0]);
             this.connection.release();
             return row[0];
         } catch (error: any) {
@@ -81,13 +90,31 @@ class crud {
             throw error;
         }
     }
-    async read() {
-        this.connection = await this.getConnection();
-        const sql = `SELECT * FROM ${this.table}`;
+    async read(data: any) {
         try {
-            const users = await this.connection.query(sql);
+            this.connection = await this.getConnection();
+            const { where } = data;
+            let value: any = [this.table];
+            let sql = `SELECT * FROM ?? WHERE ?`;
+            if (Array.isArray(where)) {
+                where.map((item: any, index) => {
+                    Object.entries(item).forEach(([key, values], i) => {
+                        let valueJson: any = {};
+                        valueJson[key] = values;
+                        value.push(valueJson);
+                        if (i !== Object.keys(item).length - 1) {
+                            sql += ` AND ?`;
+                        }
+                    });
+                    if (index !== where.length - 1) {
+                        sql += ` OR ?`;
+                    }
+                });
+            }
+            console.log(this.connection.format(sql, value));
+            const [row] = await this.connection.query(sql, value);
             this.connection.release();
-            return users[0];
+            return row;
         } catch (error: any) {
             console.error('DB read failed: ' + error.stack);
             if (this.connection) this.connection.release();
@@ -105,7 +132,6 @@ class crud {
             if (Object.keys(data).length === 0) throw new Error('No data to update');
             this.connection = await this.getConnection();
             const sql = fs.readFileSync(__dirname + '/../sql/update.sql', 'utf-8');
-            console.log(this.connection.format(sql, [this.table, data, where]));
             const response = await this.connection.query(sql, [this.table, data, where]);
             this.connection.release();
             return response;

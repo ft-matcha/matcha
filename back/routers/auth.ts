@@ -14,6 +14,7 @@ const login = async (req: any, res: any) => {
             });
         }
     } catch (error: any) {
+        console.error('login failed: ' + error.stack);
         res.status(500).json({ success: false, error: { messgae: 'login failed : server error' } });
     }
 };

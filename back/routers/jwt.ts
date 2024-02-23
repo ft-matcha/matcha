@@ -1,3 +1,4 @@
+import userControllers from '../controllers/user-controllers';
 import jwt from '../utils/jwt';
 
 const verifyJWT = async (req: any, res: any, next: any) => {
@@ -6,15 +7,23 @@ const verifyJWT = async (req: any, res: any, next: any) => {
             const token = req.headers.authorization.split('Bearer ')[1];
             const response = jwt.verify(token);
             if (response.status === false) {
+                const decode = jwt.decode(token);
+                console.log(decode);
+                if (decode['exp'] < Date.now() / 1000) {
+                    await userControllers.updateUser(decode['email'], { status: 'INACTIVE' });
+                }
                 res.status(401).json({ success: false, message: 'Expired Token' });
+                return;
             } else if (typeof response.decoded === 'object') {
                 if (response.decoded['email'] === undefined) {
                     res.status(401).json({ success: false, message: 'Invalid Token' });
                 } else {
                     req.email = response.decoded['email'];
                     next();
+                    return;
                 }
             }
+            res.status(401).json({ success: false, message: 'Invalid Token' });
         } else {
             res.status(401).json({ success: false, message: 'token does not exist' });
         }
