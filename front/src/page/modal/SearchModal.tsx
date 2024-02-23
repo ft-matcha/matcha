@@ -15,7 +15,7 @@ const SearchModal = () => {
       const { results } = (await api.call(
         'get',
         'register',
-        { text: data },
+        null,
         'https://randomuser.me/api',
       )) as any;
       setPrint(([...prev]: any) => {
@@ -69,7 +69,7 @@ const SearchModal = () => {
           console.log('hihi');
         }}
       >
-        {/* {text} */}
+        {text}
         {print?.map((item: any, index: number) => (
           <>
             <span key={item.id.value + index}>{item.name.first + item.name.last}</span>

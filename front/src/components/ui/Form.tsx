@@ -14,13 +14,15 @@ const FormContainer = styled.form<FormProps>`
 
 export const formHandler = (target: HTMLFormElement) => {
   const data = new FormData(target);
-  const obj: Record<string, FormDataEntryValue> = {};
+  const obj: Record<string, string> = {};
   for (let [key, value] of data.entries()) {
-    if (value) {
+    if (typeof value === 'string') {
       obj[key] = value;
+    } else if (value instanceof File) {
+      obj[key] = `File: ` + value.name;
     }
   }
-  return obj;
+  return { ...obj };
 };
 
 const Form: React.FC<FormProps> = ({ children, onSubmit, ...rest }) => {
