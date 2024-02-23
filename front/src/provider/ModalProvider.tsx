@@ -34,8 +34,8 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
         });
         return;
       }
-      if (modalProp.modalType === '') {
-        if (e.key === 'k' && e.metaKey && modalProp.modalType === '') {
+      if (!modalProp.toggle) {
+        if (e.key === 'k' && e.metaKey) {
           setModal({
             modalType: 'searchModal',
             toggle: true,
