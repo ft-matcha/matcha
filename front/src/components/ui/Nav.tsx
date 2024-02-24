@@ -1,7 +1,5 @@
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { ModalContext } from '@/provider/ModalProvider';
-import { useContext } from 'react';
 
 const NavContainer = styled.nav<{ gridarea: string }>`
   display: flex;
@@ -11,7 +9,7 @@ const NavContainer = styled.nav<{ gridarea: string }>`
   padding-top: 15px;
 `;
 
-const NavItem = styled(NavLink)`
+export const NavItem = styled(NavLink)`
   width: 80%;
   height: 50px;
   line-height: 50px;
@@ -26,31 +24,10 @@ const NavItem = styled(NavLink)`
   }
 `;
 
-const NavButton = styled(NavItem).attrs({ as: 'button' })``;
+export const NavButton = styled(NavItem).attrs({ as: 'button' })``;
 
-const Nav = ({ gridArea }: { gridArea: string }) => {
-  const { setModal } = useContext(ModalContext);
-  return (
-    <NavContainer gridarea={gridArea}>
-      <NavItem to="profile" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
-        profile
-      </NavItem>
-      <NavItem to="recommend" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
-        recommend
-      </NavItem>
-      <NavButton
-        to=""
-        onClick={() => {
-          setModal((modalProp: { modalType: string; toggle: boolean }) => ({
-            modalType: 'loginModal',
-            toggle: true,
-          }));
-        }}
-      >
-        Login
-      </NavButton>
-    </NavContainer>
-  );
+const Nav: React.FC<{ gridArea: string; children: React.ReactNode }> = ({ gridArea, children }) => {
+  return <NavContainer gridarea={gridArea}>{children}</NavContainer>;
 };
 
 export default Nav;
