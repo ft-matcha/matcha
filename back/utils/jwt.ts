@@ -12,6 +12,9 @@ interface verify {
     message?: string;
 }
 export default {
+    decode: (token: string) => {
+        return jwt.decode(token);
+    },
     sign: (email: string) => {
         const payload = {
             email: email,

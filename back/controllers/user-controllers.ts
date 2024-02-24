@@ -33,10 +33,11 @@ const createUser = async (body: any) => {
     }
 };
 
-const getUser = async (email: string, include?: any) => {
+const getUser = async (email: string | number) => {
     try {
         const user = await User.readOne({
             where: { email },
+            include: { profile: true },
         });
         return user;
     } catch (error: any) {
@@ -44,16 +45,32 @@ const getUser = async (email: string, include?: any) => {
     }
 };
 
+const getUserMany = async (id: number[]) => {
+    try {
+        const users = await User.read(id);
+        return users;
+    } catch (error: any) {
+        throw error;
+    }
+};
+
 const updateUser = async (email: string, body: any) => {
     try {
+        const userData = await getUser(email);
         if (body.password) {
             if (!process.env.secret) throw new Error('secret not found');
             const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(body.password).digest('hex');
             body.password = cryptoPass;
         }
+        Object.keys(body).forEach((key) => {
+            console.log(body[key] === userData[key], typeof body[key], typeof userData[key]);
+            if (body[key] === undefined) delete body[key];
+            if (body[key] === userData[key]) delete body[key];
+        });
         const user = await User.update({
             where: { email },
             data: body,
+            include: { profile: true },
         });
         return user;
     } catch (error: any) {
@@ -95,12 +112,12 @@ const login = async (body: any) => {
             const accessToken = jwt.sign(user.email);
             const refreshToken = await jwt.refresh();
             if (user.verified === false) {
-                user.update({
+                User.update({
                     where: { email },
                     data: { status: 'NOT_VERIFIED' },
                 });
             } else {
-                user.update({
+                User.update({
                     where: { email },
                     data: { status: 'ACTIVE' },
                 });
@@ -149,4 +166,5 @@ export default {
     deleteUser,
     login,
     logout,
+    getUserMany,
 };

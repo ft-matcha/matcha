@@ -2,4 +2,4 @@ FROM node
 
 WORKDIR /app
 
-ENTRYPOINT sleep 5 && npm run dev
+ENTRYPOINT sleep 10 && npm run dev

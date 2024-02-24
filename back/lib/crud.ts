@@ -13,7 +13,16 @@ const dbConfig = {
 interface update {
     data: updateData;
     where: {
-        [key: string]: string;
+        [key: string]: string | number;
+    };
+    include?: {
+        [key: string]: boolean;
+    };
+}
+interface create {
+    data: createData;
+    include?: {
+        [key: string]: boolean;
     };
 }
 interface updateData {
@@ -56,7 +65,6 @@ class crud {
                 if (typeof data[key] === 'object') data[key] = JSON.stringify(data[key]);
             });
             const sql = fs.readFileSync(__dirname + '/../sql/create.sql', 'utf-8');
-            console.log(this.connection.format(sql, [this.table, data]));
             const response = await this.connection.query(sql, [this.table, data]);
             this.connection.release();
             return response;
@@ -69,10 +77,20 @@ class crud {
 
     async readOne(data: any): Promise<any> {
         try {
-            const { where } = data;
-            const sql = fs.readFileSync(__dirname + '/../sql/readone.sql', 'utf-8');
+            const { where, include } = data;
+            let value: any[] = [this.table];
+            let sql = fs.readFileSync(__dirname + '/../sql/readOne.sql', 'utf-8');
+            if (include) {
+                sql = fs.readFileSync(__dirname + `/../sql/read${this.table}.sql`, 'utf-8');
+                Object.keys(include).forEach((key) => {
+                    if (include[key] === true) {
+                        value.push(key);
+                    }
+                });
+            }
+            value.push(where);
             this.connection = await this.getConnection();
-            const [row] = await this.connection.query<mysql.RowDataPacket[]>(sql, [this.table, where]);
+            const [row] = await this.connection.query<mysql.RowDataPacket[]>(sql, value);
             this.connection.release();
             return row[0];
         } catch (error: any) {
@@ -81,13 +99,30 @@ class crud {
             throw error;
         }
     }
-    async read() {
-        this.connection = await this.getConnection();
-        const sql = `SELECT * FROM ${this.table}`;
+    async read(data: any) {
         try {
-            const users = await this.connection.query(sql);
+            this.connection = await this.getConnection();
+            const { where } = data;
+            let value: any = [this.table];
+            let sql = `SELECT * FROM ?? WHERE ?`;
+            if (Array.isArray(where)) {
+                where.map((item: any, index) => {
+                    Object.entries(item).forEach(([key, values], i) => {
+                        let valueJson: any = {};
+                        valueJson[key] = values;
+                        value.push(valueJson);
+                        if (i !== Object.keys(item).length - 1) {
+                            sql += ` AND ?`;
+                        }
+                    });
+                    if (index !== where.length - 1) {
+                        sql += ` OR ?`;
+                    }
+                });
+            }
+            const [row] = await this.connection.query(sql, value);
             this.connection.release();
-            return users[0];
+            return row;
         } catch (error: any) {
             console.error('DB read failed: ' + error.stack);
             if (this.connection) this.connection.release();
@@ -97,16 +132,26 @@ class crud {
 
     async update(body: update) {
         try {
-            const { data, where } = body;
+            const { data, where, include } = body;
+            console.log(body);
+            let sql = fs.readFileSync(__dirname + '/../sql/update.sql', 'utf-8');
+            let value: any = [this.table];
+            if (include) {
+                sql = fs.readFileSync(__dirname + `/../sql/update${this.table}.sql`, 'utf-8');
+                Object.keys(include).forEach((key) => {
+                    if (include[key] === true) {
+                        value.push(key);
+                    }
+                });
+            }
+            if (Object.keys(data).length === 0) throw new Error('No data to update');
             Object.keys(data).forEach((key) => {
-                if (data[key] === undefined) delete data[key];
                 if (typeof data[key] === 'object') data[key] = JSON.stringify(data[key]);
             });
-            if (Object.keys(data).length === 0) throw new Error('No data to update');
+            value.push(data);
+            value.push(where);
             this.connection = await this.getConnection();
-            const sql = fs.readFileSync(__dirname + '/../sql/update.sql', 'utf-8');
-            console.log(this.connection.format(sql, [this.table, data, where]));
-            const response = await this.connection.query(sql, [this.table, data, where]);
+            const response = await this.connection.query(sql, value);
             this.connection.release();
             return response;
         } catch (error: any) {

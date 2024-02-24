@@ -81,6 +81,11 @@ class elastic {
     async update(email: string, data: any) {
         try {
             await this.getClient();
+            const exists = await this.client.exists({ index: this.index, id: email });
+            if (!exists) {
+                const response = await this.create(email, data);
+                return response;
+            }
             const response = await this.client.update({
                 index: this.index,
                 id: email,
@@ -88,6 +93,7 @@ class elastic {
             });
             return response;
         } catch (error: any) {
+            console.error('Elasticsearch update failed: ' + error.stack);
             throw error;
         }
     }
