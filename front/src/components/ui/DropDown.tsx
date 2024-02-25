@@ -17,6 +17,9 @@ const DetailDropDownStyle = styled.div`
 
 const DetailStyle = styled.details`
   position: relative;
+  summary::-webkit-details-marker {
+    font-size: 0px;
+  }
   ${DetailDropDownStyle} {
     z-index: 1000;
     background: rgba(255, 255, 255, 255);
@@ -36,7 +39,10 @@ const DetailStyle = styled.details`
 
 const SummaryStyle = styled.summary`
   ::marker {
-    content: '';
+    font-size: 0px;
+  }
+  ::-webkit-details-marker {
+    font-size: 0px;
   }
   list-style: none;
   &:hover {
