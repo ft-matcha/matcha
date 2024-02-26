@@ -1,38 +1,33 @@
-import { cloneElement, useEffect, useRef, useState } from 'react';
+import { RefObject, cloneElement, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 const DetailStyle = styled.details`
   width: 100%;
   height: 100%;
   position: relative;
+  summary::-webkit-details-marker {
+    display: inline-block;
+    font-size: 0px;
+  }
 `;
 
 const SummaryStyle = styled.summary`
-  display: flex;
   z-index: 1000;
-  height: 100%;
-  max-height: 100%;
+  padding: 5px;
+  display: flex;
+  height: fit-content;
   margin: 0;
   padding: auto;
-  font-size: 0px;
   margin: 0 auto;
-  ::marker {
-    font-size: 0px;
-  }
   svg {
     font-size: 32px;
-  }
-  div::-webkit-details-marker {
-    content: '';
-    list-style: none;
-    display: none;
   }
 `;
 
 const DetailDropDownStyle = styled.div`
   z-index: 1000;
   position: absolute;
-  display: flex;
+  display: block;
   top: 78px;
   right: 3px;
   width: 400px;
@@ -52,15 +47,27 @@ const DropDownButton = ({
   openElement: React.ReactNode;
   closeElement: React.ReactNode;
 }) => {
+  const ref = useRef<HTMLElement>(null);
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (ref.current === null) return;
+    const DetailDropDownEvent = () => {
+      const parentRef = ref.current?.parentNode as HTMLElement;
+      const parentOpen = parentRef.getAttribute('open');
+      if (open && parentOpen === null) {
+        parentRef.setAttribute('open', '');
+      } else if (!open && parentOpen !== null) {
+        parentRef.removeAttribute('open');
+      }
+    };
+    DetailDropDownEvent();
+  }, [open]);
 
+  const onClick = (e: React.MouseEvent) => {
+    setOpen((prev) => !prev);
+  };
   return (
-    <SummaryStyle
-      onClick={() => {
-        console.log('switch');
-        setOpen((prev) => !prev);
-      }}
-    >
+    <SummaryStyle ref={ref} onClick={onClick}>
       {open ? openElement : closeElement}
     </SummaryStyle>
   );
@@ -78,7 +85,7 @@ const DropDown = ({
   const ref = useRef<HTMLDetailsElement>(null);
 
   return (
-    <DetailStyle ref={ref}>
+    <DetailStyle ref={ref} onClick={(e) => e.preventDefault()}>
       <DropDownButton openElement={openElement} closeElement={closeElement} />
       <DetailDropDownStyle>{children}</DetailDropDownStyle>
     </DetailStyle>
