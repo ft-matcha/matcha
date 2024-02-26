@@ -22,7 +22,7 @@ export default {
         if (!secret) throw new Error('secret not found');
         return jwt.sign(payload, secret, {
             algorithm: 'HS256',
-            expiresIn: '30m',
+            expiresIn: '1d',
         });
     },
     verify: (token: any) => {

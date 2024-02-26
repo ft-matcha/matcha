@@ -18,8 +18,6 @@ const createUser = async (body: any) => {
             password: cryptoPass,
             phone,
             address,
-            verified: false,
-            status: 'NOT_VERIFIED',
         });
         const accessToken = await jwt.sign(email);
         const refreshToken = await jwt.refresh();
@@ -33,11 +31,11 @@ const createUser = async (body: any) => {
     }
 };
 
-const getUser = async (email: string | number) => {
+const getUser = async (email: string | number, profile?: boolean) => {
     try {
         const user = await User.readOne({
             where: { email },
-            include: { profile: true },
+            include: profile ? { profile: true } : undefined,
         });
         return user;
     } catch (error: any) {
@@ -103,12 +101,14 @@ const login = async (body: any) => {
                 success: false,
                 error: { message: 'User not found' },
             };
-        } else if (user.status === 'ACTIVE') {
-            return {
-                success: false,
-                error: { message: 'User already logged in' },
-            };
-        } else if (user.password === cryptoPass) {
+        }
+        //  else if (user.status === 'ACTIVE' ) {
+        //     return {
+        //         success: false,
+        //         error: { message: 'User already logged in' },
+        //     };
+        // }
+        else if (user.password === cryptoPass) {
             const accessToken = jwt.sign(user.email);
             const refreshToken = await jwt.refresh();
             if (user.verified === false) {

@@ -1,0 +1,1 @@
+SELECT alert.* FROM ?? WHERE ?

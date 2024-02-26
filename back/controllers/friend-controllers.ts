@@ -2,12 +2,13 @@ import curd from '../lib/crud';
 import userControllers from './user-controllers';
 const Friend = new curd('relation');
 
-const requestFriend = async (fromId: number, toId: number) => {
+const createFriend = async (fromUser: string, toUser: string) => {
     try {
+        const from = await userControllers.getUser(fromUser);
+        const to = await userControllers.getUser(toUser);
         const friend = await Friend.create({
-            fromId,
-            toId,
-            status: false,
+            fromId: from.id,
+            toId: to.id,
         });
         return true;
     } catch (error: any) {
@@ -15,11 +16,13 @@ const requestFriend = async (fromId: number, toId: number) => {
     }
 };
 
-const acceptFriend = async (fromId: number, toId: number) => {
+const updateFriend = async (toUser: string, fromUser: string, status: string) => {
     try {
+        const from = await userControllers.getUser(fromUser);
+        const to = await userControllers.getUser(toUser);
         await Friend.update({
-            where: { fromId, toId },
-            data: { status: true },
+            where: { fromId: from.id, toId: to.id },
+            data: { status: status },
         });
         return true;
     } catch (error: any) {
@@ -27,22 +30,47 @@ const acceptFriend = async (fromId: number, toId: number) => {
     }
 };
 
-const getFriend = async (userId: number) => {
-    const friend = await Friend.read({
-        where: [
-            { fromId: userId, status: true },
-            { toId: userId, status: true },
-        ],
-    });
-    const data = friend.map((item: any) => {
-        if (item.fromId === userId) {
-            return item.toId;
+const getFriend = async (email: string | any, status?: string, fromTo?: string) => {
+    if (typeof email === 'string') {
+        const friend = await Friend.read({
+            where: { email: email, 'relation.status': status },
+            include: { user: true },
+        });
+        const user = await userControllers.getUser(email);
+        if (!fromTo) {
+            const data = friend.map((item: any) => {
+                if (item.fromId === user.id) {
+                    return item.toId;
+                } else {
+                    return item.fromId;
+                }
+            });
+            return data;
         } else {
-            return item.fromId;
+            const data = friend.map((item: any) => {
+                if (fromTo === 'from') {
+                    if (item.fromId === user.id) {
+                        return item.toId;
+                    }
+                } else {
+                    if (item.toId === user.id) {
+                        return item.fromId;
+                    }
+                }
+            });
+            return data;
         }
-    });
-    const userData = await userControllers.getUserMany(data);
-    return data;
+    } else {
+        const from = await userControllers.getUser(email.fromUser);
+        const to = await userControllers.getUser(email.toUser);
+        const friend = await Friend.readOne({
+            where: [
+                { fromId: from.id, toId: to.id },
+                { fromId: to.id, toId: from.id },
+            ],
+        });
+        return friend;
+    }
 };
 
-export default { requestFriend, acceptFriend, getFriend };
+export default { createFriend, updateFriend, getFriend };
