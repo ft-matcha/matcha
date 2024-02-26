@@ -27,11 +27,10 @@ const PostContainer = styled.section<{ gridArea?: string }>`
 
 const PostTabContainer = styled.div`
   display: grid;
-
   position: sticky;
   top: 0;
-  height: 50px;
-  line-height: 50px;
+  height: 42px;
+  line-height: 42px;
   opacity: 1;
   border-bottom: 1px solid;
   margin: -1px 0 0 -1px;

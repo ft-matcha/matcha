@@ -16,7 +16,13 @@ const Main = () => {
   return (
     <Layout>
       <Nav gridArea="nav">
-        <NavItem to="profile" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
+        <NavItem
+          to="profile"
+          className={({ isActive }) => {
+            console.log(isActive);
+            return isActive ? 'actived' : 'pending';
+          }}
+        >
           profile
         </NavItem>
         <NavItem to="recommend" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
