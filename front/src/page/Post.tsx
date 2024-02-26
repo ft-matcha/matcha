@@ -1,7 +1,6 @@
 import styled from 'styled-components';
 import { FaBell } from 'react-icons/fa';
 import { CiBellOff } from 'react-icons/ci';
-
 import { StyledProfile } from '@/page/user/Profile';
 import { NavLink } from 'react-router-dom';
 import DropDown from '@/components/ui/DropDown';
@@ -57,6 +56,7 @@ const PostBody = styled.section`
   display: flex;
   justify-content: center;
   width: calc(100% - 1px);
+  margin-top: 40px;
   ${StyledProfile} {
     margin-top: 25px;
     border-top: 1px solid;

@@ -28,6 +28,8 @@ html {
   height: 100%;
   width: 100%;
   overflow-y: scroll;
+  overscroll-behavior-y: none;
+  
 }
 body{
   line-height: 1;
