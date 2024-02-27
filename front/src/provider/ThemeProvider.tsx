@@ -19,7 +19,7 @@ const theme = {
 };
 
 const ThemeProvider = ({ children }: { children: ReactNode }) => {
-  return <STheme theme={theme.lightTheme}>{children}</STheme>;
+  return <STheme theme={theme.darkTheme}>{children}</STheme>;
 };
 
 export default ThemeProvider;

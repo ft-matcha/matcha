@@ -1,22 +1,42 @@
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
-const NavContainer = styled.nav<{ gridarea: string }>`
+interface NavProps {
+  height?: string;
+  background?: string;
+  children?: React.ReactNode;
+}
+
+export const NavContainer = styled.nav<NavProps>`
   display: flex;
-  flex-direction: column;
   gap: 10px;
-  gridarea: ${({ gridarea }) => (gridarea ? gridarea : 'nav')};
-  padding-top: 15px;
+  border-right: 1px solid rgba(0, 0, 0, 0.3);
+  min-width: 325px;
+  background: ${({ background, theme }) => (background ? background : theme.background)};
+  max-width: 375px;
+  line-height: 100px;
+  height: 100px;
 `;
 
-export const NavItem = styled(NavLink)`
+export const NavRow = styled.section<NavProps>`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  background: ${({ background }) => (background ? background : 'transparent')};
+`;
+
+export const NavItem = styled(NavLink)<NavProps>`
   width: 80%;
-  height: 50px;
-  line-height: 50px;
-  font-size: 32px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 22px;
   border-radius: 5px;
   text-align: start;
-  & .actived {
+  align-items: center;
+  .active {
     background: ${({ theme }) => theme.backgroundHover};
   }
   &:hover {
@@ -26,8 +46,8 @@ export const NavItem = styled(NavLink)`
 
 export const NavButton = styled(NavItem).attrs({ as: 'button' })``;
 
-const Nav: React.FC<{ gridArea: string; children: React.ReactNode }> = ({ gridArea, children }) => {
-  return <NavContainer gridarea={gridArea}>{children}</NavContainer>;
+const Nav: React.FC<NavProps> = ({ children, ...rest }) => {
+  return <NavContainer {...rest}>{children}</NavContainer>;
 };
 
 export default Nav;
