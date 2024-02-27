@@ -1,5 +1,5 @@
 import Post, { PostTabContainer } from '@/page/Post';
-import Nav, { NavButton, NavContainer, NavItem, NavRow } from '@/components/ui/Nav';
+import Nav from '@/components/ui/Nav';
 import { ModalContext } from '@/provider/ModalProvider';
 import { useContext, useEffect } from 'react';
 import { Outlet } from 'react-router';
@@ -21,50 +21,44 @@ const Main = () => {
   return (
     <Layout>
       <Aside>
-        <NavContainer>
-          <NavRow background="rgba(24,132, 23, 0.2)" height="100px">
-            <NavItem
+        <Nav>
+          <Nav.Row background="rgba(24,132, 23, 0.2)" height="100px">
+            <Nav.Item
               to="profile"
-              height="100px"
               className={({ isActive }) => {
                 console.log(isActive);
                 return isActive ? 'actived' : 'pending';
               }}
             >
               .
-            </NavItem>
-            <NavRow>
-              <NavItem
-                height="100px"
-                to="recommend"
-                className={({ isActive }) => (isActive ? 'actived' : 'pending')}
-              >
+            </Nav.Item>
+            <Nav.Row float="right">
+              <Nav.Item to="" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
                 ..
-              </NavItem>
-              <NavItem
-                height="100px"
-                to="recommend"
-                className={({ isActive }) => (isActive ? 'actived' : 'pending')}
-              >
+              </Nav.Item>
+              <Nav.Item to="" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
                 ...
-              </NavItem>
-            </NavRow>
-          </NavRow>
-        </NavContainer>
-        <NavContainer>
-          <NavRow>
+              </Nav.Item>
+            </Nav.Row>
+          </Nav.Row>
+        </Nav>
+        <Nav>
+          <Nav.Row>
             <Post>
               <PostTabContainer>
-                <NavRow height="22px">
-                  <NavItem to="active">매치</NavItem>
-                  <NavItem to="">메시지</NavItem>
-                </NavRow>
+                <Nav.Row>
+                  <Nav.Item to="active">매치</Nav.Item>
+                  <Nav.Item to="">메시지</Nav.Item>
+                </Nav.Row>
               </PostTabContainer>
             </Post>
-          </NavRow>
-        </NavContainer>
+          </Nav.Row>
+          <Outlet />
+        </Nav>
       </Aside>
-      <Outlet />
+      <div style={{ objectFit: 'contain', width: '100%', height: '100%' }}>
+        <img src="/cat.jpg" alt="main" />
+      </div>
     </Layout>
   );
 };

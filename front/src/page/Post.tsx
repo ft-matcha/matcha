@@ -3,11 +3,9 @@ import { StyledProfile } from '@/page/user/Profile';
 import { NavLink } from 'react-router-dom';
 
 const PostContainer = styled.section<{ gridArea?: string }>`
-  grid-area: 'main';
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  min-height: 200px;
   width: 100%;
   max-width: 100%;
   height: 100%;
