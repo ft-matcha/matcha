@@ -1,7 +1,7 @@
 import Post, { PostTabContainer } from '@/page/Post';
 import Nav from '@/components/ui/Nav';
 import { ModalContext } from '@/provider/ModalProvider';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
 import Aside from '@/components/ui/Aside';
@@ -18,6 +18,7 @@ const Layout = styled.section`
 
 const Main = () => {
   const { setModal } = useContext(ModalContext);
+  const [activePage, setActivePage] = useState('');
   return (
     <Layout>
       <Aside>
@@ -33,10 +34,18 @@ const Main = () => {
               .
             </Nav.Item>
             <Nav.Row float="right">
-              <Nav.Item to="" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
+              <Nav.Item
+                to=""
+                className={({ isActive }) => (isActive ? 'actived' : 'pending')}
+                onClick={() => setActivePage('profile')}
+              >
                 ..
               </Nav.Item>
-              <Nav.Item to="" className={({ isActive }) => (isActive ? 'actived' : 'pending')}>
+              <Nav.Item
+                to=""
+                className={({ isActive }) => (isActive ? 'actived' : 'pending')}
+                onClick={() => setActivePage('test')}
+              >
                 ...
               </Nav.Item>
             </Nav.Row>
@@ -56,9 +65,7 @@ const Main = () => {
           <Outlet />
         </Nav>
       </Aside>
-      <div style={{ objectFit: 'contain', width: '100%', height: '100%' }}>
-        <img src="/cat.jpg" alt="main" />
-      </div>
+      {activePage}
     </Layout>
   );
 };
