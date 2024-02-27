@@ -4,6 +4,8 @@ import Swagger from '../lib/swagger';
 import auth from './api/auth/index';
 import jwt from './api/jwt/index';
 import user from './api/user/index';
+import relation from './api/relation/index';
+import alert from './api/alert/index';
 
 class ApiDocs {
     private apiDocsOptions;
@@ -14,6 +16,8 @@ class ApiDocs {
             ...user,
             ...auth,
             ...jwt,
+            ...relation,
+            ...alert,
         };
         this.swagger = new Swagger();
     }

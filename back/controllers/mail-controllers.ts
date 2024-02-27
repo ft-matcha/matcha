@@ -30,6 +30,7 @@ export default class mailer {
                 subject: 'Email Verification',
                 text: code,
             };
+            console.log(code);
             const response = await transporter.sendMail(mailOptions);
             console.log('Mail sent: ' + response.response);
         } catch (error: any) {

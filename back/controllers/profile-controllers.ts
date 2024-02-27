@@ -7,23 +7,25 @@ const createProfile = async (userId: number, body: any) => {
     try {
         const profile = await Profile.create({
             gender,
-            preferences: preferences,
+            preferences,
             biography,
-            tag: tag,
+            tag,
             age,
-            image: image,
+            image,
             viewList: [],
             userId: userId,
         });
+
         return profile;
     } catch (error: any) {
         throw error;
     }
 };
 
-const getProfile = async (userId: Number) => {
+const getProfile = async (email: string) => {
     const profile = await Profile.readOne({
-        where: { userId: userId },
+        where: { email: email },
+        include: { user: true },
     });
     return profile;
 };

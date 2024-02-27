@@ -65,7 +65,7 @@ const sendEmail = async (req: any, res: any) => {
         if (user === undefined) {
             res.status(401).json({ success: false, error: { message: 'User not found' } });
             return;
-        } else if (user.verified === true) {
+        } else if (user.verified === 1) {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
             return;
         }
@@ -83,7 +83,7 @@ const sendEmail = async (req: any, res: any) => {
 const verifyEmail = async (req: any, res: any) => {
     try {
         const user = await userControllers.getUser(req.email);
-        if (user.verified === true) {
+        if (user.verified === 1) {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
             return;
         }
