@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { StyledProfile } from '@/page/user/Profile';
 import { NavLink } from 'react-router-dom';
 
-const PostContainer = styled.section<{ gridArea?: string }>`
+const PostContainer = styled.section`
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -47,7 +47,6 @@ export const PostTab = styled(NavLink)`
 const PostBody = styled.section`
   display: flex;
   justify-content: center;
-  height: fit-content;
   width: calc(100% - 1px);
   margin: 0px auto;
   align-items: center;
@@ -57,10 +56,10 @@ const PostBody = styled.section`
   }
 `;
 
-const Post = ({ gridArea, children }: { gridArea?: string; children: React.ReactNode }) => {
+const Post = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
-      <PostContainer gridArea={gridArea}>
+      <PostContainer>
         <PostBody>{children}</PostBody>
       </PostContainer>
     </>

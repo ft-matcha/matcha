@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 
 interface NavProps {
+  borderRight?: string;
   height?: string;
   background?: string;
   children?: React.ReactNode;
@@ -10,23 +11,22 @@ interface NavProps {
 }
 
 const NavContainer = styled.nav<NavProps>`
-  display: flex;
   gap: 10px;
-  border-right: 1px solid rgba(0, 0, 0, 0.3);
+  border-right: ${({ borderRight }) => (borderRight ? borderRight + 'solid gray' : '0px')};
   min-width: 325px;
   background: ${({ background, theme }) => (background ? background : theme.background)};
   color: ${({ theme }) => theme.color};
   max-width: 375px;
-  line-height: 100px;
-  height: 100px;
+  line-height: normal;
+  height: auto;
 `;
 
 const NavRow = styled.section<NavProps>`
+  text-align: center;
   width: 100%;
   display: flex;
   flex-direction: row;
   justify-content: ${({ float }) => (float ? float : 'start')};
-  overflow: hidden;
   align-items: center;
   gap: 10px;
   height: ${({ height }) => (height ? height : '40px')};
@@ -34,20 +34,33 @@ const NavRow = styled.section<NavProps>`
 `;
 
 const NavItem = styled(NavLink)<NavProps>`
-  width: fit-content;
-  max-width: 50%;
-  text-ellipse: ellipsis;
+  width: 100%;
   height: 40px;
   line-height: 40px;
   font-size: 22px;
   border-radius: 5px;
-  text-align: start;
+  text-align: center;
   align-items: center;
   .active {
     background: ${({ theme }) => theme.backgroundHover};
   }
   &:hover {
     background: ${({ theme }) => theme.backgroundHover};
+  }
+`;
+
+const NavSection = styled.section<NavProps>`
+  display: flex;
+  flex-direction: row wrap;
+  height: auto;
+  border-top: 1px solid;
+  width: 100%;
+  overflow: scroll;
+  object-fit: contain;
+  scrollbar-width: none;
+
+  &:: -webkit-scrollbar {
+    display: none;
   }
 `;
 
@@ -61,4 +74,5 @@ export default Object.assign(Nav, {
   Item: NavItem,
   Row: NavRow,
   Button: NavButton,
+  Section: NavSection,
 });

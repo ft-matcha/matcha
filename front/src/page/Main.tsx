@@ -5,11 +5,13 @@ import { useContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
 import Aside from '@/components/ui/Aside';
+import { CgProfile } from 'react-icons/cg';
 
 const Layout = styled.section`
   display: grid;
   grid-template-columns: minmax(320px, 375px) 4fr;
   width: 100%;
+  min-height: 100%;
   @media screen and (max-width: 1000px) {
     grid-template-columns: 1fr;
     display: flex;
@@ -31,7 +33,10 @@ const Main = () => {
                 return isActive ? 'actived' : 'pending';
               }}
             >
-              .
+              <Nav.Row>
+                <CgProfile />
+                <span>프로필</span>
+              </Nav.Row>
             </Nav.Item>
             <Nav.Row float="right">
               <Nav.Item
@@ -56,13 +61,15 @@ const Main = () => {
             <Post>
               <PostTabContainer>
                 <Nav.Row>
-                  <Nav.Item to="active">매치</Nav.Item>
-                  <Nav.Item to="">메시지</Nav.Item>
+                  <Nav.Item to="matching">매치</Nav.Item>
+                  <Nav.Item to="message">메시지</Nav.Item>
                 </Nav.Row>
               </PostTabContainer>
             </Post>
           </Nav.Row>
-          <Outlet />
+          <Nav.Section>
+            <Outlet />
+          </Nav.Section>
         </Nav>
       </Aside>
       {activePage}
