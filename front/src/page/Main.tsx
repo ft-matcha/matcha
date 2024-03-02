@@ -3,13 +3,17 @@ import Nav from '@/components/ui/Nav';
 import { ModalContext } from '@/provider/ModalProvider';
 import { useContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router';
+import { Route } from 'react-router-dom';
 import styled from 'styled-components';
 import Aside from '@/components/ui/Aside';
 import { CgProfile } from 'react-icons/cg';
+import Profile from './user/Profile';
+import Card, { CardBody, CardFooter, CardHeader } from '@/components/ui/Card';
 
 const Layout = styled.section`
   display: grid;
   grid-template-columns: minmax(320px, 375px) 4fr;
+  grid-template-areas: 'aside main';
   width: 100%;
   min-height: 100%;
   @media screen and (max-width: 1000px) {
@@ -18,9 +22,14 @@ const Layout = styled.section`
   }
 `;
 
+const MainSection = styled.main`
+  grid-area: 'main';
+`;
+
 const Main = () => {
   const { setModal } = useContext(ModalContext);
   const [activePage, setActivePage] = useState('');
+
   return (
     <Layout>
       <Aside>
@@ -72,7 +81,7 @@ const Main = () => {
           </Nav.Section>
         </Nav>
       </Aside>
-      {activePage}
+      <MainSection id="main"></MainSection>
     </Layout>
   );
 };

@@ -12,7 +12,7 @@ const StyledAside = styled.aside`
   }
 `;
 
-const Aside = ({ children }: { children: React.ReactNode }) => {
+const Aside = ({ children }: { children?: React.ReactNode }) => {
   return <StyledAside>{children}</StyledAside>;
 };
 
