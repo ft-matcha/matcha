@@ -12,6 +12,7 @@ interface NavProps {
 
 const NavContainer = styled.nav<NavProps>`
   gap: 10px;
+  width: 100%;
   border-right: ${({ borderRight }) => (borderRight ? borderRight + 'solid gray' : '0px')};
   min-width: 325px;
   background: ${({ background, theme }) => (background ? background : theme.background)};
@@ -33,7 +34,14 @@ const NavRow = styled.section<NavProps>`
   background: ${({ background }) => (background ? background : 'transparent')};
 `;
 
+const NavList = styled.div<NavProps>`
+  width: fit-content;
+  display: flex;
+  flex-direction: row;
+`;
+
 const NavItem = styled(NavLink)<NavProps>`
+  display: flex;
   width: 100%;
   height: 40px;
   line-height: 40px;
@@ -41,6 +49,7 @@ const NavItem = styled(NavLink)<NavProps>`
   border-radius: 5px;
   text-align: center;
   align-items: center;
+  gap: 3px;
   .active {
     background: ${({ theme }) => theme.backgroundHover};
   }
@@ -58,7 +67,6 @@ const NavSection = styled.section<NavProps>`
   overflow: scroll;
   object-fit: contain;
   scrollbar-width: none;
-
   &:: -webkit-scrollbar {
     display: none;
   }
@@ -74,5 +82,6 @@ export default Object.assign(Nav, {
   Item: NavItem,
   Row: NavRow,
   Button: NavButton,
+  List: NavList,
   Section: NavSection,
 });

@@ -27,42 +27,25 @@ const MainSection = styled.main`
 `;
 
 const Main = () => {
-  const { setModal } = useContext(ModalContext);
-  const [activePage, setActivePage] = useState('');
+  const [post, setPost] = useState('');
 
   return (
     <Layout>
       <Aside>
         <Nav>
           <Nav.Row background="rgba(24,132, 23, 0.2)" height="100px">
-            <Nav.Item
-              to="profile"
-              className={({ isActive }) => {
-                console.log(isActive);
-                return isActive ? 'actived' : 'pending';
-              }}
-            >
-              <Nav.Row>
+            <Nav.List>
+              <Nav.Item
+                to="profile"
+                className={({ isActive }) => {
+                  console.log(isActive);
+                  return isActive ? 'actived' : 'pending';
+                }}
+              >
                 <CgProfile />
                 <span>프로필</span>
-              </Nav.Row>
-            </Nav.Item>
-            <Nav.Row float="right">
-              <Nav.Item
-                to=""
-                className={({ isActive }) => (isActive ? 'actived' : 'pending')}
-                onClick={() => setActivePage('profile')}
-              >
-                ..
               </Nav.Item>
-              <Nav.Item
-                to=""
-                className={({ isActive }) => (isActive ? 'actived' : 'pending')}
-                onClick={() => setActivePage('test')}
-              >
-                ...
-              </Nav.Item>
-            </Nav.Row>
+            </Nav.List>
           </Nav.Row>
         </Nav>
         <Nav>
@@ -70,18 +53,46 @@ const Main = () => {
             <Post>
               <PostTabContainer>
                 <Nav.Row>
-                  <Nav.Item to="matching">매치</Nav.Item>
-                  <Nav.Item to="message">메시지</Nav.Item>
+                  <Nav.List>
+                    <Nav.Item
+                      as="Button"
+                      to=""
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (post !== 'match') {
+                          setPost('match');
+                        } else {
+                          setPost('');
+                        }
+                      }}
+                    >
+                      매치
+                    </Nav.Item>
+                  </Nav.List>
+                  <Nav.List>
+                    <Nav.Item
+                      as="Button"
+                      to=""
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (post !== 'message') {
+                          setPost('message');
+                        } else {
+                          setPost('');
+                        }
+                      }}
+                    >
+                      메시지
+                    </Nav.Item>
+                  </Nav.List>
                 </Nav.Row>
               </PostTabContainer>
             </Post>
           </Nav.Row>
-          <Nav.Section>
-            <Outlet />
-          </Nav.Section>
+          <Nav.Section>{post === '' ? <Outlet /> : <>test</>}</Nav.Section>
         </Nav>
       </Aside>
-      <MainSection id="main"></MainSection>
+      <MainSection id="main">{post !== '' && <Outlet />}</MainSection>
     </Layout>
   );
 };
