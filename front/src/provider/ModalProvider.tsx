@@ -4,10 +4,12 @@ import SearchModal from '@/page/modal/SearchModal';
 import { ModalChild } from '@/page/modal/SwitchModal';
 import { ModalProps } from '@/types';
 import { createContext, useEffect, useState } from 'react';
+import RecommendResult from '@/page/recommend/RecommendResult';
+import { useNavigate } from 'react-router-dom';
 
 export const ModalContext = createContext({
   modalProp: {
-    modalType: 'searchModal',
+    modalType: '',
     toggle: true,
   },
   setModal: (modalProp: any) => {},
@@ -18,6 +20,7 @@ const ModalType: {
 } = {
   loginModal: <Login />,
   signUpModal: <Register />,
+  recommendModal: <RecommendResult />,
 };
 
 const ModalProvider: React.FC<ModalProps> = ({ children }) => {
@@ -25,9 +28,19 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
     modalType: '',
     toggle: false,
   });
+  const navigator = useNavigate();
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
+        if (modalProp.modalType === 'recommendModal') {
+          console.log('fucking');
+          setModal({
+            modalType: '',
+            toggle: false,
+          });
+          navigator(-1);
+          return;
+        }
         setModal({
           modalType: '',
           toggle: false,
@@ -70,10 +83,8 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
     };
 
     const onRemoveScroll = () => {
-      setTimeout(() => {
-        const html = document.querySelector('html') as HTMLElement;
-        html.style.overflowY = 'auto';
-      }, 1000);
+      const html = document.querySelector('html') as HTMLElement;
+      html.style.overflowY = 'auto';
       window.removeEventListener('scroll', onScroll);
     };
     window.addEventListener('scroll', onScroll);
@@ -81,6 +92,7 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
       onRemoveScroll();
     };
   }, [modalProp.toggle]);
+  useEffect(() => {}, [modalProp.toggle, modalProp.modalType]);
 
   return (
     <>

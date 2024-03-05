@@ -21,7 +21,7 @@ export const PostTabContainer = styled.div`
   display: grid;
   position: sticky;
   top: 0;
-  height: 12px;
+  height: fit-content;
   line-height: 12px;
   opacity: 1;
   margin: -1px 0 0 -1px;

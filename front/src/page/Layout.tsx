@@ -1,46 +1,45 @@
 import Post, { PostTabContainer } from '@/page/Post';
 import Nav from '@/components/ui/Nav';
-import { ModalContext } from '@/provider/ModalProvider';
 import { useContext, useEffect, useState } from 'react';
 import { Outlet } from 'react-router';
-import { Route } from 'react-router-dom';
 import styled from 'styled-components';
 import Aside from '@/components/ui/Aside';
 import { CgProfile } from 'react-icons/cg';
-import Profile from './user/Profile';
-import Card, { CardBody, CardFooter, CardHeader } from '@/components/ui/Card';
 
-const Layout = styled.section`
+const LayoutDefault = styled.section`
   display: grid;
   grid-template-columns: minmax(320px, 375px) 4fr;
   grid-template-areas: 'aside main';
   width: 100%;
-  min-height: 100%;
-  @media screen and (max-width: 1000px) {
+  height: 100%;
+
+  @media screen and (max-width: 768px) {
+    width: 100%;
     grid-template-columns: 1fr;
-    display: flex;
+    grid-template-rows: 100%;
+    grid-template-areas: 'aside';
   }
 `;
 
 const MainSection = styled.main`
-  grid-area: 'main';
+  grid-area: main;
+  height: 100%;
+  @media screen and (max-width: 768px) {
+  }
 `;
 
-const Main = () => {
+const Layout = () => {
   const [post, setPost] = useState('');
 
   return (
-    <Layout>
+    <LayoutDefault>
       <Aside>
         <Nav>
           <Nav.Row background="rgba(24,132, 23, 0.2)" height="100px">
             <Nav.List>
               <Nav.Item
                 to="profile"
-                className={({ isActive }) => {
-                  console.log(isActive);
-                  return isActive ? 'actived' : 'pending';
-                }}
+                className={({ isActive }) => (isActive ? 'actived' : 'pending')}
               >
                 <CgProfile />
                 <span>프로필</span>
@@ -52,10 +51,10 @@ const Main = () => {
           <Nav.Row>
             <Post>
               <PostTabContainer>
-                <Nav.Row>
+                <Nav.Row height="auto">
                   <Nav.List>
                     <Nav.Item
-                      as="Button"
+                      as="button"
                       to=""
                       onClick={(e) => {
                         e.preventDefault();
@@ -66,35 +65,29 @@ const Main = () => {
                         }
                       }}
                     >
-                      매치
+                      DM
                     </Nav.Item>
                   </Nav.List>
                   <Nav.List>
                     <Nav.Item
-                      as="Button"
-                      to=""
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (post !== 'message') {
-                          setPost('message');
-                        } else {
-                          setPost('');
-                        }
-                      }}
+                      to="recommend"
+                      className={({ isActive }) => (isActive ? 'actived' : 'pending')}
                     >
-                      메시지
+                      추천
                     </Nav.Item>
                   </Nav.List>
                 </Nav.Row>
               </PostTabContainer>
             </Post>
           </Nav.Row>
-          <Nav.Section>{post === '' ? <Outlet /> : <>test</>}</Nav.Section>
+          <Nav.Section id="nav-section">
+            <Outlet />
+          </Nav.Section>
         </Nav>
       </Aside>
-      <MainSection id="main">{post !== '' && <Outlet />}</MainSection>
-    </Layout>
+      <MainSection id="main"></MainSection>
+    </LayoutDefault>
   );
 };
 
-export default Main;
+export default Layout;

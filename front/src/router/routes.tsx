@@ -1,10 +1,11 @@
-import Main from '@/page/Main';
+import Layout from '@/page/Layout';
 import Recommend from '@/page/recommend/Recommend';
+import RecommendResult from '@/page/recommend/RecommendResult';
 import Profile from '@/page/user/Profile';
 import ProfileList from '@/page/user/ProfileList';
 import { ApiProvider } from '@/provider/ApiContainerProvider';
 
-import { Outlet, createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
 
 const routes = createBrowserRouter([
   {
@@ -13,7 +14,7 @@ const routes = createBrowserRouter([
     children: [
       {
         path: '',
-        element: <Main />,
+        element: <Layout />,
         children: [
           {
             path: 'profile',
@@ -27,11 +28,17 @@ const routes = createBrowserRouter([
           },
           {
             path: 'liked',
-            element: <Recommend />,
+            element: <>liked</>,
           },
           {
             path: 'recommend',
             element: <Recommend />,
+            children: [
+              {
+                path: ':id',
+                element: <RecommendResult />,
+              },
+            ],
           },
         ],
       },
