@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
+import Layout from './page/Layout';
 
 const Container = styled.div`
   min-height: 100%;
@@ -16,7 +17,7 @@ function App() {
   return (
     <>
       <Container>
-        <Outlet />
+        <Layout />
       </Container>
     </>
   );

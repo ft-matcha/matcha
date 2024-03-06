@@ -60,7 +60,7 @@ const SearchModal = () => {
             });
           }}
         >
-          close
+          X
         </button>
       </ModalHeader>
       <ModalBody

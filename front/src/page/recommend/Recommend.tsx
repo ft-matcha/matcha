@@ -1,11 +1,13 @@
 import CardList from '@/components/CardList';
 import ReactDOM, { createPortal } from 'react-dom';
-import { Link, useParams, useOutletContext } from 'react-router-dom';
+import { Link, useParams, useOutletContext, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
-import RecommendResult from '@/page/recommend/RecommendResult';
-import { useContext, useEffect } from 'react';
+import RecommendResult, { RecommendTest } from '@/page/recommend/RecommendResult';
+import { useContext, useEffect, useState } from 'react';
 import { ModalContext } from '@/provider/ModalProvider';
 import Nav from '@/components/ui/Nav';
+import { ModalContextProps } from '@/types';
+import portalWrapper from '@/utils/portalWrapper';
 
 const RecommendData = [
   {
@@ -40,53 +42,58 @@ const RecommendData = [
   },
 ];
 
-const recommendMobile = ({
-  modalProp,
-  setModal,
-}: {
-  modalProp: { modalType: string; toggle: boolean };
-  setModal: (modalProp: { modalType: string; toggle: boolean }) => void;
-}) => {
-  if (modalProp.modalType === 'recommendModal' && modalProp.toggle) {
-    return;
-  }
-  setModal({ toggle: true, modalType: 'recommendModal' });
-};
+const RecommendModal = ({ id }: { id: string | undefined }) => {
+  const navigator = useNavigate();
+  const { setModal } = useContext(ModalContext);
 
-const recommendDesktop = () => {
-  return ReactDOM.createPortal(<RecommendResult />, document.getElementById('main') as Element);
-};
-
-const recommendCondition = ({
-  mobile,
-  modalProp,
-  setModal,
-}: {
-  mobile: 'mobile' | 'desktop';
-  modalProp: { modalType: string; toggle: boolean };
-  setModal: (modalProp: { modalType: string; toggle: boolean }) => void;
-}) => {
-  return mobile === 'mobile' ? recommendMobile({ modalProp, setModal }) : recommendDesktop();
+  useEffect(() => {
+    if (!id) {
+      return;
+    }
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setModal({ modalType: '', toggle: false });
+        navigator('/recommend');
+      }
+    };
+    setModal({ modalType: 'recommendModal', toggle: true });
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
+  }, [id]);
+  return <></>;
 };
 
 const Recommend = () => {
-  const params = useParams();
-  const { modalProp, setModal } = useContext(ModalContext);
+  const { id } = useParams();
+  const [mobile, setMobile] = useState(false);
 
-  if (params.id) {
-    recommendCondition({
-      mobile: document.body.clientWidth > 768 ? 'desktop' : 'mobile',
-      modalProp,
-      setModal,
-    });
-  }
+  useEffect(() => {
+    const onResize = () => {
+      if (document.body.clientWidth > 768) {
+        mobile && setMobile(() => false);
+      } else {
+        !mobile && setMobile(() => true);
+      }
+    };
+    onResize();
+    window.addEventListener('resize', onResize);
+    return () => {
+      window.removeEventListener('resize', onResize);
+    };
+  }, []);
+  useEffect(() => {
+    console.log('render');
+  }, [mobile, document.getElementById('main')]);
+
   return (
     <>
       <Nav>
         {RecommendData.map((data, index) => (
           <Nav.Row key={index} height="200px">
             <Nav.Item
-              to={data.url === params.id ? '' : data.url}
+              to={data.url === id ? '' : data.url}
               height="200px"
               background_image={data.image}
             >
@@ -95,6 +102,10 @@ const Recommend = () => {
           </Nav.Row>
         ))}
       </Nav>
+      {!mobile
+        ? portalWrapper(<RecommendTest />, document.getElementById('main') as Element)
+        : null}
+      <RecommendModal id={id} />
     </>
   );
 };

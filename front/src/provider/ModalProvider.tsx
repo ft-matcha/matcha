@@ -33,12 +33,10 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         if (modalProp.modalType === 'recommendModal') {
-          console.log('fucking');
           setModal({
             modalType: '',
             toggle: false,
           });
-          navigator(-1);
           return;
         }
         setModal({

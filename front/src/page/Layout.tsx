@@ -1,6 +1,6 @@
 import Post, { PostTabContainer } from '@/page/Post';
 import Nav from '@/components/ui/Nav';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useRef, useState } from 'react';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
 import Aside from '@/components/ui/Aside';
@@ -53,18 +53,7 @@ const Layout = () => {
               <PostTabContainer>
                 <Nav.Row height="auto">
                   <Nav.List>
-                    <Nav.Item
-                      as="button"
-                      to=""
-                      onClick={(e) => {
-                        e.preventDefault();
-                        if (post !== 'match') {
-                          setPost('match');
-                        } else {
-                          setPost('');
-                        }
-                      }}
-                    >
+                    <Nav.Item as="button" to="">
                       DM
                     </Nav.Item>
                   </Nav.List>

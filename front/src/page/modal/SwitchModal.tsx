@@ -12,6 +12,7 @@ export const ModalChild: React.FC<ModalProviderProps> = ({ children, header, set
     <Modal width="600px" onToggle={() => setModal({ modalType: '', toggle: false })}>
       <ModalHeader>
         <h2>{header}</h2>
+        <button onClick={() => setModal({ modalType: '', toggle: false })}>X</button>
       </ModalHeader>
       <ModalBody> {children}</ModalBody>
     </Modal>

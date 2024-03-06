@@ -13,34 +13,28 @@ const routes = createBrowserRouter([
     element: <ApiProvider />,
     children: [
       {
-        path: '',
-        element: <Layout />,
+        path: 'recommend',
+        element: <Recommend />,
         children: [
           {
-            path: 'profile',
-            element: <Profile />,
-            children: [
-              {
-                path: ':id',
-                element: <ProfileList />,
-              },
-            ],
-          },
-          {
-            path: 'liked',
-            element: <>liked</>,
-          },
-          {
-            path: 'recommend',
-            element: <Recommend />,
-            children: [
-              {
-                path: ':id',
-                element: <RecommendResult />,
-              },
-            ],
+            path: ':id',
+            element: <RecommendResult />,
           },
         ],
+      },
+      {
+        path: 'profile',
+        element: <Profile />,
+        children: [
+          {
+            path: ':id',
+            element: <ProfileList />,
+          },
+        ],
+      },
+      {
+        path: 'liked',
+        element: <>liked</>,
       },
     ],
   },

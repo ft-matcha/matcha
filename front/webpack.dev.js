@@ -5,9 +5,7 @@ module.exports = merge(common, {
   mode: 'development',
   devtool: 'eval',
   devServer: {
-    historyApiFallback: {
-      index: 'dist/index.html',
-    },
+    historyApiFallback: { index: '/', disableDotRule: true, verbose: true },
     port: 3000,
     hot: true,
     client: {
