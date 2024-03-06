@@ -44,7 +44,7 @@ const RecommendData = [
 
 const RecommendModal = ({ id }: { id: string | undefined }) => {
   const navigator = useNavigate();
-  const { setModal } = useContext(ModalContext);
+  const { modalProp, setModal } = useContext(ModalContext);
 
   useEffect(() => {
     if (!id) {
@@ -62,6 +62,11 @@ const RecommendModal = ({ id }: { id: string | undefined }) => {
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [id]);
+  useEffect(() => {
+    if (modalProp.toggle === false) {
+      navigator('/recommend');
+    }
+  }, [modalProp]);
   return <></>;
 };
 

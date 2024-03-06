@@ -4,8 +4,8 @@ import SearchModal from '@/page/modal/SearchModal';
 import { ModalChild } from '@/page/modal/SwitchModal';
 import { ModalProps } from '@/types';
 import { createContext, useEffect, useState } from 'react';
-import RecommendResult from '@/page/recommend/RecommendResult';
 import { useNavigate } from 'react-router-dom';
+import { lazy } from 'react';
 
 export const ModalContext = createContext({
   modalProp: {
@@ -14,6 +14,8 @@ export const ModalContext = createContext({
   },
   setModal: (modalProp: any) => {},
 });
+
+const RecommendResult = lazy(() => import('@/page/recommend/RecommendResult'));
 
 const ModalType: {
   [key: string]: React.ReactNode;
