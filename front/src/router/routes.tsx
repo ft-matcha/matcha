@@ -1,6 +1,8 @@
-import Main from '@/page/Main';
+import Layout from '@/page/Layout';
 import Recommend from '@/page/recommend/Recommend';
+import RecommendResult from '@/page/recommend/RecommendResult';
 import Profile from '@/page/user/Profile';
+import ProfileList from '@/page/user/ProfileList';
 import { ApiProvider } from '@/provider/ApiContainerProvider';
 
 import { createBrowserRouter } from 'react-router-dom';
@@ -11,22 +13,28 @@ const routes = createBrowserRouter([
     element: <ApiProvider />,
     children: [
       {
-        path: '',
-        element: <Main />,
+        path: 'recommend',
+        element: <Recommend />,
         children: [
           {
-            path: 'profile',
-            element: <Profile />,
-          },
-          {
-            path: 'liked',
-            element: <Recommend />,
-          },
-          {
-            path: 'recommend',
-            element: <Recommend />,
+            path: ':id',
+            element: <RecommendResult />,
           },
         ],
+      },
+      {
+        path: 'profile',
+        element: <Profile />,
+        children: [
+          {
+            path: ':id',
+            element: <ProfileList />,
+          },
+        ],
+      },
+      {
+        path: 'liked',
+        element: <>liked</>,
       },
     ],
   },
