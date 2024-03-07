@@ -27,9 +27,9 @@ a, dl, dt, dd, ol, ul, li, form, label, table{
 html {
   height: 100%;
   width: 100%;
-  overflow-y: scroll;
-  overscroll-behavior: none;
+  overscroll-behavior-y: none;
 }
+
 body{
   line-height: 1;
   font-family: 'Noto Sans KR', sans-serif;
@@ -37,6 +37,7 @@ body{
   margin-bottom: 100px;
   min-height: 100%;
   min-width: 100%;
+  overscroll-behavior-y: none;
 }
 ol, ul{
   list-style: none;

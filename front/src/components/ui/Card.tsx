@@ -24,9 +24,9 @@ const CardComponents = styled.div<CardProps>`
   margin: -1px 0 0 -1px;
   border: 1px solid;
   min-height: 420px;
-  min-width: 280px;
+  min-width: ${({ minWidth }) => (minWidth ? minWidth : '280px')};
   height: fit-content;
-  @media screen and (max-width: 480px) {
+  480px) {
     width: 100%;
     max-width: 100%;
   }
@@ -36,4 +36,8 @@ const Card: React.FC<CardProps> = ({ children, ...rest }) => {
   return <CardComponents {...rest}>{children}</CardComponents>;
 };
 
-export default Card;
+export default Object.assign(Card, {
+  Header: CardHeader,
+  Footer: CardFooter,
+  Body: CardBody,
+});

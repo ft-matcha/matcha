@@ -37,3 +37,18 @@ export const userRegister: InputContainerProps[] = [
 ];
 
 export const userGender = ['male', 'female', 'other'];
+
+export const dropData = [
+  {
+    name: '흐르는 강물을',
+    id: 'river',
+  },
+  {
+    name: '거꾸로 거슬러 오르는',
+    id: 'upstream',
+  },
+  {
+    name: '연어들의',
+    id: 'salmon',
+  },
+];

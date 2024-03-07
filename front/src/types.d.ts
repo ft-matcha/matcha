@@ -27,3 +27,15 @@ export interface CardProps {
   borderRadius?: string;
   children?: ReactNode;
 }
+
+export interface ModalContextProps {
+  setModal: (prev: {
+    modalProp: {
+      modalType: string;
+      toggle: boolean;
+    };
+  }) => void | {
+    modalType: string;
+    toggle: boolean;
+  };
+}
