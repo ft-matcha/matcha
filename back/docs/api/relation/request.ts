@@ -1,6 +1,6 @@
 export default {
     '/friend/request': {
-        get: {
+        post: {
             tags: ['relation'],
             summary: '친구 요청',
             description: '친구 요청',
@@ -9,17 +9,21 @@ export default {
                     bearerAuth: [],
                 },
             ],
-            parameters: [
-                {
-                    in: 'query',
-                    name: 'email',
-                    required: true,
-                    schema: {
-                        type: 'string',
+            requestBody: {
+                content: {
+                    'application/json': {
+                        schema: {
+                            properties: {
+                                email: {
+                                    type: 'string',
+                                    description: '이메일',
+                                    example: 'srdn45@gmail.com',
+                                },
+                            },
+                        },
                     },
-                    description: '친구 요청할 유저 email',
                 },
-            ],
+            },
             responses: {
                 200: {
                     description: '친구 요청 성공',

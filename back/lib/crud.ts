@@ -1,5 +1,6 @@
 import fs from 'fs';
 import mysql from 'mysql2/promise';
+import QueryBuilder from './queryBuilder';
 const dbConfig = {
     host: process.env.MYSQL_HOST,
     user: process.env.MYSQL_USER,
@@ -11,16 +12,16 @@ const dbConfig = {
 };
 
 interface update {
-    data: updateData;
+    set: updateData;
     where: {
-        [key: string]: string | number;
+        [key: string]: string | number | undefined;
     };
     include?: {
         [key: string]: boolean;
     };
 }
 interface create {
-    data: createData;
+    set: createData;
     include?: {
         [key: string]: boolean;
     };
@@ -44,7 +45,7 @@ class crud {
         try {
             if (crud.migration) return;
             this.connection = await this.getConnection();
-            const sql = await fs.promises.readFile(__dirname + '/../sql/init.sql', 'utf-8');
+            const sql = await fs.readFileSync(__dirname + '/../sql/init.sql', 'utf-8');
             await this.connection.query(sql);
             console.log('DB migration success');
             crud.migration = true;
@@ -61,16 +62,18 @@ class crud {
             throw error;
         }
     }
-    async create(data: createData) {
+
+    async create(data: any) {
         try {
             this.connection = await this.getConnection();
-            let value: any = [[this.table]];
-            Object.keys(data).forEach((key) => {
-                if (typeof data[key] === 'object') data[key] = JSON.stringify(data[key]);
-            });
-            const sql = fs.readFileSync(__dirname + '/../sql/create.sql', 'utf-8');
-            value.push(data);
-            const response = await this.connection.query(sql, value);
+            const { query, params } = new QueryBuilder()
+                .insert(this.table)
+                .set(data.set)
+                .selectJoin(data.selectJoin)
+                .where(data.where)
+                .build();
+            console.log(this.connection?.format(query, params));
+            const response = await this.connection.query(query, params);
             this.connection.release();
             return response;
         } catch (error: any) {
@@ -82,42 +85,18 @@ class crud {
 
     async readOne(data: any): Promise<any> {
         try {
-            const { where, include } = data;
-            let value: any[] = [[this.table]];
-            let sql = fs.readFileSync(__dirname + '/../sql/readOne.sql', 'utf-8');
-            if (include) {
-                Object.keys(include).forEach((key) => {
-                    if (include[key] === true) {
-                        value[0].push(key);
-                    }
-                });
-            }
-            if (Array.isArray(where)) {
-                where.map((item: any, index) => {
-                    Object.entries(item).forEach(([key, values], i) => {
-                        value.push({
-                            [key]: values,
-                        });
-                        if (i !== Object.keys(item).length - 1) {
-                            sql += ` AND ?`;
-                        }
-                    });
-                    if (index !== where.length - 1) {
-                        sql += ` OR ?`;
-                    }
-                });
-            } else {
-                Object.entries(where).forEach(([key, values], i) => {
-                    value.push({
-                        [key]: values,
-                    });
-                    if (i !== Object.keys(where).length - 1) {
-                        sql += ` AND ?`;
-                    }
-                });
-            }
+            const { query, params } = new QueryBuilder()
+                .select([data.join ? this.table + '.*' : '*'])
+                .from(this.table)
+                .join(data.join)
+                .include(data.include)
+                .where(data.where)
+                .limit(1)
+                .build();
             this.connection = await this.getConnection();
-            const [row] = await this.connection.query<mysql.RowDataPacket[]>(sql, value);
+            console.log(this.connection.format(query, params));
+            const [row] = await this.connection.query<mysql.RowDataPacket[]>(query, params);
+            console.log(row);
             this.connection.release();
             return row[0];
         } catch (error: any) {
@@ -126,53 +105,18 @@ class crud {
             throw error;
         }
     }
-    async read(data: any) {
+    async read(data?: any) {
         try {
             this.connection = await this.getConnection();
-            const { where, include } = data;
-            let value: any = [[this.table]];
-            let sql: string;
-            if (fs.existsSync(__dirname + `/../sql/read${this.table}.sql`)) {
-                sql = fs.readFileSync(__dirname + `/../sql/read${this.table}.sql`, 'utf-8');
-            } else {
-                sql = fs.readFileSync(__dirname + '/../sql/read.sql', 'utf-8');
-            }
-            if (include) {
-                Object.keys(include).forEach((key) => {
-                    if (include[key] === true) {
-                        value[0].push(key);
-                    }
-                });
-            }
-            if (typeof where === 'string') {
-                value.push(where);
-            } else if (typeof where === 'object') {
-                Object.keys(where).forEach((key, idx) => {
-                    if (idx !== Object.keys(where).length - 1) {
-                        sql += ' AND ?';
-                    }
-                    value.push({
-                        [key]: where[key],
-                    });
-                });
-            }
-            console.log(this.connection.format(sql, value));
-            // if (Array.isArray(where)) {
-            //     where.map((item: any, index) => {
-            //         Object.entries(item).forEach(([key, values], i) => {
-            //             let valueJson: any = {};
-            //             valueJson[key] = values;
-            //             value.push(valueJson);
-            // if (i !== Object.keys(item).length - 1) {
-            //     sql += ` AND ?`;
-            // }
-            // });
-            // if (index !== where.length - 1) {
-            //     sql += ` OR ?`;
-            // }
-            // });
-            // }
-            const [row] = await this.connection.query(sql, value);
+            const { query, params } = new QueryBuilder()
+                .select([data.join ? this.table + '.*' : '*'], data.select)
+                .from(this.table)
+                .join(data.join)
+                .include(data.include)
+                .where(data.where)
+                .build();
+            console.log(this.connection.format(query, params));
+            const [row] = await this.connection.query<mysql.RowDataPacket[]>(query, params);
             this.connection.release();
             return row;
         } catch (error: any) {
@@ -182,34 +126,17 @@ class crud {
         }
     }
 
-    async update(body: update) {
+    async update(data: any) {
         try {
-            const { data, where, include } = body;
-            let sql = fs.readFileSync(__dirname + '/../sql/update.sql', 'utf-8');
-            let value: any = [[this.table]];
-            if (include) {
-                sql = fs.readFileSync(__dirname + `/../sql/update${this.table}.sql`, 'utf-8');
-                Object.keys(include).forEach((key) => {
-                    if (include[key] === true) {
-                        value[0].push(key);
-                    }
-                });
-            }
-            if (Object.keys(data).length === 0) throw new Error('No data to update');
-            Object.keys(data).forEach((key) => {
-                if (typeof data[key] === 'object') data[key] = JSON.stringify(data[key]);
-            });
-            value.push(data);
-            Object.keys(where).forEach((key, idx) => {
-                if (idx !== Object.keys(where).length - 1) {
-                    sql += ' AND ?';
-                }
-                value.push({
-                    [key]: where[key],
-                });
-            });
+            const { query, params } = new QueryBuilder()
+                .update(this.table)
+                .include(data.include)
+                .join(data.join)
+                .set(data.set)
+                .where(data.where)
+                .build();
             this.connection = await this.getConnection();
-            const response = await this.connection.query(sql, value);
+            const response = await this.connection.query(query, params);
             this.connection.release();
             return response;
         } catch (error: any) {

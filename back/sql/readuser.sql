@@ -1,1 +1,0 @@
-SELECT * FROM ?? LEFT JOIN ?? ON user.id=profile.userId WHERE ?;

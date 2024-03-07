@@ -97,15 +97,12 @@ class elastic {
             throw error;
         }
     }
-    async search(key: string, query: string) {
+    async search(data: any) {
         try {
             await this.getClient();
-            var match: { [key: string]: string } = {};
-            match[key] = query;
             const response = await this.client.search({
-                query: {
-                    match,
-                },
+                index: this.index,
+                query: data,
             });
             return response;
         } catch (error: any) {

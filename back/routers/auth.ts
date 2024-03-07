@@ -1,9 +1,12 @@
 import userControllers from '../controllers/user-controllers';
 import mailControllers from '../controllers/mail-controllers';
+import elastic from '../lib/elastic';
 const login = async (req: any, res: any) => {
     try {
         const response = await userControllers.login(req.body);
-        if (response.success === false) {
+        if (response === undefined) {
+            res.status(404).json({ success: false, error: { message: 'User not found' } });
+        } else if (response.success === false) {
             res.status(401).json(response);
         } else {
             const { accessToken, refreshToken } = response;
@@ -22,7 +25,9 @@ const login = async (req: any, res: any) => {
 const signup = async (req: any, res: any) => {
     try {
         const user = await userControllers.getUser(req.body.email);
+        console.log(user);
         if (user === undefined) {
+            console.log(req.body);
             const response = await userControllers.createUser(req.body);
             console.log('signUp success');
             const { refreshToken, accessToken } = response;
@@ -49,7 +54,6 @@ const logout = async (req: any, res: any) => {
         const response = await userControllers.logout(req.email);
         if (response.success === false) {
             res.status(401).json(response);
-            return;
         } else {
             res.clearCookie('refreshToken');
             res.status(201).json(response);
@@ -59,13 +63,14 @@ const logout = async (req: any, res: any) => {
         res.status(500).json({ success: false, error: { message: 'logout failed : server error' } });
     }
 };
+
 const sendEmail = async (req: any, res: any) => {
     try {
-        const user = await userControllers.getUser(req.email);
-        if (user === undefined) {
+        const response = await userControllers.getUser(req.email);
+        if (response === undefined) {
             res.status(401).json({ success: false, error: { message: 'User not found' } });
             return;
-        } else if (user.verified === 1) {
+        } else if (response.verified === 1) {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
             return;
         }
@@ -83,6 +88,10 @@ const sendEmail = async (req: any, res: any) => {
 const verifyEmail = async (req: any, res: any) => {
     try {
         const user = await userControllers.getUser(req.email);
+        if (user === undefined) {
+            res.status(401).json({ success: false, error: { message: 'User not found' } });
+            return;
+        }
         if (user.verified === 1) {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
             return;
@@ -90,7 +99,11 @@ const verifyEmail = async (req: any, res: any) => {
         const mailer = new mailControllers(req.email);
         const response = mailer.verifyEmail(req.params.code);
         if (response === true) {
-            await userControllers.updateUser(req.email, { status: 'ACTIVE', verified: true });
+            if (user.profile === 1) {
+                const { id, password, profile, verified, userId, profileId, ...rest } = user;
+                await elastic.update(req.email, rest);
+            }
+            await userControllers.updateUser(req.email, { verified: 1 });
             res.status(201).json({ success: true });
         } else {
             res.status(401).json({ success: false, error: { message: 'Invalid code' } });

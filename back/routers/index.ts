@@ -2,11 +2,14 @@ import express from 'express';
 import auth from './auth';
 import user from './user';
 import apiDocs from '../docs/index';
-import elastic from '../lib/elastic';
 import jwt from './jwt';
-import friend from './friend';
+import relation from './relation';
 import alert from './alert';
+import layout from './layout';
+// import multer from 'multer';
+// const upload = multer({ dest: 'uploads/' });
 const router = express.Router();
+router.use(express.static('uploads'));
 
 apiDocs.init();
 const { swaggerUI, specs, setUpOption } = apiDocs.getSwaggerOption();
@@ -20,15 +23,19 @@ router.get('/email/:code', jwt.verifyJWT, auth.verifyEmail);
 //user
 router.get('/register', user.checkEmail);
 router.put('/user', jwt.verifyJWT, user.update);
+router.get('/recommend', jwt.verifyJWT, user.checkProfileVerify, user.getRecommend);
+
 //jwt
 router.get('/refresh', jwt.refreshJWT);
 //realtion
-router.get('/friend', jwt.verifyJWT, user.checkProfileVerify, friend.getFriend);
-router.get('/friend/request', jwt.verifyJWT, user.checkProfileVerify, friend.requestFriend);
-router.get('/friend/accept', jwt.verifyJWT, user.checkProfileVerify, friend.acceptFriend);
-//alert
-router.get('/alert/get', jwt.verifyJWT, alert.getAlert);
+router.get('/friend', jwt.verifyJWT, user.checkProfileVerify, relation.getFriend);
+router.post('/friend/request', jwt.verifyJWT, user.checkProfileVerify, relation.requestFriend);
+router.post('/hate', jwt.verifyJWT, user.checkProfileVerify, relation.hateUser);
+router.put('/friend/accept', jwt.verifyJWT, user.checkProfileVerify, relation.acceptFriend);
 //docs
 router.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));
 
+//layout
+router.get('/layout', jwt.verifyJWT, user.checkProfileVerify, layout.getProfileAlert);
+router.get('/tag', user.getTag);
 export default router;
