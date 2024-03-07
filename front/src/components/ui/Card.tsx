@@ -11,6 +11,7 @@ export const CardFooter = styled.div<CardProps>`
 `;
 export const CardBody = styled.div<CardProps>`
   min-height: 300px;
+  width: 100%;
   height: fit-content;
   padding: 10px 5px 10px 5px;
   border-bottom: 1px solid;
