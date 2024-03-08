@@ -1,1 +1,0 @@
-SELECT relation.* FROM ?? WHERE ?

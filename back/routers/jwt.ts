@@ -8,10 +8,13 @@ const verifyJWT = async (req: any, res: any, next: any) => {
             const response = jwt.verify(token);
             if (response.status === false) {
                 const decode = jwt.decode(token);
-                console.log(decode);
-                if (decode['exp'] < Date.now() / 1000) {
-                    await userControllers.updateUser(decode['email'], { status: 'INACTIVE' });
-                }
+                // if (decode['exp'] < Date.now() / 1000) {
+                //     const result = await userControllers
+                //     if (result === undefined) {
+                //         res.status(401).json({ success: false, message: 'Invalid Token' });
+                //         return;
+                //     }
+                // }
                 res.status(401).json({ success: false, message: 'Expired Token' });
                 return;
             } else if (typeof response.decoded === 'object') {

@@ -1,18 +1,32 @@
 export default {
-    '/layout': {
-        get: {
-            tags: ['alert'],
-            summary: 'Get alert',
-            description: 'Get alert',
-            operationId: 'getAlert',
+    '/hate': {
+        post: {
+            tags: ['relation'],
+            summary: '싫어요',
+            description: '싫어요',
             security: [
                 {
                     bearerAuth: [],
                 },
             ],
+            requestBody: {
+                content: {
+                    'application/json': {
+                        schema: {
+                            properties: {
+                                email: {
+                                    type: 'string',
+                                    description: 'email',
+                                    example: 'srdn45@gmail.com',
+                                },
+                            },
+                        },
+                    },
+                },
+            },
             responses: {
-                '200': {
-                    description: 'Success',
+                200: {
+                    description: '싫어요 성공',
                     content: {
                         'application/json': {
                             schema: {
@@ -20,17 +34,16 @@ export default {
                                 properties: {
                                     success: {
                                         type: 'boolean',
-                                    },
-                                    data: {
-                                        type: 'object',
+                                        description: '성공여부',
+                                        example: true,
                                     },
                                 },
                             },
                         },
                     },
                 },
-                '500': {
-                    description: 'Server error',
+                400: {
+                    description: '싫어요 실패',
                     content: {
                         'application/json': {
                             schema: {
@@ -38,12 +51,16 @@ export default {
                                 properties: {
                                     success: {
                                         type: 'boolean',
+                                        description: '성공여부',
+                                        example: false,
                                     },
                                     error: {
                                         type: 'object',
                                         properties: {
                                             message: {
                                                 type: 'string',
+                                                description: '에러 메시지',
+                                                example: '싫어요 실패',
                                             },
                                         },
                                     },

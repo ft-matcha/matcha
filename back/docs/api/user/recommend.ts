@@ -1,9 +1,9 @@
 export default {
-    '/friend/accept': {
-        put: {
-            tags: ['relation'],
-            summary: '요청 수락',
-            description: '요청 수락',
+    '/recommend': {
+        get: {
+            tags: ['user'],
+            summary: 'Get recommend user info',
+            description: 'Get recommend user info',
             security: [
                 {
                     bearerAuth: [],
@@ -12,17 +12,16 @@ export default {
             parameters: [
                 {
                     in: 'query',
-                    name: 'email',
-                    required: true,
+                    name: 'tag',
                     schema: {
                         type: 'string',
                     },
-                    description: '요청 수락할 유저 email',
+                    description: '추천 태그',
                 },
             ],
             responses: {
                 200: {
-                    description: '요청 수락 성공',
+                    description: 'Get user info success',
                     content: {
                         'application/json': {
                             schema: {
@@ -33,26 +32,25 @@ export default {
                                         description: '성공여부',
                                         example: true,
                                     },
-                                    data: {
-                                        type: 'array',
-                                        items: {
-                                            type: 'object',
-                                            properties: {
-                                                email: {
-                                                    type: 'string',
-                                                    description: '이메일',
-                                                    example: '',
-                                                },
+                                    user: {
+                                        type: 'object',
+                                        description: '유저 정보',
+                                        example: [
+                                            {
+                                                id: 'srdn45',
+                                                email: 'srdn45@gmail.com',
+                                                firstName: 'Lee',
+                                                lastName: 'eunryong',
                                             },
-                                        },
+                                        ],
                                     },
                                 },
                             },
                         },
                     },
                 },
-                400: {
-                    description: '요청 수락 실패',
+                401: {
+                    description: 'Get user info fail',
                     content: {
                         'application/json': {
                             schema: {
@@ -65,12 +63,9 @@ export default {
                                     },
                                     error: {
                                         type: 'object',
-                                        properties: {
-                                            message: {
-                                                type: 'string',
-                                                description: '에러 메시지',
-                                                example: '요청 수락 실패',
-                                            },
+                                        description: '에러',
+                                        example: {
+                                            message: 'Get recommend user info fail',
                                         },
                                     },
                                 },

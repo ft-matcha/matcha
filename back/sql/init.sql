@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `lastName` varchar(255) NOT NULL,
     `phone` varchar(255) NOT NULL,
     `address` varchar(255) NOT NULL,
-    `status` varchar(255) NOT NULL DEFAULT 'NOT_VERIFIED',
+    `status` varchar(255) NOT NULL DEFAULT 'ACTIVE',
     `verified` BOOLEAN NOT NULL DEFAULT FALSE,
     `profile` BOOLEAN NOT NULL DEFAULT FALSE,
 
@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS `profile` (
     `tag` JSON NOT NULL,
     `age` INTEGER NOT NULL,
     `image` JSON NOT NULL,
-    `viewList` JSON NOT NULL ,
     `userId` INTEGER NOT NULL,
 
     UNIQUE INDEX `profile_userId_key`(`userId`),
@@ -34,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `relation` (
     `relationId` INTEGER NOT NULL AUTO_INCREMENT,
     `fromId` INTEGER NOT NULL,
     `toId` INTEGER NOT NULL,
-    `status` varchar(255) NOT NULL DEFAULT 'PENDING',
+    `status` varchar(255) NOT NULL,
 
     PRIMARY KEY (`relationId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
@@ -44,8 +43,8 @@ ALTER TABLE `relation` ADD FOREIGN KEY (`toId`) REFERENCES `user`(`id`) ON DELET
 
 CREATE TABLE IF NOT EXISTS `alert` (
     `alertId` INTEGER NOT NULL AUTO_INCREMENT,
+    `fromId` INTEGER NOT NULL,
     `toId` INTEGER NOT NULL,
-    `fromUser` varchar(255) NOT NULL,
     `type` varchar(255) NOT NULL,
     `message` varchar(255) DEFAULT NULL,
     `status` varchar(255) NOT NULL DEFAULT 'PENDING',
@@ -53,18 +52,18 @@ CREATE TABLE IF NOT EXISTS `alert` (
     PRIMARY KEY (`alertId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
+ALTER TABLE `alert` ADD FOREIGN KEY (`fromId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 ALTER TABLE `alert` ADD FOREIGN KEY (`toId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
 
--- CREATE TABLE IF NOT EXISTS `message` (
---     `messageId` INTEGER NOT NULL AUTO_INCREMENT,
---     `fromId` INTEGER NOT NULL,
---     `toId` INTEGER NOT NULL,
---     `content` varchar(255) NOT NULL,
---     `status` varchar(255) NOT NULL DEFAULT 'PENDING',
+CREATE TABLE IF NOT EXISTS `message` (
+    `messageId` INTEGER NOT NULL AUTO_INCREMENT,
+    `fromId` INTEGER NOT NULL,
+    `toId` INTEGER NOT NULL,
+    `content` varchar(255) NOT NULL,
+    `status` varchar(255) NOT NULL DEFAULT 'PENDING',
 
---     PRIMARY KEY (`messageId`)
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
+    PRIMARY KEY (`messageId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
--- ALTER TABLE `message` ADD FOREIGN KEY (`fromId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
--- ALTER TABLE `message` ADD FOREIGN KEY (`toId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
-
+ALTER TABLE `message` ADD FOREIGN KEY (`fromId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE `message` ADD FOREIGN KEY (`toId`) REFERENCES `user`(`id`) ON DELETE CASCADE ON UPDATE CASCADE;
