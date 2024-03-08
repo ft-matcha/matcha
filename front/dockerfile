@@ -2,11 +2,7 @@ FROM node
 
 WORKDIR /app
 
-COPY package*.json ./
-RUN yarn
+COPY ./init_test.sh /tmp/
+RUN chmod 777 /tmp/init_test.sh
 
-COPY . .
-
-EXPOSE 3000
-
-CMD [ "yarn", "dev" ]
+CMD /tmp/init_test.sh
