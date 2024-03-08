@@ -17,7 +17,6 @@ export class ApiCall {
   }
 
   callApi(type: string, url: string, params: any) {
-    console.log(params);
     switch (type) {
       case 'post':
         return this.getInstance().post(url, params);
@@ -62,21 +61,21 @@ export class ApiContainer {
       if (typeof value === 'function') {
         const temp = (value as (apiInstance: Api.ApiInstance, url: string) => ApiCall)(
           apiInstance,
-          `http://localhost:3000/api/v0/${key.replace('Api', '')}`,
+          `${process.env.REACT_APP_URL}${key.replace('Api', '')}`,
         );
         if (temp instanceof ApiCall) {
           (this.apiContainer as Record<string, ApiCall>)[key] = temp as ApiCall;
         }
       }
     });
-    console.log(this);
   }
 
   setBearerTokenInHeader(type: 'get' | 'post' | 'put', dataParams: Record<string, any> | null) {
     const token = getToken('accessToken');
     const obj: Record<string, Record<string, string | null> | boolean | string> = {
-      // withCredentials: true,
+      withCredentials: true,
       headers: {
+		"Content-Type": "application/json",
         Authorization: token && `bearer ${token}`,
       },
     };
@@ -101,7 +100,6 @@ export class ApiContainer {
       const result = this.run(type, target, this.setBearerTokenInHeader(type, dataParams), url);
       if (result instanceof Promise) {
         const response = await responsePipe(result as Promise<Api.BackendResponse>);
-        console.log(response);
         return response;
       }
     } catch (e) {
