@@ -28,6 +28,7 @@ const signup = async (req: any, res: any) => {
         console.log(user);
         if (user === undefined) {
             console.log(req.body);
+
             const response = await userControllers.createUser(req.body);
             console.log('signUp success');
             const { refreshToken, accessToken } = response;

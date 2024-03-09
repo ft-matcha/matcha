@@ -38,4 +38,5 @@ router.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));
 //layout
 router.get('/layout', jwt.verifyJWT, user.checkProfileVerify, layout.getProfileAlert);
 router.get('/tag', user.getTag);
+
 export default router;
