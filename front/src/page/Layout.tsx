@@ -1,10 +1,11 @@
 import Post, { PostTabContainer } from '@/page/Post';
 import Nav from '@/components/ui/Nav';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext,  useEffect,  useState } from 'react';
 import { Outlet } from 'react-router';
 import styled from 'styled-components';
 import Aside from '@/components/ui/Aside';
 import { CgProfile } from 'react-icons/cg';
+import { ApiContainers } from '@/provider/ApiContainerProvider';
 
 const LayoutDefault = styled.section`
   display: grid;
@@ -30,6 +31,17 @@ const MainSection = styled.main`
 
 const Layout = () => {
   const [post, setPost] = useState('');
+  const [profile, setProfile] = useState({
+	image: "",
+	lastName: "",
+	firstName: "",
+  })
+
+  const api = useContext(ApiContainers);
+  useEffect(() => {
+	const response = api.call('get', 'user');
+	console.log(response);
+  }, []);
 
   return (
     <LayoutDefault>
@@ -59,7 +71,7 @@ const Layout = () => {
                   </Nav.List>
                   <Nav.List>
                     <Nav.Item
-                      to="recommend"
+                      to="/explorer/recommend"
                       className={({ isActive }) => (isActive ? 'actived' : 'pending')}
                     >
                       추천

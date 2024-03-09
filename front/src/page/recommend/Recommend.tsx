@@ -53,7 +53,7 @@ const RecommendModal = ({ id }: { id: string | undefined }) => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setModal({ modalType: '', toggle: false });
-        navigator('/recommend');
+        navigator('/explorer/recommend');
       }
     };
     setModal({ modalType: 'recommendModal', toggle: true });
@@ -64,7 +64,7 @@ const RecommendModal = ({ id }: { id: string | undefined }) => {
   }, [id]);
   useEffect(() => {
     if (modalProp.toggle === false) {
-      navigator('/recommend');
+      navigator('/explorer/recommend');
     }
   }, [modalProp]);
   return <></>;
