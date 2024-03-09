@@ -76,10 +76,11 @@ const Register = () => {
 					setForm={setFunnelForm}
 					step={'id'}
 					nextStep={'userinfo'}
-				/>
-				<Link to ='/'>
-					Sign In
-				</Link>
+				>
+					<Link to="/">
+						Sign In
+					</Link>
+				</EmailStep>
 			</Funnel.Step>
 			<Funnel.Step name="userinfo">
 				<Form onSubmit={async (e) => onSubmit(e, 'userinfo', 'address')}>
