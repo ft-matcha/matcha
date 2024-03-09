@@ -39,7 +39,7 @@ services:
         networks:
             - matcha_network
         volumes:
-            - front:/app 
+            - front:/app
 
     redis:
         image: redis
@@ -76,21 +76,18 @@ volumes:
         driver_opts:
             type: none
             o: bind
-            device: /Users/jihkang/Desktop/ft_matcha/back
+            device: ${PWD}/back
     front:
         name: front
         driver: local
         driver_opts:
             type: none
             o: bind
-            device: /Users/jihkang/Desktop/ft_matcha/front
-
+            device: ${PWD}/front
 
 networks:
     matcha_network:
         driver: bridge
-
-   
 
     # certs:
     #     name: certs

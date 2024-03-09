@@ -9,18 +9,19 @@ import layout from './layout';
 // import multer from 'multer';
 // const upload = multer({ dest: 'uploads/' });
 const router = express.Router();
-router.use(express.static('uploads'));
+// router.use(express.static('uploads'));
 
 apiDocs.init();
 const { swaggerUI, specs, setUpOption } = apiDocs.getSwaggerOption();
 //auth
 router.post('/login', auth.login);
 router.post('/signup', auth.signup);
-router.get('/user/:email', jwt.verifyJWT, user.checkProfileVerify, user.get);
 router.get('/logout', jwt.verifyJWT, auth.logout);
 router.get('/email', jwt.verifyJWT, auth.sendEmail);
 router.get('/email/:code', jwt.verifyJWT, auth.verifyEmail);
 //user
+router.get('/user', jwt.verifyJWT, user.checkProfileVerify, user.get);
+router.get('/user/:email', jwt.verifyJWT, user.checkProfileVerify, user.get);
 router.get('/register', user.checkEmail);
 router.put('/user', jwt.verifyJWT, user.update);
 router.get('/recommend', jwt.verifyJWT, user.checkProfileVerify, user.getRecommend);

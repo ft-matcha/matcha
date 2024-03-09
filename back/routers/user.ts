@@ -45,7 +45,7 @@ const checkProfileVerify = async (req: any, res: any, next: any) => {
 
 const get = async (req: any, res: any) => {
     try {
-        const response = await userControllers.getUser(req.params.email);
+        const response = await userControllers.getUser(req.params.email ? req.params.email : req.email);
         if (response === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
@@ -53,13 +53,14 @@ const get = async (req: any, res: any) => {
             const { id, password, verified, userId, profileId, ...rest } = response;
             if (req.email === req.params.email) {
                 rest['relaiton'] = 'me';
-            } else {
-                const relation = await relationControllers.getRelation({
-                    from: req.email,
-                    to: req.params.email,
-                });
-                // rest['relation'] = relation?.status;
             }
+            //  else {
+            //     const relation = await relationControllers.getRelation({
+            //         from: req.email,
+            //         to: req.params.email,
+            //     });
+            //     // rest['relation'] = relation?.status;
+            // }
             res.status(200).json({
                 success: true,
                 data: rest,
