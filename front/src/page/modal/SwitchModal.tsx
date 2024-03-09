@@ -9,9 +9,8 @@ interface ModalProviderProps {
 
 export const ModalChild: React.FC<ModalProviderProps> = ({ children, header, setModal }) => {
   return (
-    <Modal width="600px" onToggle={() => setModal({ modalType: '', toggle: false })}>
+    <Modal width="600px" height="500px" onToggle={() => setModal({ modalType: '', toggle: false })}>
       <ModalHeader>
-        <h2>{header}</h2>
         <button onClick={() => setModal({ modalType: '', toggle: false })}>X</button>
       </ModalHeader>
       <ModalBody> {children}</ModalBody>

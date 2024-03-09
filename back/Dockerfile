@@ -2,4 +2,8 @@ FROM node
 
 WORKDIR /app
 
-ENTRYPOINT sleep 10 && npm run dev
+COPY init.sh /tmp/
+
+RUN chmod 777 /tmp/init.sh
+
+ENTRYPOINT sleep 10 && /tmp/init.sh

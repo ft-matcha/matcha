@@ -1,14 +1,37 @@
 import Card from '@/components/ui/Card';
 import { useCallback, useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { ApiContainers } from '@/provider/ApiContainerProvider';
-import { lazy } from 'react';
 import debounce from '@/utils/debounce';
+
 export const RecommendTest = ({ ...rest }) => {
+  const api = useContext(ApiContainers);
+  const [data, setData] = useState({
+    gender: '',
+    name: {
+      first: '',
+      last: '',
+    },
+    picture: {
+      large: '',
+    },
+  });
+  const setChangeData = useCallback(
+    debounce(async (data?: any) => {
+    }, 400),
+    [],
+  );
+  useEffect(() => {
+    setChangeData('test');
+  }, []);
+
   return (
     <>
       <Card width="100%">
-        <Card.Body>hello this is Test</Card.Body>
+        <Card.Body>
+          <div style={{ width: '100%', height: '100%', objectFit: 'contain' }}>
+          </div>
+        </Card.Body>
       </Card>
     </>
   );
@@ -16,6 +39,7 @@ export const RecommendTest = ({ ...rest }) => {
 
 const RecommendResult = ({ ...rest }) => {
   const { id } = useParams();
+  const navigator = useNavigate();
 
   const api = useContext(ApiContainers);
   const [data, setData] = useState({
@@ -25,18 +49,11 @@ const RecommendResult = ({ ...rest }) => {
       last: '',
     },
     picture: {
-      thumbnail: '',
+      large: '',
     },
   });
   const setChangeData = useCallback(
     debounce(async (data?: any) => {
-      const response = (await api.call(
-        'get',
-        'register',
-        null,
-        'https://randomuser.me/api',
-      )) as any;
-      setData({ ...response.results[0] });
     }, 400),
     [],
   );
@@ -51,7 +68,13 @@ const RecommendResult = ({ ...rest }) => {
         <h2 style={{ fontSize: '32px' }}>{data?.name.first + data?.name.last}</h2>
       </Card.Header>
       <Card.Body>
-        <img src={data.picture.thumbnail} alt="thumbnail" />
+        <div style={{ width: '100%', height: '100%', objectFit: 'contain' }}>
+          <img
+            src={data.picture.large}
+            alt="thumbnail"
+            style={{ width: '400px', height: '400px' }}
+          />
+        </div>
       </Card.Body>
     </Card>
   );

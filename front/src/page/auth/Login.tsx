@@ -17,7 +17,7 @@ export default function Login() {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const obj = formHandler(e.currentTarget);
-    const result = await api.call('get', 'login', obj, 'https://randomuser.me/api');
+    const result = await api.call('post', 'login', obj);
     if (result?.success) {
       setCookie('refreshToken', result.refreshToken, { path: '/' });
       setToken('accessToken', result.data.accessToken);

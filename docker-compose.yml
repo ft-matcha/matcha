@@ -30,6 +30,16 @@ services:
             - mysql
             - redis
             - elasticsearch
+    front:
+        image: front
+        build: ./front
+        container_name: front
+        ports:
+            - '3000:3000'
+        networks:
+            - matcha_network
+        volumes:
+            - front:/app 
 
     redis:
         image: redis
@@ -59,10 +69,6 @@ services:
         env_file:
             - .env
 
-networks:
-    matcha_network:
-        driver: bridge
-
 volumes:
     back:
         name: back
@@ -70,7 +76,22 @@ volumes:
         driver_opts:
             type: none
             o: bind
-            device: ./back
+            device: /Users/jihkang/Desktop/ft_matcha/back
+    front:
+        name: front
+        driver: local
+        driver_opts:
+            type: none
+            o: bind
+            device: /Users/jihkang/Desktop/ft_matcha/front
+
+
+networks:
+    matcha_network:
+        driver: bridge
+
+   
+
     # certs:
     #     name: certs
     #     driver: local
