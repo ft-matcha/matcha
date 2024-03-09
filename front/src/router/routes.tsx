@@ -1,4 +1,6 @@
 import Layout from '@/page/Layout';
+import Main from '@/page/Main';
+import Login from '@/page/auth/Login';
 import Recommend from '@/page/recommend/Recommend';
 import RecommendResult from '@/page/recommend/RecommendResult';
 import Profile from '@/page/user/Profile';
@@ -12,15 +14,21 @@ const routes = createBrowserRouter([
     path: '',
     element: <ApiProvider />,
     children: [
-      {
-        path: 'recommend',
-        element: <Recommend />,
-        children: [
-          {
-            path: ':id',
-            element: <RecommendResult />,
-          },
-        ],
+	{
+		path: '',
+		element: <Login/>,
+	},
+    {
+        path: 'explorer',
+		element: <Main/>,
+		children: [{
+			path: "recommend",
+        	element: <Recommend />,
+			children: [{
+				path: ':id',
+				element: <RecommendResult />,
+			}]
+		}]
       },
       {
         path: 'profile',

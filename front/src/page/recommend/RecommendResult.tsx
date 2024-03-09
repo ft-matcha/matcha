@@ -69,11 +69,9 @@ const RecommendResult = ({ ...rest }) => {
       </Card.Header>
       <Card.Body>
         <div style={{ width: '100%', height: '100%', objectFit: 'contain' }}>
-          <img
-            src={data.picture.large}
-            alt="thumbnail"
-            style={{ width: '400px', height: '400px' }}
-          />
+			<h1>
+				test data
+			</h1>
         </div>
       </Card.Body>
     </Card>

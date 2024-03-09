@@ -3,8 +3,8 @@ import Form, { formHandler } from '@/components/ui/Form';
 import InputContainer from '@/components/InputContainer';
 import { userInfo } from '@/data/AuthData';
 import { ApiContainers } from '@/provider/ApiContainerProvider';
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { ModalContext } from '@/provider/ModalProvider';
 import { useCookies } from 'react-cookie';
 import { deleteToken, getToken, setToken } from '@/utils/token';
@@ -13,13 +13,22 @@ export default function Login() {
   const api = React.useContext(ApiContainers);
   const modal = React.useContext(ModalContext);
   const [_, setCookie, removeCookie] = useCookies(['refreshToken']);
+  const navigator = useNavigate();
+
+  useEffect(() => {
+	const token = getToken('accessToken');
+	console.log(token) 
+	if (token) {
+		navigator("/explorer");
+	}
+
+  }, [])
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const obj = formHandler(e.currentTarget);
     const result = await api.call('post', 'login', obj);
     if (result?.success) {
-      setCookie('refreshToken', result.refreshToken, { path: '/' });
       setToken('accessToken', result.data.accessToken);
       getToken('accessToken');
     } else {

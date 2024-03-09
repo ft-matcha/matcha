@@ -24,7 +24,7 @@ export namespace Api {
 
   interface ApiInstance {
     get: <T>(path: string, options?: { params: Record<string, string> }) => Promise<T>;
-    post: <T>(path: string, options?: { data: Record<string, string> }) => Promise<T>;
+    post: <T>(path: string, data?: Record<string, string> , config?: Record<string, any> ) => Promise<T>;
     put: <T>(path: string, options?: { data: Record<string, string> }) => Promise<T>;
     delete: <T>(path: string, options?: { data: Record<string, string> }) => Promise<T>;
   }

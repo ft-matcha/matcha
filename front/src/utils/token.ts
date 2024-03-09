@@ -15,6 +15,5 @@ export const deleteToken = (key: string) => {
 };
 
 export const getToken = (key: string) => {
-  console.log(getLocalStorgae(key));
   return getLocalStorgae(key);
 };
