@@ -1,6 +1,7 @@
 import Layout from '@/page/Layout';
 import Main from '@/page/Main';
 import Login from '@/page/auth/Login';
+import Register from '@/page/auth/register/Register';
 import Recommend from '@/page/recommend/Recommend';
 import RecommendResult from '@/page/recommend/RecommendResult';
 import Profile from '@/page/user/Profile';
@@ -18,9 +19,13 @@ const routes = createBrowserRouter([
 		path: '',
 		element: <Login/>,
 	},
+	{
+		path: 'register',
+		element: <Register />,
+	},
     {
         path: 'explorer',
-		element: <Main/>,
+		element: <Layout/>,
 		children: [{
 			path: "recommend",
         	element: <Recommend />,

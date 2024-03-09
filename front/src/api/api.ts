@@ -20,10 +20,9 @@ export class ApiCall {
 		switch (type) {
 			case 'post':
 				const {data, ...rest} = params;
-				console.log(`data: `, data)
-				console.log(`headers: `, rest);
 				return this.getInstance().post(url, data, rest);
 			case 'get':
+				console.log(params);
 				return this.getInstance().get(url, params);
 			case 'put':
 				return this.getInstance().put(url, params);
@@ -79,7 +78,7 @@ export class ApiContainer {
 			withCredentials: true,
 			headers: {
 				"Content-Type": "application/json",
-				"Authorization": token && `bearer ${token}`,
+				"Authorization": token && `Bearer ${token}`,
 			},
 		};
 		if (!dataParams) return obj;
@@ -106,7 +105,7 @@ export class ApiContainer {
 				return response;
 			}
 		} catch (e) {
-			console.log(e);
+			console.log(`error: `, e);
 			// if (target === 'login') {
 			//   return { success: false, error: { message: 'Login failed' } };
 			// }

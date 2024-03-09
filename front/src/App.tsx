@@ -17,7 +17,7 @@ function App() {
   return (
     <>
       <Container>
-        <Layout />
+		<Outlet/>
       </Container>
     </>
   );

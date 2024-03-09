@@ -3,9 +3,11 @@ import jwt from '../utils/jwt';
 
 const verifyJWT = async (req: any, res: any, next: any) => {
     try {
+		console.log(req, res, next);
         if (req.headers.authorization) {
             const token = req.headers.authorization.split('Bearer ')[1];
             const response = jwt.verify(token);
+			console.log(`response: `, response)
             if (response.status === false) {
                 const decode = jwt.decode(token);
                 // if (decode['exp'] < Date.now() / 1000) {

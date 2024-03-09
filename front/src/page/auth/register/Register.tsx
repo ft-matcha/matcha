@@ -4,7 +4,7 @@ import { useContext, useState } from 'react';
 import { ModalContext } from '@/provider/ModalProvider';
 import { useCookies } from 'react-cookie';
 import { ApiContainers } from '@/provider/ApiContainerProvider';
-import { Form } from 'react-router-dom';
+import { Form, Link, NavigateFunction, useNavigate } from 'react-router-dom';
 import { getToken, setToken } from '@/utils/token';
 import InputContainer from '@/components/InputContainer';
 import Button from '@/components/ui/Button';
@@ -21,14 +21,20 @@ const userRegister = async (
 	api: ApiContainer,
 	funnelForm: RegisterFormProps,
 	setCookie: (name: 'refreshToken', value: any, options?: any | undefined) => void,
-	setModal: (modalProps: any) => any,
+	navigator: NavigateFunction
 ) => {
 	const result = await api.call('post', 'signup', funnelForm);
 	if (result?.success) {
 		setToken('accessToken', result.data.accessToken);
 		getToken('accessToken');
+		navigator('/explorer');
 	}
-	setModal(() => ({ modalType: '', toggle: false }));
+	/**
+	 * 
+	 * @if error occurs added toast element will be  
+	 * not yet..
+	 */
+
 };
 
 const Register = () => {
@@ -43,7 +49,7 @@ const Register = () => {
 		gender: 'male',
 		address: "",
 	});
-
+	const navigator = useNavigate();
 	const onSubmit = async (
 		e: React.FormEvent<HTMLFormElement>,
 		step?: 'id' | 'userinfo' | 'address' | 'gender' | 'complete',
@@ -57,7 +63,8 @@ const Register = () => {
 			return;
 		}
 		if (step === 'complete' && !nextStep) {
-			await userRegister(api, funnelForm, setCookie, setModal);
+			await userRegister(api, funnelForm, setCookie, navigator);
+
 		}
 	};
 	return (
@@ -70,6 +77,9 @@ const Register = () => {
 					step={'id'}
 					nextStep={'userinfo'}
 				/>
+				<Link to ='/'>
+					Sign In
+				</Link>
 			</Funnel.Step>
 			<Funnel.Step name="userinfo">
 				<Form onSubmit={async (e) => onSubmit(e, 'userinfo', 'address')}>
@@ -83,11 +93,17 @@ const Register = () => {
 					/>
 					<Button>다음</Button>
 				</Form>
+				<Link to ='/'>
+					Sign In
+				</Link>
 			</Funnel.Step>
 			<Funnel.Step name="address">
 				<Form onSubmit={async (e) => onSubmit(e, 'address', 'gender')}>
 					<Button>집주소</Button>
 				</Form>
+				<Link to ='/'>
+					Sign In
+				</Link>
 			</Funnel.Step>
 			<Funnel.Step name="gender">
 				<Form onSubmit={async (e) => onSubmit(e, 'gender', 'complete')}>
@@ -98,12 +114,22 @@ const Register = () => {
 							</option>
 						))}
 					</Select>
+					<div>
+
 					<Button>다음</Button>
+					<Link to ='/'>
+						Sign In
+					</Link>
+					</div>
 				</Form>
+				
 			</Funnel.Step>
 			<Funnel.Step name="complete">
 				<Form onSubmit={async (e) => onSubmit(e, "complete")}>
 					<Button>done</Button>
+					<Link to ='/'>
+						Sign In
+					</Link>
 				</Form>
 			</Funnel.Step>
 		</Funnel>

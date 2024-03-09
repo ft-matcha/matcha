@@ -38,9 +38,12 @@ const Layout = () => {
   })
 
   const api = useContext(ApiContainers);
+  const fetchData = async () => {
+	const res = await api.call('get', 'user');
+	setProfile({...res?.data})
+  }
   useEffect(() => {
-	const response = api.call('get', 'user');
-	console.log(response);
+	fetchData();
   }, []);
 
   return (
@@ -54,7 +57,7 @@ const Layout = () => {
                 className={({ isActive }) => (isActive ? 'actived' : 'pending')}
               >
                 <CgProfile />
-                <span>프로필</span>
+                <span>{profile.firstName + profile.lastName}</span>
               </Nav.Item>
             </Nav.List>
           </Nav.Row>
