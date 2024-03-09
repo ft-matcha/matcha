@@ -1,10 +1,10 @@
-import get from './get';
-import update from './update';
+import user from './user';
+import userParams from './userParams';
 import checkEmail from './checkEmail';
 import recommend from './recommend';
 export default {
-    ...get,
-    ...update,
+    ...user,
+    ...userParams,
     ...checkEmail,
     ...recommend,
 };

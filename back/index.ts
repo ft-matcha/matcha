@@ -7,10 +7,9 @@ import crud from './lib/crud';
 import elastic from './lib/elastic';
 import routers from './routers/index';
 import { Server } from 'socket.io';
-import cors from "cors";
+import cors from 'cors';
 
-import eventHandler from './socket/socket';
-
+// import socket from './socket/socket';
 
 const app = express();
 
@@ -20,21 +19,25 @@ const options = {
     cert: fs.readFileSync(path.join(__dirname, 'ssl', 'server.crt')),
 };
 const server = https.createServer(options, app);
-app.use(cors({
-	origin: "http://localhost:3000",
-	credentials: true,
-}));
+app.use(
+    cors({
+        origin: 'http://localhost:3000',
+        credentials: true,
+    })
+);
 
 new crud('').migrate();
 elastic.createIndex('matcha');
-app.use(bodyParser.urlencoded({
-	extended: true,
-}));
+app.use(
+    bodyParser.urlencoded({
+        extended: true,
+    })
+);
 app.use(bodyParser.json());
 
 app.use('/api/v1', routers);
-const io = new Server(server);
-io.on('connection', eventHandler);
+// const io = new Server(server);
+// io.on('connection', socket.eventHandler);
 server.listen(port, () => {
     console.log(`Server is running on https://localhost:${port}`);
 });

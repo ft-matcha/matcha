@@ -28,7 +28,7 @@ const verifyJWT = async (req: any, res: any, next: any) => {
             }
             res.status(401).json({ success: false, message: 'Invalid Token' });
         } else {
-            res.status(401).json({ success: false, message: 'token does not exist' });
+            res.status(401).json({ success: false, message: 'token does not exist' }); //redirect login page
         }
     } catch (error: any) {
         console.error('verifyJWT failed: ' + error.stack);

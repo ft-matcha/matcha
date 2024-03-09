@@ -26,14 +26,14 @@ class UserControllers {
             const { firstName, lastName, email, password, phone, address } = body;
             if (!process.env.secret) throw new Error('secret not found');
             const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(password).digest('hex');
-		
+
             await User.create({
                 set: {
                     email: email,
                     firstName,
                     lastName,
-                    password: cryptoPass, 
-					phone : phone? phone : "",
+                    password: cryptoPass,
+                    phone: phone ? phone : '',
                     address,
                 },
             });
