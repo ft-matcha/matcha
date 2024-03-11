@@ -18,3 +18,5 @@
 0311
 [ ] 
 	api 호출시 에에러  발생하면  토스트  
+remain 
+	axios intercepter code will be added.
