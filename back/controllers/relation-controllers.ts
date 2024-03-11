@@ -5,16 +5,11 @@ class relationControllers {
     createRelation = async (from: string, to: string, status: string) => {
         try {
             const relation = await Relation.create({
-                selectJoin: {
-                    data: {
-                        status: status,
-                    },
-                    relation: [
-                        { fk: 'fromId', pk: 'id', table: 'user' },
-                        { fk: 'toId', pk: 'id', table: 'user' },
-                    ],
+                set: {
+                    fromId: from,
+                    toId: to,
+                    status: status,
                 },
-                where: { 'a0.email': from, 'a1.email': to },
             });
             return relation;
         } catch (error: any) {
@@ -24,7 +19,7 @@ class relationControllers {
 
     updateRelation = async (data: any, status: string) => {
         try {
-            if (typeof data.relationId === 'object') {
+            if (typeof data.relationId === 'number') {
                 const relation = await Relation.update({
                     where: { relationId: data.relationId },
                     set: { status: status },
@@ -32,7 +27,7 @@ class relationControllers {
                 return relation;
             } else {
                 const relation = await Relation.update({
-                    where: { relationId: data },
+                    where: { fromId: data.from, toId: data.to },
                     set: { status: status },
                 });
                 return relation;
@@ -49,40 +44,11 @@ class relationControllers {
                     const relation = await Relation.read({
                         join: [
                             {
-                                table: 'user',
-                                on: {
-                                    'a0.id': 'fromId',
-                                },
-                            },
-                            {
                                 table: 'relation',
                                 on: {
-                                    'a1.toId': 'fromId',
-                                    'a1.fromId': 'toId',
-                                    'a1.status': 'status',
-                                },
-                            },
-                            {
-                                table: 'user',
-                                on: {
-                                    'a2.id': 'toId',
-                                },
-                            },
-                        ],
-                        where: {
-                            'a0.email': user.from,
-                            'relation.status': status,
-                        },
-                        select: ['a2.email'],
-                    });
-                    return relation;
-                } else {
-                    const relation = await Relation.read({
-                        join: [
-                            {
-                                table: 'user',
-                                on: {
-                                    'a0.id': 'fromId',
+                                    'a0.toId': 'fromId',
+                                    'a0.fromId': 'toId',
+                                    'a0.status': 'status',
                                 },
                             },
                             {
@@ -92,32 +58,36 @@ class relationControllers {
                                 },
                             },
                         ],
-                        select: ['a1.email'],
+                        select: ['a1.*'],
                         where: {
-                            'a0.email': user.from,
+                            fromId: user.from,
+                            status: status,
+                        },
+                    });
+                    return relation;
+                } else {
+                    const relation = await Relation.read({
+                        join: [
+                            {
+                                table: 'user',
+                                on: {
+                                    'a0.id': 'toId',
+                                },
+                            },
+                        ],
+                        select: ['a0.*'],
+                        where: {
+                            fromId: user.from,
+                            status: status,
                         },
                     });
                     return relation;
                 }
             } else {
                 const relation = await Relation.readOne({
-                    join: [
-                        {
-                            table: 'user',
-                            on: {
-                                'a0.id': 'fromId',
-                            },
-                        },
-                        {
-                            table: 'user',
-                            on: {
-                                'a1.id': 'toId',
-                            },
-                        },
-                    ],
                     where: {
-                        'a0.email': user.from,
-                        'a1.email': user.to,
+                        fromId: user.from,
+                        toId: user.to,
                     },
                 });
                 return relation;

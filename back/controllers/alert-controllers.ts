@@ -5,17 +5,12 @@ class alertControllers {
     createAlert = async (from: string, to: string, type: string, message?: string) => {
         try {
             const alert = await Alert.create({
-                selectJoin: {
-                    data: {
-                        type: type,
-                        message: message,
-                    },
-                    relation: [
-                        { fk: 'fromId', pk: 'id', table: 'user' },
-                        { fk: 'toId', pk: 'id', table: 'user' },
-                    ],
+                set: {
+                    fromId: from,
+                    toId: to,
+                    type: type,
+                    message: message ? message : null,
                 },
-                where: { 'a0.email': from, 'a1.email': to },
             });
             return alert;
         } catch (error: any) {
@@ -26,22 +21,7 @@ class alertControllers {
     getAlert = async (user: string, type: string) => {
         try {
             const alert = await Alert.read({
-                join: [
-                    {
-                        table: 'user',
-                        on: {
-                            'a0.id': 'toId',
-                        },
-                    },
-                    {
-                        table: 'user',
-                        on: {
-                            'a1.id': 'fromId',
-                        },
-                    },
-                ],
-                select: ['a1.email'],
-                where: { 'a0.email': user, type: type },
+                where: { toId: user, type: type },
             });
             return alert;
         } catch (error: any) {

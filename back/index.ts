@@ -36,6 +36,9 @@ app.use(
 app.use(bodyParser.json());
 
 app.use('/api/v1', routers);
+app.use((req: any, res: any) => {
+    res.status(200).json({ success: false, error: { status: 404, message: 'Not Found' } });
+});
 // const io = new Server(server);
 // io.on('connection', socket.eventHandler);
 server.listen(port, () => {
