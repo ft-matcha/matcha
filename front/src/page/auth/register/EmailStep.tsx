@@ -2,20 +2,19 @@ import { ApiContainer } from '@/api/api';
 import { uniqueEmail } from '@/api/uniqueEmail';
 import InputContainer from '@/components/InputContainer';
 import Button from '@/components/ui/Button';
+import Form from '@/components/ui/Form';
+import useApi from '@/hooks/useApi';
 import { useRef, ReactNode } from 'react';
-import { Form } from 'react-router-dom';
 
 const EmailStep = <T extends readonly string[]>({
-	api,
 	step,
 	nextStep,
 	onSubmit,
 	setForm,
-	children?
+	children
 }: {
 	step: T[number];
 	nextStep: T[number];
-	api: ApiContainer;
 	children?: ReactNode;
 	onSubmit: (e: React.FormEvent<HTMLFormElement>, step?: T[number], nextStep?: T[number]) => void;
 	setForm: (
@@ -23,6 +22,7 @@ const EmailStep = <T extends readonly string[]>({
 	) => void;
 }) => {
 	const ref = useRef(false);
+	const api = useApi();
 	return (
 		<>
 			<Form
@@ -39,7 +39,7 @@ const EmailStep = <T extends readonly string[]>({
 						onClick={async (e) => {
 							e.preventDefault();
 							const email = e.currentTarget.previousElementSibling;
-							const response = await uniqueEmail(api, email.value);
+							const response = await api('get', 'register', { email });
 							if (response?.success) {
 								// setForm((prev) => ({ ...prev, emailValid: true }));
 								ref.current = true;
@@ -59,6 +59,7 @@ const EmailStep = <T extends readonly string[]>({
 					required={true}
 				/>
 				<Button>다음</Button>
+				{children}
 			</Form>
 		</>
 	);

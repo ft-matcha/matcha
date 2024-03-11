@@ -8,54 +8,42 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ModalContext } from '@/provider/ModalProvider';
 import { useCookies } from 'react-cookie';
 import { deleteToken, getToken, setToken } from '@/utils/token';
+import useApi from '@/hooks/useApi';
 
-export default function Login() {
-  const api = React.useContext(ApiContainers);
-  const modal = React.useContext(ModalContext);
-  const [_, setCookie, removeCookie] = useCookies(['refreshToken']);
-  const navigator = useNavigate();
+export default function Login({onClick}: { onClick: (prev: boolean) => void; }) {
+	const modal = React.useContext(ModalContext);
+	const navigator = useNavigate();
+	const api = useApi();
 
-  useEffect(() => {
-	const token = getToken('accessToken');
-	console.log(token) 
-	if (token) {
-		navigator("/explorer");
-	}
 
-  }, [])
+	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		const obj = formHandler(e.currentTarget);
+		const response =  await api('post', 'login', obj, true);	
+		if (response) {
+			navigator('/explorer');
+		}
+	};
 
-  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const obj = formHandler(e.currentTarget);
-    const result = await api.call('post', 'login', obj);
-    if (result?.success) {
-      setToken('accessToken', result.data.accessToken);
-      getToken('accessToken');
-    } else {
-      removeCookie('refreshToken');
-      deleteToken('accessToken');
-    }
-  };
-
-  return (
-    <Form onSubmit={onSubmit}>
-      <div id="header">
-        <h1>Login</h1>
-        <p>Enter your email below to login to your account</p>
-      </div>
-      <div>
-        {userInfo.map((item, i) => (
-          <InputContainer notFocus={i !== 0} {...item} key={`user_${item.id}`} />
-        ))}
-        <Button type="submit">Sign In</Button>
-        {modal.modalProp.modalType === 'loginModal' ? (
-          <Button onClick={() => modal.setModal({ modalType: 'signUpModal', toggle: true })}>
-            Sign Up
-          </Button>
-        ) : (
-          <Link to="/register">Sign Up</Link>
-        )}
-      </div>
-    </Form>
-  );
+	return (
+		<Form onSubmit={onSubmit}>
+			<div id="header">
+				<h1>Login</h1>
+				<p>Enter your email below to login to your account</p>
+			</div>
+			<div>
+				{userInfo.map((item, i) => (
+					<InputContainer notFocus={i !== 0} {...item} key={`user_${item.id}`} />
+				))}
+				<Button type="submit">Sign In</Button>
+				{modal.modalProp.modalType === 'loginModal' ? (
+					<Button onClick={() => modal.setModal({ modalType: 'signUpModal', toggle: true })}>
+						Sign Up
+					</Button>
+				) : (
+					<Button onClick={onClick}>Sign Up</Button>
+				)}
+			</div>
+		</Form>
+	);
 }

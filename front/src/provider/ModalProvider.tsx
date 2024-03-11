@@ -20,8 +20,8 @@ const RecommendResult = lazy(() => import('@/page/recommend/RecommendResult'));
 const ModalType: {
   [key: string]: React.ReactNode;
 } = {
-  loginModal: <Login />,
-  signUpModal: <Register />,
+//   loginModal: <Login />,
+//   signUpModal: <Register />,
   recommendModal: <RecommendResult />,
 };
 
@@ -52,17 +52,7 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
           modalType: 'searchModal',
           toggle: true,
         });
-      } else if (e.key === 'k' && e.ctrlKey) {
-        setModal({
-          modalType: 'loginModal',
-          toggle: true,
-        });
-      } else if (e.key === 'l' && e.ctrlKey) {
-        setModal({
-          modalType: 'signUpModal',
-          toggle: true,
-        });
-      }
+      } 
     };
 
     window.addEventListener('keydown', onKeyDown);
@@ -103,11 +93,13 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
             (
             {modalProp.modalType === 'searchModal' ? (
               <SearchModal />
-            ) : (
-              <ModalChild header={modalProp.modalType} setModal={setModal}>
-                {ModalType[modalProp.modalType]}
-              </ModalChild>
-            )}
+            )  :
+			 (
+               <ModalChild header={modalProp.modalType} setModal={setModal}>
+                 {ModalType[modalProp.modalType]}
+               </ModalChild>
+             )
+			}
             )
           </>
         )}

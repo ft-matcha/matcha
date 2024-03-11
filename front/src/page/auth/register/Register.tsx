@@ -1,50 +1,42 @@
 import useFunnel from '@/hooks/useFunnel';
 import Select from '@/components/ui/Select';
-import { useContext, useState } from 'react';
-import { ModalContext } from '@/provider/ModalProvider';
+import { useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { ApiContainers } from '@/provider/ApiContainerProvider';
-import { Form, Link, NavigateFunction, useNavigate } from 'react-router-dom';
-import { getToken, setToken } from '@/utils/token';
+import { Form,  NavigateFunction, useNavigate } from 'react-router-dom';
+import {  getToken, setToken } from '@/utils/token';
 import InputContainer from '@/components/InputContainer';
 import Button from '@/components/ui/Button';
 import { formHandler } from '@/components/ui/Form';
 import { userGender } from '@/data/AuthData';
 import { ApiContainer } from '@/api/api';
 import EmailStep from '@/page/auth/register/EmailStep';
+import useApi from '@/hooks/useApi';
 
 interface RegisterFormProps {
 	[key: string]: string | boolean;
 }
 
-const userRegister = async (
-	api: ApiContainer,
-	funnelForm: RegisterFormProps,
-	setCookie: (name: 'refreshToken', value: any, options?: any | undefined) => void,
-	navigator: NavigateFunction
-) => {
-	const result = await api.call('post', 'signup', funnelForm);
-	if (result?.success) {
-		setToken('accessToken', result.data.accessToken);
-		getToken('accessToken');
-		navigator('/explorer');
-	}
-	/**
-	 * 
-	 * @if error occurs added toast element will be  
-	 * not yet..
-	 */
+// const userRegister = async (
+// 	api: ApiContainer,
+// 	funnelForm: RegisterFormProps,
+// 	setCookie: (name: 'refreshToken', value: any, options?: any | undefined) => void,
+// 	navigator: NavigateFunction
+// ) => {
+// 	const result = await api.call('post', 'signup', funnelForm);
+// 	if (result?.success) {
+// 		setToken('accessToken', result.data.accessToken);
+// 		getToken('accessToken');
+// 		navigator('/explorer');
+// 	} 
+// };
 
-};
-
-const Register = () => {
+const Register = ({onClick} : {onClick: (prev: boolean) => void}) => {
 	const [Funnel, setStep] = useFunnel(
 		['id', 'userinfo', 'address', 'gender', 'complete'] as const,
 		'id',
 	);
-	const { setModal } = useContext(ModalContext);
-	const api = useContext(ApiContainers);
-	const [_, setCookie] = useCookies(['refreshToken']);
+	const api = useApi();
+	const [_, setCookie] = useCookies();
 	const [funnelForm, setFunnelForm] = useState<RegisterFormProps>({
 		gender: 'male',
 		address: "",
@@ -63,23 +55,21 @@ const Register = () => {
 			return;
 		}
 		if (step === 'complete' && !nextStep) {
-			await userRegister(api, funnelForm, setCookie, navigator);
-
+			const data = await api('post', 'register', funnelForm)
 		}
 	};
 	return (
 		<Funnel>
 			<Funnel.Step name="id">
 				<EmailStep<['id' | 'userinfo' | 'address' | 'gender' | 'complete']>
-					api={api}
 					onSubmit={onSubmit}
 					setForm={setFunnelForm}
 					step={'id'}
 					nextStep={'userinfo'}
 				>
-					<Link to="/">
+					<Button onClick={onClick}>
 						Sign In
-					</Link>
+					</Button>
 				</EmailStep>
 			</Funnel.Step>
 			<Funnel.Step name="userinfo">
@@ -93,18 +83,19 @@ const Register = () => {
 						notFocus={true}
 					/>
 					<Button>다음</Button>
-				</Form>
-				<Link to ='/'>
+				<Button onClick={onClick}>
 					Sign In
-				</Link>
+				</Button>
+				</Form>
+
 			</Funnel.Step>
 			<Funnel.Step name="address">
 				<Form onSubmit={async (e) => onSubmit(e, 'address', 'gender')}>
 					<Button>집주소</Button>
 				</Form>
-				<Link to ='/'>
+				<Button onClick={onClick}>
 					Sign In
-				</Link>
+				</Button>
 			</Funnel.Step>
 			<Funnel.Step name="gender">
 				<Form onSubmit={async (e) => onSubmit(e, 'gender', 'complete')}>
@@ -118,9 +109,9 @@ const Register = () => {
 					<div>
 
 					<Button>다음</Button>
-					<Link to ='/'>
+					<Button onClick={onClick}>
 						Sign In
-					</Link>
+					</Button>
 					</div>
 				</Form>
 				
@@ -128,9 +119,9 @@ const Register = () => {
 			<Funnel.Step name="complete">
 				<Form onSubmit={async (e) => onSubmit(e, "complete")}>
 					<Button>done</Button>
-					<Link to ='/'>
+					<Button onClick={onClick}>
 						Sign In
-					</Link>
+					</Button>
 				</Form>
 			</Funnel.Step>
 		</Funnel>

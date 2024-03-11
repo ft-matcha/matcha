@@ -1,5 +1,6 @@
 import Layout from '@/page/Layout';
 import Main from '@/page/Main';
+import AuthContainer from '@/page/auth/AuthContainer';
 import Login from '@/page/auth/Login';
 import Register from '@/page/auth/register/Register';
 import Recommend from '@/page/recommend/Recommend';
@@ -17,12 +18,8 @@ const routes = createBrowserRouter([
     children: [
 	{
 		path: '',
-		element: <Login/>,
-	},
-	{
-		path: 'register',
-		element: <Register />,
-	},
+		element: <AuthContainer/>
+	} ,
     {
         path: 'explorer',
 		element: <Layout/>,

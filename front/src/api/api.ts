@@ -1,6 +1,6 @@
 import type { Api } from '@/api/api-types';
 import { responsePipe } from '@/api/apiWrapper';
-import { getToken, setToken } from '@/utils/token';
+import { deleteToken, getToken, setToken } from '@/utils/token';
 
 
 export class ApiCall {
@@ -19,7 +19,7 @@ export class ApiCall {
 	callApi(type: string, url: string, params: any) {
 		switch (type) {
 			case 'post':
-				const {data, ...rest} = params;
+				const { data, ...rest } = params;
 				return this.getInstance().post(url, data, rest);
 			case 'get':
 				console.log(params);
@@ -36,18 +36,6 @@ export class ApiCall {
 		return this.callApi(type, this.baseUrl, params);
 	}
 }
-
-// export class LoginApi extends ApiCall {
-//   constructor(apiInstance: Api.ApiInstance, url: string) {
-//     super(apiInstance, url);
-//   }
-// }
-
-// export class RegisterApi extends ApiCall {
-//   constructor(apiInstance: Api.ApiInstance, url: string) {
-//     super(apiInstance, url);
-//   }
-// }
 
 interface ApiContainerProps {
 	apiInstance: Api.ApiInstance;
@@ -97,18 +85,18 @@ export class ApiContainer {
 		return (this.apiContainer[target + 'Api'] as ApiCall).fetchApi(method, dataParams, url);
 	}
 
-	async call(type: 'get' | 'post' | 'put', target: string, dataParams?: any, url?: string) {
+	call(type: 'get' | 'post' | 'put', target: string, dataParams?: any, url?: string) {
 		try {
-			const result = this.run(type, target, this.setBearerTokenInHeader(type, dataParams), url);
-			if (result instanceof Promise) {
-				const response = await responsePipe(result as Promise<Api.BackendResponse>);
-				return response;
-			}
+			const bearer = this.setBearerTokenInHeader(type, dataParams);
+			const result =  this.run(type, target, bearer, url);
+			const response = responsePipe(result as Promise<Api.BackendResponse>);
+			return response;
 		} catch (e) {
-			console.log(`error: `, e);
-			// if (target === 'login') {
-			//   return { success: false, error: { message: 'Login failed' } };
-			// }
+			if (getToken(
+				'accessToken'
+			)) {
+				deleteToken('accessToken');
+			}
 		}
 	}
 }
