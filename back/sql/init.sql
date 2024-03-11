@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `user` (
-    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `id` varchar(255) NOT NULL,
     `password` varchar(255) NOT NULL,
     `email` varchar(255) NOT NULL,
     `firstName` varchar(255) NOT NULL,
@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `profile` BOOLEAN NOT NULL DEFAULT FALSE,
 
     UNIQUE INDEX `user_email_key`(`email`),
+    UNIQUE INDEX `user_id_key`(`id`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 
@@ -22,7 +23,7 @@ CREATE TABLE IF NOT EXISTS `profile` (
     `tag` JSON NOT NULL,
     `age` INTEGER NOT NULL,
     `image` JSON NOT NULL,
-    `userId` INTEGER NOT NULL,
+    `userId` varchar(255) NOT NULL,
 
     UNIQUE INDEX `profile_userId_key`(`userId`),
     PRIMARY KEY (`profileId`)
@@ -31,8 +32,8 @@ ALTER TABLE `profile` ADD FOREIGN KEY (`userId`) REFERENCES `user`(`id`) ON DELE
 
 CREATE TABLE IF NOT EXISTS `relation` (
     `relationId` INTEGER NOT NULL AUTO_INCREMENT,
-    `fromId` INTEGER NOT NULL,
-    `toId` INTEGER NOT NULL,
+    `fromId` varchar(255) NOT NULL,
+    `toId` varchar(255) NOT NULL,
     `status` varchar(255) NOT NULL,
 
     PRIMARY KEY (`relationId`)
@@ -43,8 +44,8 @@ ALTER TABLE `relation` ADD FOREIGN KEY (`toId`) REFERENCES `user`(`id`) ON DELET
 
 CREATE TABLE IF NOT EXISTS `alert` (
     `alertId` INTEGER NOT NULL AUTO_INCREMENT,
-    `fromId` INTEGER NOT NULL,
-    `toId` INTEGER NOT NULL,
+    `fromId` varchar(255) NOT NULL,
+    `toId` varchar(255) NOT NULL,
     `type` varchar(255) NOT NULL,
     `message` varchar(255) DEFAULT NULL,
     `status` varchar(255) NOT NULL DEFAULT 'PENDING',
@@ -57,8 +58,8 @@ ALTER TABLE `alert` ADD FOREIGN KEY (`toId`) REFERENCES `user`(`id`) ON DELETE C
 
 CREATE TABLE IF NOT EXISTS `message` (
     `messageId` INTEGER NOT NULL AUTO_INCREMENT,
-    `fromId` INTEGER NOT NULL,
-    `toId` INTEGER NOT NULL,
+    `fromId` varchar(255) NOT NULL,
+    `toId` varchar(255) NOT NULL,
     `content` varchar(255) NOT NULL,
     `status` varchar(255) NOT NULL DEFAULT 'PENDING',
 

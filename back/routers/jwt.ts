@@ -15,24 +15,24 @@ const verifyJWT = async (req: any, res: any, next: any) => {
                 //         return;
                 //     }
                 // }
-                res.status(401).json({ success: false, message: 'Expired Token' });
+                res.status(200).json({ success: false, error: { status: 401, message: 'Expired Token' } });
                 return;
             } else if (typeof response.decoded === 'object') {
-                if (response.decoded['email'] === undefined) {
-                    res.status(401).json({ success: false, message: 'Invalid Token' });
+                if (response.decoded['id'] === undefined) {
+                    res.status(200).json({ success: false, error: { status: 401, message: 'Invalid Token' } });
                 } else {
-                    req.email = response.decoded['email'];
+                    req.id = response.decoded['id'];
                     next();
                     return;
                 }
             }
-            res.status(401).json({ success: false, message: 'Invalid Token' });
+            res.status(200).json({ success: false, error: { status: 401, message: 'Invalid Token' } });
         } else {
-            res.status(401).json({ success: false, message: 'token does not exist' }); //redirect login page
+            res.status(200).json({ success: false, error: { status: 401, message: 'token does not exist' } }); //redirect login page
         }
     } catch (error: any) {
         console.error('verifyJWT failed: ' + error.stack);
-        res.status(500).json({ success: false, error: { message: 'verifyJWT failed : server error' } });
+        res.status(200).json({ success: false, error: { status: 500, message: 'verifyJWT failed : server error' } });
     }
 };
 
@@ -43,15 +43,15 @@ const refreshJWT = async (req: any, res: any) => {
             const refreshToken = req.headers.refresh.split('refresh ')[1];
             const response = await jwt.refreshVerify(accessToken, refreshToken);
             if (response.success === false) {
-                res.status(401).json({ success: false, message: 'Invalid Token' });
+                res.status(200).json({ success: false, error: { status: 401, message: 'Invalid Token' } });
             } else {
-                res.status(201).json({ success: true, accessToken: jwt.sign(response.email) });
+                res.status(201).json({ success: true, accessToken: jwt.sign(response.id) });
             }
         } else {
-            res.status(401).json({ success: false, message: 'Token does not exist' });
+            res.status(200).json({ success: false, error: { status: 401, message: 'Token does not exist' } });
         }
     } catch (error: any) {
-        res.status(500).json({ success: false, error: error });
+        res.status(200).json({ success: false, error: { status: 500, message: 'server error' } });
     }
 };
 
