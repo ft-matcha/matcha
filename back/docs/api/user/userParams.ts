@@ -1,5 +1,5 @@
 export default {
-    '/user/{email}': {
+    '/user/{id}': {
         get: {
             tags: ['user'],
             summary: 'Get user info',
@@ -12,7 +12,7 @@ export default {
             parameters: [
                 {
                     in: 'path',
-                    name: 'email',
+                    name: 'id',
                     required: true,
                     schema: {
                         type: 'string',

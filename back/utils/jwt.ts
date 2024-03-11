@@ -65,7 +65,7 @@ export default {
                 };
             }
         } catch (err: any) {
-            return { success: false, message: err.message };
+            return { success: false, error: { status: 500, message: err.message } };
         }
     },
 };

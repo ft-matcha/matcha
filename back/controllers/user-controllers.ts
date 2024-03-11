@@ -52,9 +52,9 @@ class UserControllers {
 
     getUser = async (where: any) => {
         try {
-            console.log(where);
             const user = await User.readOne({
                 where: where,
+                include: { table: 'profile', fk: 'userId', pk: 'id' },
             });
             if (user === undefined) {
                 return undefined;
@@ -157,7 +157,7 @@ class UserControllers {
                 console.log('User not found');
                 return {
                     success: false,
-                    error: { message: 'User not found' },
+                    error: { status: 404, message: 'User not found' },
                 };
             }
             if (!process.env.secret) throw new Error('secret not found');
