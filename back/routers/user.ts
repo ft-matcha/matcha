@@ -4,8 +4,9 @@ import elastic from '../lib/elastic';
 
 const checkEmail = async (req: any, res: any) => {
     try {
+        console.log(req.query['email']);
         if (req.query['email']) {
-            const response = await userControllers.getUser(req.query['email']);
+            const response = await userControllers.getUser({ email: req.query['email'] });
             if (response === undefined) {
                 res.status(200).json({ success: true });
                 return;
@@ -25,7 +26,7 @@ const checkEmail = async (req: any, res: any) => {
 
 const checkProfileVerify = async (req: any, res: any, next: any) => {
     try {
-        const response = await userControllers.getUser(req.email);
+        const response = await userControllers.getUser({ id: req.id });
         if (response === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
@@ -45,12 +46,13 @@ const checkProfileVerify = async (req: any, res: any, next: any) => {
 
 const get = async (req: any, res: any) => {
     try {
-        const response = await userControllers.getUser(req.params.email ? req.params.email : req.email);
+        if (req.params.id === undefined) req.params.id = req.id;
+        const response = await userControllers.getUser({ id: req.params.id });
         if (response === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
         } else {
-            const { id, password, verified, userId, profileId, ...rest } = response;
+            const { password, verified, profile, userId, profileId, ...rest } = response;
             if (req.email === req.params.email) {
                 rest['relaiton'] = 'me';
             }
@@ -74,7 +76,7 @@ const get = async (req: any, res: any) => {
 
 const update = async (req: any, res: any) => {
     try {
-        const user = await userControllers.getUser(req.email);
+        const user = await userControllers.getUser({ id: req.id });
         if (user === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
@@ -100,7 +102,7 @@ const update = async (req: any, res: any) => {
 
 const getRecommend = async (req: any, res: any) => {
     try {
-        const user = await userControllers.getRecommend(req.email, req.query.tag);
+        const user = await userControllers.getRecommend(req.id, req.query.tag);
         res.status(200).json({ success: true, data: user });
     } catch (error: any) {
         console.error('getRecommend failed: ' + error.stack);

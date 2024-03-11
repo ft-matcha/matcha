@@ -7,7 +7,7 @@ import relationControllers from './relation-controllers';
 const User = new crud('user');
 const Profile = new crud('profile');
 interface User {
-    id: number;
+    id: string;
     email: string;
     firstName: string;
     lastName: string;
@@ -19,25 +19,26 @@ interface User {
     profile: any;
 }
 class UserControllers {
-    private email: any;
+    private id: any;
     private data: any;
     createUser = async (body: any) => {
         try {
             const { firstName, lastName, email, password, phone, address } = body;
             if (!process.env.secret) throw new Error('secret not found');
             const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(password).digest('hex');
-
+            const id = crypto.randomUUID();
             await User.create({
                 set: {
+                    id: id,
                     email: email,
                     firstName,
                     lastName,
                     password: cryptoPass,
-                    phone: phone ? phone : '',
+                    phone: phone,
                     address,
                 },
             });
-            const accessToken = await jwt.sign(email);
+            const accessToken = await jwt.sign(id);
             const refreshToken = await jwt.refresh();
             return {
                 accessToken,
@@ -49,17 +50,16 @@ class UserControllers {
         }
     };
 
-    getUser = async (email: string) => {
+    getUser = async (where: any) => {
         try {
+            console.log(where);
             const user = await User.readOne({
-                include: {
-                    table: 'profile',
-                    fk: 'userId',
-                    pk: 'id',
-                },
-                where: { email },
+                where: where,
             });
-            this.email = email;
+            if (user === undefined) {
+                return undefined;
+            }
+            this.id = user.id;
             this.data = user;
             return user;
         } catch (error: any) {
@@ -87,7 +87,7 @@ class UserControllers {
         }
     };
 
-    updateUser = async (email: string, set: any) => {
+    updateUser = async (id: string, set: any) => {
         try {
             if (set.password) {
                 if (!process.env.secret) throw new Error('secret not found');
@@ -98,7 +98,7 @@ class UserControllers {
                 if (set[key] === undefined) delete set[key];
             });
             const response = await User.update({
-                where: { email: email },
+                where: { id: id },
                 set: set,
                 include: { table: 'profile', fk: 'userId', pk: 'id' },
             });
@@ -122,20 +122,15 @@ class UserControllers {
         }
     };
 
-    getRecommend = async (email: string, tag?: string) => {
+    getRecommend = async (id: string, tag?: string) => {
         try {
-            const user = await this.getUser(email);
+            const user = await this.getUser({ id: id });
             const should: any = [{ terms: { gender: user.preferences } }];
             if (tag) {
                 should.push({ terms: { tag: tag } });
             }
             const bool: any = {};
-            const relation = await relationControllers.getRelation(
-                {
-                    from: email,
-                },
-                'HATE'
-            );
+            const relation = await relationControllers.getRelation({ from: id }, 'HATE');
             if (relation.length > 0) {
                 const notUser = relation.map((item: any) => {
                     return item.email;
@@ -157,7 +152,7 @@ class UserControllers {
     login = async (body: any) => {
         try {
             const { email, password } = body;
-            const user = await this.getUser(email);
+            const user = await this.getUser({ email: email });
             if (user === undefined) {
                 console.log('User not found');
                 return {
@@ -168,10 +163,10 @@ class UserControllers {
             if (!process.env.secret) throw new Error('secret not found');
             const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(password).digest('hex');
             if (user.password === cryptoPass) {
-                const accessToken = jwt.sign(email);
+                const accessToken = jwt.sign(user.id);
                 const refreshToken = await jwt.refresh();
-                await this.updateUser(email, { status: 'ACTIVE' });
-                await redis.set(email, refreshToken);
+                await this.updateUser(user.id, { status: 'ACTIVE' });
+                await redis.set(user.id, refreshToken);
                 return {
                     accessToken,
                     refreshToken,
@@ -188,13 +183,13 @@ class UserControllers {
         }
     };
 
-    logout = async (email: string) => {
+    logout = async (id: string) => {
         try {
-            const user = await this.getUser(email);
+            const user = await this.getUser({ id: id });
             if (user === undefined) throw new Error('email not found');
             if (user.status === 'ACTIVE') {
-                await redis.del(email);
-                await this.updateUser(email, { status: 'INACTIVE' });
+                await redis.del(id);
+                await this.updateUser(id, { status: 'INACTIVE' });
                 return { success: true };
             } else {
                 return { success: false, error: { message: 'User already logged out' } };

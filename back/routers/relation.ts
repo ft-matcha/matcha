@@ -2,10 +2,10 @@ import relationControllers from '../controllers/relation-controllers';
 import alertControllers from '../controllers/alert-controllers';
 const requestFriend = async (req: any, res: any) => {
     try {
-        const response: any = await relationControllers.getRelation({ from: req.email, to: req.body.email });
-        const alert = await alertControllers.createAlert(req.email, req.body.email, 'request');
+        const response: any = await relationControllers.getRelation({ from: req.id, to: req.body.id });
+        const alert = await alertControllers.createAlert(req.id, req.body.id, 'request');
         if (response === undefined) {
-            const create = await relationControllers.createRelation(req.email, req.body.email, 'FRIEND');
+            const create = await relationControllers.createRelation(req.id, req.body.id, 'FRIEND');
             res.status(201).json({ success: true, data: create });
         } else {
             const update = await relationControllers.updateRelation(response.relationId, 'FRIEND');
@@ -19,9 +19,9 @@ const requestFriend = async (req: any, res: any) => {
 
 const acceptFriend = async (req: any, res: any) => {
     try {
-        const response: any = await relationControllers.getRelation({ from: req.email, to: req.body.email });
+        const response: any = await relationControllers.getRelation({ from: req.id, to: req.body.id });
         if (response === undefined) {
-            const create = await relationControllers.createRelation(req.email, req.body.email, 'FRIEND');
+            const create = await relationControllers.createRelation(req.id, req.body.id, 'FRIEND');
         } else {
             const update = await relationControllers.updateRelation(response.id, 'FRIEND');
         }
@@ -34,9 +34,9 @@ const acceptFriend = async (req: any, res: any) => {
 
 const getFriend = async (req: any, res: any) => {
     try {
-        const response = await relationControllers.getRelation({ from: req.email, duplex: true }, 'FRIEND');
+        const response = await relationControllers.getRelation({ from: req.id, duplex: true }, 'FRIEND');
         const friendList = response.map((relation: any) => {
-            return relation.email;
+            return relation.id;
         });
         res.status(200).json({ success: true, data: friendList });
     } catch (error: any) {
@@ -48,11 +48,11 @@ const getFriend = async (req: any, res: any) => {
 const hateUser = async (req: any, res: any) => {
     try {
         const relation = await relationControllers.getRelation({
-            from: req.email,
-            to: req.body.email,
+            from: req.id,
+            to: req.body.id,
         });
         if (relation === undefined) {
-            await relationControllers.createRelation(req.email, req.body.email, 'HATE');
+            await relationControllers.createRelation(req.id, req.body.id, 'HATE');
         } else {
             await relationControllers.updateRelation(relation.relationId, 'HATE');
         }

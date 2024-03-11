@@ -18,10 +18,10 @@ const verifyJWT = async (req: any, res: any, next: any) => {
                 res.status(401).json({ success: false, message: 'Expired Token' });
                 return;
             } else if (typeof response.decoded === 'object') {
-                if (response.decoded['email'] === undefined) {
+                if (response.decoded['id'] === undefined) {
                     res.status(401).json({ success: false, message: 'Invalid Token' });
                 } else {
-                    req.email = response.decoded['email'];
+                    req.id = response.decoded['id'];
                     next();
                     return;
                 }
@@ -45,7 +45,7 @@ const refreshJWT = async (req: any, res: any) => {
             if (response.success === false) {
                 res.status(401).json({ success: false, message: 'Invalid Token' });
             } else {
-                res.status(201).json({ success: true, accessToken: jwt.sign(response.email) });
+                res.status(201).json({ success: true, accessToken: jwt.sign(response.id) });
             }
         } else {
             res.status(401).json({ success: false, message: 'Token does not exist' });

@@ -24,11 +24,8 @@ const login = async (req: any, res: any) => {
 
 const signup = async (req: any, res: any) => {
     try {
-        const user = await userControllers.getUser(req.body.email);
-        console.log(user);
+        const user = await userControllers.getUser({ email: req.body.email });
         if (user === undefined) {
-            console.log(req.body);
-
             const response = await userControllers.createUser(req.body);
             console.log('signUp success');
             const { refreshToken, accessToken } = response;
@@ -67,7 +64,7 @@ const logout = async (req: any, res: any) => {
 
 const sendEmail = async (req: any, res: any) => {
     try {
-        const response = await userControllers.getUser(req.email);
+        const response = await userControllers.getUser({ id: req.id });
         if (response === undefined) {
             res.status(401).json({ success: false, error: { message: 'User not found' } });
             return;
@@ -88,7 +85,7 @@ const sendEmail = async (req: any, res: any) => {
 
 const verifyEmail = async (req: any, res: any) => {
     try {
-        const user = await userControllers.getUser(req.email);
+        const user = await userControllers.getUser({ id: req.id });
         if (user === undefined) {
             res.status(401).json({ success: false, error: { message: 'User not found' } });
             return;
