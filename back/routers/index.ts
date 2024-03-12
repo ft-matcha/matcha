@@ -15,7 +15,7 @@ const { swaggerUI, specs, setUpOption } = apiDocs.getSwaggerOption();
 //auth
 router.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));
 router.post('/login', auth.login);
-router.post('/signup', auth.signup);
+router.post('/register', auth.signup);
 router.get('/register', user.checkEmail);
 router.get('/tag', user.getTag);
 router.get('/refresh', jwt.refreshJWT);

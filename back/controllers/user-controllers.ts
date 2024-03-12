@@ -12,7 +12,7 @@ interface User {
     firstName: string;
     lastName: string;
     password: string;
-    phone: string;
+    gender: string;
     address: string;
     verified?: number;
     status?: string;
@@ -24,20 +24,19 @@ interface Where {
 }
 class UserControllers {
     createUser = async (body: User) => {
-        console.log('createUser');
         try {
-            const { firstName, lastName, email, password, phone, address } = body;
+            const { firstName, lastName, email, password, gender, address } = body;
             if (!process.env.secret) throw new Error('secret not found');
             const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(password).digest('hex');
             const id = crypto.randomUUID();
             await User.create({
                 set: {
                     id: id,
-                    email: email,
+                    email,
                     firstName,
                     lastName,
                     password: cryptoPass,
-                    phone: phone,
+                    gender,
                     address,
                 },
             });
