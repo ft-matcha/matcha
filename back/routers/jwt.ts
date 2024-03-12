@@ -47,7 +47,7 @@ const refreshJWT = async (req: any, res: any) => {
             if (response.success === false) {
                 res.status(401).json({ success: false, message: 'Invalid Token' });
             } else {
-                res.status(201).json({ success: true, accessToken: jwt.sign(response.email) });
+                res.status(201).json({ success: true, accessToken: jwt.sign(response.id) });
             }
         } else {
             res.status(401).json({ success: false, message: 'Token does not exist' });

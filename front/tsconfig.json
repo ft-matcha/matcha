@@ -29,7 +29,7 @@
   },
   "include": [
     "src",
-    "types.d.ts",
+    "*.d.ts",
     "public",
   ],
   "exclude": [

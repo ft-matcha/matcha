@@ -24,7 +24,7 @@ export const StyledProfile = styled(FormContainer)`
 
 const Profile = () => {
   const main = document.getElementById('main');
-  const naviagtor = useNavigate();
+  const navigator = useNavigate();
   const [location, setLocation] = useState({ latitude: 0, longitude: 0 });
   const { state } = useLocation();
   const api = useApi();
@@ -35,19 +35,23 @@ const Profile = () => {
     maximumAge: 0,
   };
 
-
+  const fetchApi = async() => {
+	const result = await api('get', 'user');
+	if (!result) {
+		navigator('/')
+	}
+  }
   useEffect(() => {
-	api('get', 'user');
-    const success = (pos: any) => {
-      const crd = pos.coords;
-      setLocation({ latitude: crd.latitude, longitude: crd.longitude });
-    };
-    const error = () => {
-      console.log('error');
-    };
-    navigator.geolocation.watchPosition(success, error, options);
+	fetchApi();
+    // const success = (pos: any) => {
+    //   const crd = pos.coords;
+    //   setLocation({ latitude: crd.latitude, longitude: crd.longitude });
+    // };
+    // const error = () => {
+    //   console.log('error');
+    // };
+    // navigator.geolocation.watchPosition(success, error, options);
   }, []);
-  console.log(state);
 
   return (
     <>
@@ -104,7 +108,7 @@ const Profile = () => {
               context={[
                 <Button
                   onClick={() => {
-                    naviagtor(-1);
+                    navigator(-1);
                   }}
                 >
                   Test

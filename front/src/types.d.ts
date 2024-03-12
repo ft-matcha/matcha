@@ -1,3 +1,12 @@
+export interface IWindow extends Window {
+	kakao: {
+		maps : {
+			Map: any;
+			LatLng: any;
+		}
+	};
+}
+
 export interface InputContainerProps {
   type: string;
   id: string;
@@ -6,6 +15,10 @@ export interface InputContainerProps {
   required?: boolean;
   notFocus?: boolean;
   children?: React.ReactNode;
+  defaultValue?: string;
+  readOnly?: boolean;
+  value?: string;
+  pattern?: string;
 }
 
 export interface ModalProps {

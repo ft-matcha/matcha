@@ -2,11 +2,11 @@ import useFunnel from '@/hooks/useFunnel';
 import Select from '@/components/ui/Select';
 import { useState } from 'react';
 import { useCookies } from 'react-cookie';
-import { Form,  NavigateFunction, useNavigate } from 'react-router-dom';
+import {  NavigateFunction, useNavigate } from 'react-router-dom';
 import {  getToken, setToken } from '@/utils/token';
 import InputContainer from '@/components/InputContainer';
 import Button from '@/components/ui/Button';
-import { formHandler } from '@/components/ui/Form';
+import Form, { formHandler } from '@/components/ui/Form';
 import { userGender } from '@/data/AuthData';
 import { ApiContainer } from '@/api/api';
 import EmailStep from '@/page/auth/register/EmailStep';
@@ -15,20 +15,6 @@ import useApi from '@/hooks/useApi';
 interface RegisterFormProps {
 	[key: string]: string | boolean;
 }
-
-// const userRegister = async (
-// 	api: ApiContainer,
-// 	funnelForm: RegisterFormProps,
-// 	setCookie: (name: 'refreshToken', value: any, options?: any | undefined) => void,
-// 	navigator: NavigateFunction
-// ) => {
-// 	const result = await api.call('post', 'signup', funnelForm);
-// 	if (result?.success) {
-// 		setToken('accessToken', result.data.accessToken);
-// 		getToken('accessToken');
-// 		navigator('/explorer');
-// 	} 
-// };
 
 const Register = ({onClick} : {onClick: (prev: boolean) => void}) => {
 	const [Funnel, setStep] = useFunnel(
@@ -55,7 +41,7 @@ const Register = ({onClick} : {onClick: (prev: boolean) => void}) => {
 			return;
 		}
 		if (step === 'complete' && !nextStep) {
-			const data = await api('post', 'register', funnelForm)
+			const data = await api('post', 'signup', funnelForm)
 		}
 	};
 	return (
@@ -63,7 +49,6 @@ const Register = ({onClick} : {onClick: (prev: boolean) => void}) => {
 			<Funnel.Step name="id">
 				<EmailStep<['id' | 'userinfo' | 'address' | 'gender' | 'complete']>
 					onSubmit={onSubmit}
-					setForm={setFunnelForm}
 					step={'id'}
 					nextStep={'userinfo'}
 				>
@@ -83,11 +68,10 @@ const Register = ({onClick} : {onClick: (prev: boolean) => void}) => {
 						notFocus={true}
 					/>
 					<Button>다음</Button>
-				<Button onClick={onClick}>
-					Sign In
-				</Button>
+					<Button onClick={onClick}>
+						Sign In
+					</Button>
 				</Form>
-
 			</Funnel.Step>
 			<Funnel.Step name="address">
 				<Form onSubmit={async (e) => onSubmit(e, 'address', 'gender')}>
@@ -107,11 +91,10 @@ const Register = ({onClick} : {onClick: (prev: boolean) => void}) => {
 						))}
 					</Select>
 					<div>
-
-					<Button>다음</Button>
-					<Button onClick={onClick}>
-						Sign In
-					</Button>
+						<Button>다음</Button>
+						<Button onClick={onClick}>
+							Sign In
+						</Button>
 					</div>
 				</Form>
 				
