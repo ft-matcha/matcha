@@ -13,7 +13,7 @@ import EmailStep from '@/page/auth/register/EmailStep';
 import useApi from '@/hooks/useApi';
 
 interface RegisterFormProps {
-	[key: string]: string | boolean;
+	[key: string]: string | boolean | undefined;
 }
 
 const Register = ({onClick} : {onClick: (prev: boolean) => void}) => {
@@ -41,7 +41,7 @@ const Register = ({onClick} : {onClick: (prev: boolean) => void}) => {
 			return;
 		}
 		if (step === 'complete' && !nextStep) {
-			const data = await api('post', 'signup', funnelForm)
+			const data = await api('post', 'register', funnelForm, true)
 		}
 	};
 	return (
@@ -49,6 +49,8 @@ const Register = ({onClick} : {onClick: (prev: boolean) => void}) => {
 			<Funnel.Step name="id">
 				<EmailStep<['id' | 'userinfo' | 'address' | 'gender' | 'complete']>
 					onSubmit={onSubmit}
+					setFunnel={setFunnelForm}
+					email={funnelForm?.email as string | undefined}
 					step={'id'}
 					nextStep={'userinfo'}
 				>

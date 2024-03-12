@@ -36,6 +36,7 @@ const Input: React.FC<InputProps> = ({ onChange, notFocus, readOnly, type, value
 	ref={ref}
 	type={type}
 	autoComplete={type !== 'password' ? "given-name": 'off'}
+	value={value}
 	{...rest} />;
 };
 
