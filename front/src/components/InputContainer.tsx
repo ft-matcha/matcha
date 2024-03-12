@@ -1,16 +1,21 @@
 import { InputContainerProps } from '@/types';
-import Label from './ui/Label';
-import Input from './ui/input';
+import Label from '@/components/ui/Label';
+import Input from '@/components/ui/input';
+import styled from 'styled-components';
 
-const InputContainer: React.FC<InputContainerProps> = ({ name, children, ...rest }) => {
+const Container = styled.div`
+	width: 100%;
+
+`
+
+const InputContainer: React.FC<InputContainerProps> = ({ name, children, readOnly, value, ...rest }) => {
 
   return (
-    <div>
+    <Container>
       <Label htmlFor={name}>{name}</Label>
-      <Input name={name} {...rest}></Input>
-
+      <Input name={name} value={readOnly && value ? value : undefined} readOnly={readOnly} {...rest}></Input>
       {children}
-    </div>
+    </Container>
   );
 };
 

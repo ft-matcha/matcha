@@ -1,11 +1,21 @@
 import Post, { PostTabContainer } from '@/page/Post';
 import Nav from '@/components/ui/Nav';
-import { useContext,  useEffect,  useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Outlet } from 'react-router';
+import { useNavigate } from 'react-router-dom';
+import type { NavigateFunction } from "react-router-dom";
 import styled from 'styled-components';
 import Aside from '@/components/ui/Aside';
 import { CgProfile } from 'react-icons/cg';
 import { ApiContainers } from '@/provider/ApiContainerProvider';
+import { useCookies } from 'react-cookie';
+import { deleteToken, getToken } from '@/utils/token';
+import { ApiContainer } from '@/api/api';
+import useApi from '@/hooks/useApi';
+import { FaUserFriends } from "react-icons/fa";
+import type {IWindow} from "@/types"
+
+const {kakao} = window as unknown as IWindow;
 
 const LayoutDefault = styled.section`
   display: grid;
@@ -29,66 +39,130 @@ const MainSection = styled.main`
   }
 `;
 
+const MobileLayout = () => {
+	return <></>
+}
+
+const DesktopLayout = () => {
+	return <></>
+}
+
 const Layout = () => {
-  const [post, setPost] = useState('');
-  const [profile, setProfile] = useState({
-	image: "",
-	lastName: "",
-	firstName: "",
-  })
+	const [post, setPost] = useState('');
+	const [cookie, setCookie, removeCookie] = useCookies(["refreshToken"]);
+	const api = useApi();
+	const navigator = useNavigate();
+	const [profile, setProfile] = useState({
+		image: "",
+		lastName: "",
+		firstName: "",
+		gender: '',
+	})
 
-  const api = useContext(ApiContainers);
-  useEffect(() => {
-	const response = api.call('get', 'user');
-	console.log(response);
-  }, []);
+	const kakaoRef = useRef<HTMLDivElement>(null);
+	const fetchData = async () => {
+		const response = await api('get', 'user');
+	}
+	useEffect(() => {
+		fetchData();
+		if (kakaoRef) {
+			const options = {
+				enableHighAccuracy: true,
+				timeout: 5000,
+				maximumAge: 0,
+			};
+			const map = new kakao.maps.Map(kakaoRef.current, {
+				center: new kakao.maps.LatLng(	
+					33.450701, 126.570667
+				),
+				level: 3,
+			});
+			console.log(map);
+			// 	function success(pos: GeolocationPosition) {
+			// 	const crd = pos.coords;
+			// 	console.log(map);
+			// 	console.log("Your current position is:");
+			// 	console.log(`Latitude : `);
+			// 	console.log(`Longitude: `);
+			// 	console.log(`More or less ${crd.accuracy} meters.`);
+			// }
 
-  return (
-    <LayoutDefault>
-      <Aside>
-        <Nav>
-          <Nav.Row background="rgba(24,132, 23, 0.2)" height="100px">
-            <Nav.List>
-              <Nav.Item
-                to="profile"
-                className={({ isActive }) => (isActive ? 'actived' : 'pending')}
-              >
-                <CgProfile />
-                <span>프로필</span>
-              </Nav.Item>
-            </Nav.List>
-          </Nav.Row>
-        </Nav>
-        <Nav>
-          <Nav.Row>
-            <Post>
-              <PostTabContainer>
-                <Nav.Row height="auto">
-                  <Nav.List>
-                    <Nav.Item as="button" to="">
-                      DM
-                    </Nav.Item>
-                  </Nav.List>
-                  <Nav.List>
-                    <Nav.Item
-                      to="/explorer/recommend"
-                      className={({ isActive }) => (isActive ? 'actived' : 'pending')}
-                    >
-                      추천
-                    </Nav.Item>
-                  </Nav.List>
-                </Nav.Row>
-              </PostTabContainer>
-            </Post>
-          </Nav.Row>
-          <Nav.Section id="nav-section">
-            <Outlet />
-          </Nav.Section>
-        </Nav>
-      </Aside>
-      <MainSection id="main"></MainSection>
-    </LayoutDefault>
-  );
+			// function error(err: {code : number, message: string}) {
+			// 	console.warn(`ERROR(${err.code}): ${err.message}`);
+			// }
+
+			// window.navigator.geolocation.getCurrentPosition(success, error, options);
+			// if (window.kakao) {
+			// }
+		}
+	}, []);
+
+	return (
+		<LayoutDefault>
+			<Aside>
+				<Nav>
+					<Nav.Row background="rgba(24,132, 23, 0.2)" height="100px">
+						<Nav.List float="space-between" width="100%">
+							<Nav.Item
+								to="/profile"
+								className={({ isActive }) => (isActive ? 'actived' : 'pending')}
+								width={'fit-content'}
+							>
+								<CgProfile />
+								<span>{profile.firstName + profile.lastName}</span>
+							</Nav.Item>
+							<Nav.Item
+								to="/"
+								onClick={(e) => {
+									e.preventDefault();
+									removeCookie('refreshToken');
+									deleteToken('accessToken');
+									navigator('/');
+								}}
+								width={"fit-content"}
+							>
+								Logout
+							</Nav.Item>
+						</Nav.List>
+					</Nav.Row>
+				</Nav>
+				<Nav>
+					<Nav.Row>
+						<Post>
+							<PostTabContainer>
+								<Nav.Row height="auto">
+									<Nav.List>
+										<Nav.Item as="button" to="">
+											DM
+										</Nav.Item>
+									</Nav.List>
+									<Nav.List>
+										<Nav.Item
+											to="/explorer/recommend"
+											className={({ isActive }) => (isActive ? 'actived' : 'pending')}
+										>
+											추천
+										</Nav.Item>
+									</Nav.List>
+								</Nav.Row>
+							</PostTabContainer>
+						</Post>
+					</Nav.Row>
+					<Nav.Section id="nav-section">
+						<Outlet />
+					</Nav.Section>
+					<div>
+						<FaUserFriends fontSize={"32px"} />
+					</div>
+				</Nav>
+			</Aside>
+			<MainSection id="main">
+				<div ref={kakaoRef} style={{width: "600px", height: "600px"}}>
+
+				</div>
+			</MainSection>
+		</LayoutDefault>
+	);
 };
 
 export default Layout;

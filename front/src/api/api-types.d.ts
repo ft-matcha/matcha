@@ -5,7 +5,7 @@ export namespace Api {
   }
 
   interface BackendResponse extends Record<string, any> {
-    ok?: boolean;
+    success?: boolean;
     data?: Record<string, any>;
   }
 

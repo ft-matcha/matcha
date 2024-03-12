@@ -2,6 +2,8 @@ import userControllers from '../controllers/user-controllers';
 import mailControllers from '../controllers/mail-controllers';
 import elastic from '../lib/elastic';
 import { Request, Response } from 'express';
+const mailer = new mailControllers();
+
 const login = async (req: Request, res: Response) => {
     try {
         const response = await userControllers.login(req.body);
@@ -73,8 +75,7 @@ const sendEmail = async (req: Request, res: Response) => {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
             return;
         }
-        const mailer = new mailControllers(user.email);
-        await mailer.sendEmail();
+        await mailer.sendEmail(user.email);
         res.status(201).json({
             success: true,
         });
@@ -95,8 +96,7 @@ const verifyEmail = async (req: Request, res: Response) => {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
             return;
         }
-        const mailer = new mailControllers(user.email);
-        const response = mailer.verifyEmail(req.params.code);
+        const response = await mailer.verifyEmail(user.email, req.params.code);
         if (response === true) {
             if (user.profile === 1) {
                 const { id, password, profile, verified, userId, profileId, ...rest } = user;
