@@ -1,10 +1,10 @@
-import signup from './signup';
+import register from './register';
 import login from './login';
 import sendEmail from './sendEmail';
 import verifyEmail from './verifyEmail';
 import logout from './logout';
 export default {
-    ...signup,
+    ...register,
     ...login,
     ...logout,
     ...sendEmail,
