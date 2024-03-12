@@ -1,7 +1,13 @@
 import crud from '../lib/crud';
 const Message = new crud('message');
-
-const create = async (user: any, content: string, status: string) => {
+interface User {
+    from: string;
+    to: string;
+}
+interface Data {
+    [key: string]: string | number | undefined;
+}
+const create = async (user: User, content: string, status: string) => {
     try {
         const message = await Message.create({
             set: {
@@ -17,7 +23,7 @@ const create = async (user: any, content: string, status: string) => {
     }
 };
 
-const get = async (user: any, status?: string) => {
+const get = async (user: User, status?: string) => {
     try {
         const where = {
             OR: [
@@ -37,7 +43,7 @@ const get = async (user: any, status?: string) => {
     }
 };
 
-const update = async (user: any, data: any) => {
+const update = async (user: User, data: Data) => {
     try {
         const message = await Message.update({
             where: { fromId: user.from, toId: user.to },

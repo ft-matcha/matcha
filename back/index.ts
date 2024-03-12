@@ -6,8 +6,9 @@ import bodyParser from 'body-parser';
 import crud from './lib/crud';
 import elastic from './lib/elastic';
 import routers from './routers/index';
-import { Server } from 'socket.io';
+// import { Server } from 'socket.io';
 import cors from 'cors';
+import { Request, Response } from 'express';
 
 // import socket from './socket/socket';
 
@@ -36,7 +37,7 @@ app.use(
 app.use(bodyParser.json());
 
 app.use('/api/v1', routers);
-app.use((req: any, res: any) => {
+app.use((req: Request, res: Response) => {
     res.status(404).json({ success: false, error: { message: 'Not Found' } });
 });
 // const io = new Server(server);

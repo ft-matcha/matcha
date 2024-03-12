@@ -13,30 +13,27 @@ const router = express.Router();
 apiDocs.init();
 const { swaggerUI, specs, setUpOption } = apiDocs.getSwaggerOption();
 //auth
+router.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));
 router.post('/login', auth.login);
 router.post('/signup', auth.signup);
-router.get('/logout', jwt.verifyJWT, auth.logout);
-router.get('/email', jwt.verifyJWT, auth.sendEmail);
-router.get('/email/:code', jwt.verifyJWT, auth.verifyEmail);
-//user
-router.get('/user', jwt.verifyJWT, user.get);
-router.get('/user/:email', jwt.verifyJWT, user.checkProfileVerify, user.get);
 router.get('/register', user.checkEmail);
-router.put('/user', jwt.verifyJWT, user.update);
-router.get('/recommend', jwt.verifyJWT, user.checkProfileVerify, user.getRecommend);
-
-//jwt
-router.get('/refresh', jwt.refreshJWT);
-//realtion
-router.get('/friend', jwt.verifyJWT, user.checkProfileVerify, relation.getFriend);
-router.post('/friend/request', jwt.verifyJWT, user.checkProfileVerify, relation.requestFriend);
-router.post('/hate', jwt.verifyJWT, user.checkProfileVerify, relation.hateUser);
-router.put('/friend/accept', jwt.verifyJWT, user.checkProfileVerify, relation.acceptFriend);
-//docs
-router.use('/api-docs', swaggerUI.serve, swaggerUI.setup(specs, setUpOption));
-
-//layout
-router.get('/layout', jwt.verifyJWT, user.checkProfileVerify, layout.getProfileAlert);
 router.get('/tag', user.getTag);
+router.get('/refresh', jwt.refreshJWT);
+
+router.use(jwt.verifyJWT);
+router.get('/logout', auth.logout);
+router.get('/email', auth.sendEmail);
+router.get('/email/:code', auth.verifyEmail);
+router.get('/user', user.get);
+router.put('/user', user.update);
+
+router.use(user.checkProfileVerify);
+router.get('/user/:email', user.get);
+router.get('/recommend', user.getRecommend);
+router.get('/friend', relation.getFriend);
+router.post('/friend/request', relation.requestFriend);
+router.post('/hate', relation.hateUser);
+router.put('/friend/accept', relation.acceptFriend);
+router.get('/layout', layout.getProfileAlert);
 
 export default router;

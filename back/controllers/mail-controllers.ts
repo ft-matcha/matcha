@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
+import redisClient from '../lib/redisClient';
 const transporter = nodemailer.createTransport({
     service: process.env.MAIL_SERVICE,
     auth: {
@@ -9,24 +10,14 @@ const transporter = nodemailer.createTransport({
 });
 
 export default class mailer {
-    private static store: any = {};
-    private email: string;
+    constructor() {}
 
-    constructor(email: string) {
-        this.email = email;
-    }
-    getEmail = (): string => {
-        return this.email;
-    };
-    sendEmail = async () => {
+    sendEmail = async (email: string) => {
         try {
             const code = crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
-            mailer.store[this.email] = {
-                code: code,
-                expiration: Date.now() + 300000,
-            };
+            redisClient.set(email, code, 300);
             const mailOptions = {
-                to: this.email,
+                to: email,
                 subject: 'Email Verification',
                 text: code,
             };
@@ -38,11 +29,12 @@ export default class mailer {
             throw error;
         }
     };
-    verifyEmail = (code: string) => {
+    verifyEmail = async (email: string, code: string) => {
         try {
-            if (mailer.store[this.email] === undefined || mailer.store[this.email].expiration < Date.now()) {
+            const redisCode = await redisClient.get(email);
+            if (redisCode === null) {
                 return false;
-            } else if (mailer.store[this.email].code === code) {
+            } else if (redisCode === code) {
                 return true;
             }
             return false;

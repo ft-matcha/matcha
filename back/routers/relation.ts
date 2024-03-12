@@ -1,7 +1,12 @@
 import relationControllers from '../controllers/relation-controllers';
 import alertControllers from '../controllers/alert-controllers';
-const requestFriend = async (req: any, res: any) => {
+import { Request, Response } from 'express';
+const requestFriend = async (req: Request, res: Response) => {
     try {
+        if (req.id === undefined) {
+            res.status(400).json({ success: false, error: { message: 'Invalid id' } });
+            return;
+        }
         const response: any = await relationControllers.getRelation({ from: req.id, to: req.body.id });
         const alert = await alertControllers.createAlert(req.id, req.body.id, 'request');
         if (response === undefined) {
@@ -17,7 +22,7 @@ const requestFriend = async (req: any, res: any) => {
     }
 };
 
-const acceptFriend = async (req: any, res: any) => {
+const acceptFriend = async (req: Request, res: Response) => {
     try {
         const response: any = await relationControllers.getRelation({ from: req.id, to: req.body.id });
         if (response === undefined) {
@@ -32,7 +37,7 @@ const acceptFriend = async (req: any, res: any) => {
     }
 };
 
-const getFriend = async (req: any, res: any) => {
+const getFriend = async (req: Request, res: Response) => {
     try {
         const response = await relationControllers.getRelation({ from: req.id, duplex: true }, 'FRIEND');
         const friendList = response.map((relation: any) => {
@@ -45,7 +50,7 @@ const getFriend = async (req: any, res: any) => {
     }
 };
 
-const hateUser = async (req: any, res: any) => {
+const hateUser = async (req: Request, res: Response) => {
     try {
         const relation = await relationControllers.getRelation({
             from: req.id,

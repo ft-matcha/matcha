@@ -1,11 +1,10 @@
 import userControllers from '../controllers/user-controllers';
-import relationControllers from '../controllers/relation-controllers';
 import elastic from '../lib/elastic';
+import { Request, Response, NextFunction } from 'express';
 
-const checkEmail = async (req: any, res: any) => {
+const checkEmail = async (req: Request, res: Response) => {
     try {
-        console.log(req.query['email']);
-        if (req.query['email']) {
+        if (typeof req.query['email'] === 'string') {
             const response = await userControllers.getUser({ email: req.query['email'] });
             if (response === undefined) {
                 res.status(200).json({ success: true });
@@ -24,7 +23,7 @@ const checkEmail = async (req: any, res: any) => {
     }
 };
 
-const checkProfileVerify = async (req: any, res: any, next: any) => {
+const checkProfileVerify = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const response = await userControllers.getUser({ id: req.id });
         if (response === undefined) {
@@ -47,18 +46,17 @@ const checkProfileVerify = async (req: any, res: any, next: any) => {
     }
 };
 
-const get = async (req: any, res: any) => {
+const get = async (req: Request, res: Response) => {
     try {
-        if (req.params.id === undefined) req.params.id = req.id;
-        const response = await userControllers.getUser({ id: req.params.id });
+        const response = await userControllers.getUser({ id: req.params.id ? req.params.id : req.id });
         if (response === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
         } else {
             const { password, verified, profile, userId, profileId, ...rest } = response;
-            if (req.email === req.params.email) {
-                rest['relaiton'] = 'me';
-            }
+            // if (req.email === req.params.email) {
+            //     rest['relaiton'] = 'me';
+            // }
             //  else {
             //     const relation = await relationControllers.getRelation({
             //         from: req.email,
@@ -77,21 +75,25 @@ const get = async (req: any, res: any) => {
     }
 };
 
-const update = async (req: any, res: any) => {
+const update = async (req: Request, res: Response) => {
     try {
+        if (req.id === undefined) {
+            res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
+            return;
+        }
         const user = await userControllers.getUser({ id: req.id });
         if (user === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
         }
         if (user.profile === 0) {
-            const response = await userControllers.createProfile(req.email, req.body);
+            const response = await userControllers.createProfile(req.id, req.body);
             if (response) req.body['profile'] = 1;
         }
-        const data = await userControllers.updateUser(req.email, req.body);
+        const data = await userControllers.updateUser(req.id, req.body);
         const { password, verified, userId, profile, profileId, ...rest } = data;
         if (verified === 1) {
-            await elastic.update(req.email, rest);
+            await elastic.update(req.id, rest);
         }
         res.status(201).json({
             success: true,

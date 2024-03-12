@@ -23,7 +23,7 @@ const login = async (req: Request, res: Response) => {
     }
 };
 
-const signup = async (req: any, res: any) => {
+const signup = async (req: Request, res: Response) => {
     try {
         const user = await userControllers.getUser({ email: req.body.email });
         if (user === undefined) {
@@ -48,9 +48,9 @@ const signup = async (req: any, res: any) => {
     }
 };
 
-const logout = async (req: any, res: any) => {
+const logout = async (req: Request, res: Response) => {
     try {
-        const response = await userControllers.logout(req.email);
+        const response = await userControllers.logout(req.id);
         if (response.success === false) {
             res.status(400).json(response);
         } else {
@@ -63,17 +63,17 @@ const logout = async (req: any, res: any) => {
     }
 };
 
-const sendEmail = async (req: any, res: any) => {
+const sendEmail = async (req: Request, res: Response) => {
     try {
-        const response = await userControllers.getUser({ id: req.id });
-        if (response === undefined) {
+        const user = await userControllers.getUser({ id: req.id });
+        if (user === undefined) {
             res.status(401).json({ success: false, error: { message: 'User not found' } });
             return;
-        } else if (response.verified === 1) {
+        } else if (user.verified === 1) {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
             return;
         }
-        const mailer = new mailControllers(req.email);
+        const mailer = new mailControllers(user.email);
         await mailer.sendEmail();
         res.status(201).json({
             success: true,
@@ -84,7 +84,7 @@ const sendEmail = async (req: any, res: any) => {
     }
 };
 
-const verifyEmail = async (req: any, res: any) => {
+const verifyEmail = async (req: Request, res: Response) => {
     try {
         const user = await userControllers.getUser({ id: req.id });
         if (user === undefined) {
@@ -95,14 +95,14 @@ const verifyEmail = async (req: any, res: any) => {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
             return;
         }
-        const mailer = new mailControllers(req.email);
+        const mailer = new mailControllers(user.email);
         const response = mailer.verifyEmail(req.params.code);
         if (response === true) {
             if (user.profile === 1) {
                 const { id, password, profile, verified, userId, profileId, ...rest } = user;
-                await elastic.update(req.email, rest);
+                await elastic.update(user.email, rest);
             }
-            await userControllers.updateUser(req.email, { verified: 1 });
+            await userControllers.updateUser(user.email, { verified: 1 });
             res.status(201).json({ success: true });
         } else {
             res.status(401).json({ success: false, error: { message: 'Invalid code' } });

@@ -1,7 +1,8 @@
+import { RequestHandler, Request, Response, NextFunction } from 'express';
 import userControllers from '../controllers/user-controllers';
 import jwt from '../utils/jwt';
 
-const verifyJWT = async (req: any, res: any, next: any) => {
+const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (req.headers.authorization) {
             const token = req.headers.authorization.split('Bearer ')[1];
@@ -23,10 +24,8 @@ const verifyJWT = async (req: any, res: any, next: any) => {
                 } else {
                     req.id = response.decoded['id'];
                     next();
-                    return;
                 }
             }
-            res.status(401).json({ success: false, error: { message: 'Invalid Token' } });
         } else {
             res.status(401).json({ success: false, error: { message: 'token does not exist' } }); //redirect login page
         }
@@ -36,11 +35,16 @@ const verifyJWT = async (req: any, res: any, next: any) => {
     }
 };
 
-const refreshJWT = async (req: any, res: any) => {
+const refreshJWT = async (req: Request, res: Response) => {
     try {
         if (req.headers['authorization'] && req.headers['refresh']) {
             const accessToken = req.headers.authorization.split('Bearer ')[1];
-            const refreshToken = req.headers.refresh.split('refresh ')[1];
+            const refreshToken =
+                typeof req.headers.refresh === 'string' ? req.headers.refresh.split('refresh ')[1] : null;
+            if (refreshToken === null) {
+                res.status(401).json({ success: false, error: { message: 'Invalid Token' } });
+                return;
+            }
             const response = await jwt.refreshVerify(accessToken, refreshToken);
             if (response.success === false) {
                 res.status(401).json({ success: false, error: { message: 'Invalid Token' } });
