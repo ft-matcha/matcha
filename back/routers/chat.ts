@@ -6,7 +6,7 @@ const getHistory = async (req: any, res: any) => {
         res.status(200).json({ success: true, data: history });
     } catch (error: any) {
         console.error('getHistory failed: ' + error.stack);
-        res.status(200).json({ success: false, error: { status: 500, message: 'getHistory failed : server error' } });
+        res.status(500).json({ success: false, error: { message: 'getHistory failed : server error' } });
     }
 };
 
@@ -16,7 +16,7 @@ const getChatList = async (req: any, res: any) => {
         res.status(200).json({ success: true, data: chatList });
     } catch (error: any) {
         console.error('getChatList failed: ' + error.stack);
-        res.status(200).json({ success: false, error: { status: 500, message: 'getChatList failed : server error' } });
+        res.status(500).json({ success: false, error: { message: 'getChatList failed : server error' } });
     }
 };
 

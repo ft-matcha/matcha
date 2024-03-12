@@ -157,7 +157,7 @@ class UserControllers {
                 console.log('User not found');
                 return {
                     success: false,
-                    error: { status: 404, message: 'User not found' },
+                    error: { message: 'User not found' },
                 };
             }
             if (!process.env.secret) throw new Error('secret not found');

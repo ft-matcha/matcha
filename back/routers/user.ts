@@ -11,16 +11,16 @@ const checkEmail = async (req: any, res: any) => {
                 res.status(200).json({ success: true });
                 return;
             }
-            res.status(200).json({
+            res.status(409).json({
                 success: false,
-                error: { status: 409, message: 'User already exists' },
+                error: { message: 'User already exists' },
             });
         } else {
-            res.status(200).json({ success: false, error: { status: 400, message: 'Invalid email' } });
+            res.status(400).json({ success: false, error: { message: 'Invalid email' } });
         }
     } catch (error: any) {
         console.error('checkEmail failed: ' + error.stack);
-        res.status(200).json({ success: false, error: { status: 500, message: 'checkEmail failed : server error' } });
+        res.status(500).json({ success: false, error: { message: 'checkEmail failed : server error' } });
     }
 };
 
@@ -28,21 +28,21 @@ const checkProfileVerify = async (req: any, res: any, next: any) => {
     try {
         const response = await userControllers.getUser({ id: req.id });
         if (response === undefined) {
-            res.status(200).json({ success: false, error: { status: 404, message: 'User not found' } });
+            res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
         }
         if (response.verified === 1 && response.profile === 1) {
             next();
         } else if (response.profile === 0) {
-            res.status(200).json({ success: false, error: { status: 404, message: 'Profile not found' } });
+            res.status(404).json({ success: false, error: { message: 'Profile not found' } });
         } else {
-            res.status(200).json({ success: false, error: { status: 401, message: 'User not verified' } });
+            res.status(401).json({ success: false, error: { message: 'User not verified' } });
         }
     } catch (error: any) {
         console.error('checkProfileVerify failed: ' + error.stack);
-        res.status(200).json({
+        res.status(500).json({
             success: false,
-            error: { status: 500, message: 'checkProfileVerify failed : server error' },
+            error: { message: 'checkProfileVerify failed : server error' },
         });
     }
 };
@@ -52,7 +52,7 @@ const get = async (req: any, res: any) => {
         if (req.params.id === undefined) req.params.id = req.id;
         const response = await userControllers.getUser({ id: req.params.id });
         if (response === undefined) {
-            res.status(200).json({ success: false, error: { status: 404, message: 'User not found' } });
+            res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
         } else {
             const { password, verified, profile, userId, profileId, ...rest } = response;
@@ -73,7 +73,7 @@ const get = async (req: any, res: any) => {
         }
     } catch (error: any) {
         console.error('getUser failed: ' + error.stack);
-        res.status(200).json({ success: false, error: { status: 500, message: 'getUser failed : server error' } });
+        res.status(500).json({ success: false, error: { message: 'getUser failed : server error' } });
     }
 };
 
@@ -81,7 +81,7 @@ const update = async (req: any, res: any) => {
     try {
         const user = await userControllers.getUser({ id: req.id });
         if (user === undefined) {
-            res.status(200).json({ success: false, error: { status: 404, message: 'User not found' } });
+            res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
         }
         if (user.profile === 0) {
@@ -99,7 +99,7 @@ const update = async (req: any, res: any) => {
         });
     } catch (error: any) {
         console.error('updateUser failed: ' + error.stack);
-        res.status(200).json({ success: false, error: { status: 500, message: 'updateUser failed : server error' } });
+        res.status(500).json({ success: false, error: { message: 'updateUser failed : server error' } });
     }
 };
 
@@ -109,7 +109,7 @@ const getRecommend = async (req: any, res: any) => {
         res.status(200).json({ success: true, data: user });
     } catch (error: any) {
         console.error('getRecommend failed: ' + error.stack);
-        res.status(200).json({ success: false, error: { status: 500, message: 'getRecommend failed : server error' } });
+        res.status(500).json({ success: false, error: { message: 'getRecommend failed : server error' } });
     }
 };
 
@@ -119,7 +119,7 @@ const getTag = async (req: any, res: any) => {
         res.status(200).json({ success: true, data: response });
     } catch (error: any) {
         console.error('getTag failed: ' + error.stack);
-        res.status(200).json({ success: false, error: { status: 500, message: 'getTag failed : server error' } });
+        res.status(500).json({ success: false, error: { message: 'getTag failed : server error' } });
     }
 };
 
