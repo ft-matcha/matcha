@@ -3,9 +3,11 @@ import jwt from '../utils/jwt';
 
 const verifyJWT = async (req: any, res: any, next: any) => {
     try {
+		console.log(req, res, next);
         if (req.headers.authorization) {
             const token = req.headers.authorization.split('Bearer ')[1];
             const response = jwt.verify(token);
+			console.log(`response: `, response)
             if (response.status === false) {
                 const decode = jwt.decode(token);
                 // if (decode['exp'] < Date.now() / 1000) {
@@ -15,24 +17,24 @@ const verifyJWT = async (req: any, res: any, next: any) => {
                 //         return;
                 //     }
                 // }
-                res.status(200).json({ success: false, error: { status: 401, message: 'Expired Token' } });
+                res.status(401).json({ success: false, message: 'Expired Token' });
                 return;
             } else if (typeof response.decoded === 'object') {
-                if (response.decoded['id'] === undefined) {
-                    res.status(200).json({ success: false, error: { status: 401, message: 'Invalid Token' } });
+                if (response.decoded['email'] === undefined) {
+                    res.status(401).json({ success: false, message: 'Invalid Token' });
                 } else {
-                    req.id = response.decoded['id'];
+                    req.email = response.decoded['email'];
                     next();
                     return;
                 }
             }
-            res.status(200).json({ success: false, error: { status: 401, message: 'Invalid Token' } });
+            res.status(401).json({ success: false, message: 'Invalid Token' });
         } else {
-            res.status(200).json({ success: false, error: { status: 401, message: 'token does not exist' } }); //redirect login page
+            res.status(401).json({ success: false, message: 'token does not exist' }); //redirect login page
         }
     } catch (error: any) {
         console.error('verifyJWT failed: ' + error.stack);
-        res.status(200).json({ success: false, error: { status: 500, message: 'verifyJWT failed : server error' } });
+        res.status(500).json({ success: false, error: { message: 'verifyJWT failed : server error' } });
     }
 };
 
@@ -43,15 +45,15 @@ const refreshJWT = async (req: any, res: any) => {
             const refreshToken = req.headers.refresh.split('refresh ')[1];
             const response = await jwt.refreshVerify(accessToken, refreshToken);
             if (response.success === false) {
-                res.status(200).json({ success: false, error: { status: 401, message: 'Invalid Token' } });
+                res.status(401).json({ success: false, message: 'Invalid Token' });
             } else {
                 res.status(201).json({ success: true, accessToken: jwt.sign(response.id) });
             }
         } else {
-            res.status(200).json({ success: false, error: { status: 401, message: 'Token does not exist' } });
+            res.status(401).json({ success: false, message: 'Token does not exist' });
         }
     } catch (error: any) {
-        res.status(200).json({ success: false, error: { status: 500, message: 'server error' } });
+        res.status(500).json({ success: false, error: error });
     }
 };
 

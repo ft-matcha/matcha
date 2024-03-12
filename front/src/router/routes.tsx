@@ -1,6 +1,8 @@
 import Layout from '@/page/Layout';
 import Main from '@/page/Main';
+import AuthContainer from '@/page/auth/AuthContainer';
 import Login from '@/page/auth/Login';
+import Register from '@/page/auth/register/Register';
 import Recommend from '@/page/recommend/Recommend';
 import RecommendResult from '@/page/recommend/RecommendResult';
 import Profile from '@/page/user/Profile';
@@ -16,11 +18,11 @@ const routes = createBrowserRouter([
     children: [
 	{
 		path: '',
-		element: <Login/>,
-	},
+		element: <AuthContainer/>
+	} ,
     {
         path: 'explorer',
-		element: <Main/>,
+		element: <Layout/>,
 		children: [{
 			path: "recommend",
         	element: <Recommend />,

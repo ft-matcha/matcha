@@ -1,6 +1,5 @@
 import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
-import Layout from './page/Layout';
 
 const Container = styled.div`
   min-height: 100%;
@@ -9,6 +8,7 @@ const Container = styled.div`
   margin: 0 auto;
   display: flex;
   justify-content: center;
+  align-items: center;
   background: ${({ theme }) => theme.background};
   color: ${({ theme }) => theme.color};
 `;
@@ -17,7 +17,7 @@ function App() {
   return (
     <>
       <Container>
-        <Layout />
+		<Outlet/>
       </Container>
     </>
   );

@@ -47,8 +47,9 @@ const NavRow = styled.section<NavProps>`
 `;
 
 const NavList = styled.div<NavProps>`
-  width: fit-content;
   display: flex;
+  width: ${({width}) => width? width : 'fit-content'};
+  justify-content: ${({ float }) => (float ? float : 'start')};
   flex-direction: row;
 `;
 
@@ -63,6 +64,8 @@ const NavItem = styled(NavLink)<NavProps>`
   align-items: center;
   gap: 3px;
   background-size: cover;
+  margin-right: 2px;
+  margin-left: 2px;
   background-image: ${({ background_image }) => (background_image ? background_image : 'none')};
   .active {
     background: ${({ theme }) => theme.backgroundHover};
@@ -75,6 +78,7 @@ const NavItem = styled(NavLink)<NavProps>`
 const NavSection = styled.section<NavProps>`
   display: flex;
   flex-flow: row wrap;
+  justify-content: ${({ float }) => (float ? float : 'start')};
   height: auto;
   border-top: 1px solid;
   width: 100%;
