@@ -9,7 +9,7 @@ class alertControllers {
                     fromId: from,
                     toId: to,
                     type: type,
-                    message: message ? message : null,
+                    message: message ? message : undefined,
                 },
             });
             return alert;
@@ -18,7 +18,7 @@ class alertControllers {
         }
     };
 
-    getAlert = async (user: string, type: string) => {
+    getAlert = async (user: string | undefined, type: string) => {
         try {
             const alert = await Alert.read({
                 where: { toId: user, type: type },

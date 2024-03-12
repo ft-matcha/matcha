@@ -11,27 +11,25 @@ const dbConfig = {
     multipleStatements: true,
 };
 
-interface update {
-    set: updateData;
-    where: {
-        [key: string]: string | number | undefined;
+interface Data {
+    set?: {
+        [key: string]: string | number | boolean | object | undefined;
     };
     include?: {
-        [key: string]: boolean;
+        [key: string]: string;
     };
-}
-interface create {
-    set: createData;
-    include?: {
-        [key: string]: boolean;
+    selectJoin?: {
+        [key: string]: string;
     };
+    join?: Array<{
+        [key: string]: string | any;
+    }>;
+    where?: {
+        [key: string]: string | number | undefined | Array<{ [key: string]: string | number }>;
+    };
+    select?: string[];
 }
-interface updateData {
-    [key: string]: string | number | boolean | object | undefined;
-}
-interface createData {
-    [key: string]: string | number | boolean | object | undefined;
-}
+
 const pool = mysql.createPool(dbConfig);
 class crud {
     private connection: mysql.PoolConnection | undefined;
@@ -63,7 +61,7 @@ class crud {
         }
     }
 
-    async create(data: any) {
+    async create(data: Data) {
         try {
             this.connection = await this.getConnection();
             const { query, params } = new QueryBuilder()
@@ -83,7 +81,7 @@ class crud {
         }
     }
 
-    async readOne(data: any): Promise<any> {
+    async readOne(data: Data): Promise<any> {
         try {
             const { query, params } = new QueryBuilder()
                 .select([data.join ? this.table + '.*' : '*'])
@@ -105,7 +103,7 @@ class crud {
             throw error;
         }
     }
-    async read(data?: any) {
+    async read(data: Data) {
         try {
             this.connection = await this.getConnection();
             const { query, params } = new QueryBuilder()
@@ -115,7 +113,6 @@ class crud {
                 .include(data.include)
                 .where(data.where)
                 .build();
-            console.log(this.connection.format(query, params));
             const [row] = await this.connection.query<mysql.RowDataPacket[]>(query, params);
             this.connection.release();
             return row;
@@ -126,7 +123,7 @@ class crud {
         }
     }
 
-    async update(data: any) {
+    async update(data: Data) {
         try {
             const { query, params } = new QueryBuilder()
                 .update(this.table)

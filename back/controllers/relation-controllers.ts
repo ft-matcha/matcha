@@ -1,8 +1,7 @@
 import curd from '../lib/crud';
-import userControllers from './user-controllers';
 const Relation = new curd('relation');
 class relationControllers {
-    createRelation = async (from: string, to: string, status: string) => {
+    createRelation = async (from: string | undefined, to: string, status: string) => {
         try {
             const relation = await Relation.create({
                 set: {
@@ -17,7 +16,14 @@ class relationControllers {
         }
     };
 
-    updateRelation = async (data: any, status: string) => {
+    updateRelation = async (
+        data: {
+            relationId?: number;
+            from?: string;
+            to?: string;
+        },
+        status: string
+    ) => {
         try {
             if (typeof data.relationId === 'number') {
                 const relation = await Relation.update({

@@ -7,21 +7,24 @@ import relationControllers from './relation-controllers';
 const User = new crud('user');
 const Profile = new crud('profile');
 interface User {
-    id: string;
+    id?: string;
     email: string;
     firstName: string;
     lastName: string;
     password: string;
     phone: string;
     address: string;
-    verified: boolean;
-    status: string;
-    profile: any;
+    verified?: number;
+    status?: string;
+    profile?: number;
+}
+
+interface Where {
+    [key: string]: string | number | undefined;
 }
 class UserControllers {
-    private id: any;
-    private data: any;
-    createUser = async (body: any) => {
+    createUser = async (body: User) => {
+        console.log('createUser');
         try {
             const { firstName, lastName, email, password, phone, address } = body;
             if (!process.env.secret) throw new Error('secret not found');
@@ -50,17 +53,12 @@ class UserControllers {
         }
     };
 
-    getUser = async (where: any) => {
+    getUser = async (where: Where) => {
         try {
             const user = await User.readOne({
                 where: where,
                 include: { table: 'profile', fk: 'userId', pk: 'id' },
             });
-            if (user === undefined) {
-                return undefined;
-            }
-            this.id = user.id;
-            this.data = user;
             return user;
         } catch (error: any) {
             throw error;
@@ -69,7 +67,7 @@ class UserControllers {
 
     getTag = async () => {
         try {
-            const response = await Profile.read();
+            const response = await Profile.read({});
             const tagCount: any = {};
             response.forEach((item: any) => {
                 if (item.tag) {
@@ -110,10 +108,6 @@ class UserControllers {
 
     deleteUser = async (email: string) => {
         try {
-            const data = await User.readOne(email);
-            if (data.profile.length !== 0) {
-                // await profileController.deleteProfile(email);
-            }
             const response = await User.delete(email);
             return response;
         } catch (error: any) {
@@ -157,7 +151,7 @@ class UserControllers {
                 console.log('User not found');
                 return {
                     success: false,
-                    error: { status: 404, message: 'User not found' },
+                    error: { message: 'User not found' },
                 };
             }
             if (!process.env.secret) throw new Error('secret not found');
@@ -183,10 +177,15 @@ class UserControllers {
         }
     };
 
-    logout = async (id: string) => {
+    logout = async (id: string | undefined) => {
         try {
+            if (id === undefined) throw new Error('id not found');
             const user = await this.getUser({ id: id });
-            if (user === undefined) throw new Error('email not found');
+            if (user === undefined)
+                return {
+                    success: false,
+                    error: { message: 'User not found' },
+                };
             if (user.status === 'ACTIVE') {
                 await redis.del(id);
                 await this.updateUser(id, { status: 'INACTIVE' });
@@ -199,22 +198,14 @@ class UserControllers {
             throw error;
         }
     };
-    createProfile = async (email: string, body: any) => {
+    createProfile = async (id?: string, body?: any) => {
         const { gender, preferences, biography, tag, age, image } = body;
         try {
             const profile = await Profile.create({
-                selectJoin: {
-                    data: {
-                        gender,
-                        preferences,
-                        biography,
-                        tag,
-                        age,
-                        image,
-                    },
-                    relation: [{ fk: 'userId', pk: 'id', table: 'user' }],
+                set: {
+                    ...body,
+                    userId: id,
                 },
-                where: { email: email },
             });
             return profile;
         } catch (error: any) {

@@ -18,9 +18,9 @@ class QueryBuilder {
         return this;
     }
 
-    select(fields: string[], add?: string) {
+    select(fields: string[], add?: string[]) {
         if (fields === undefined) return this;
-        if (add) fields.push(add);
+        if (add) fields = fields.concat(add);
         this.query += 'SELECT ' + fields.join(', ');
         return this;
     }
