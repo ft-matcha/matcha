@@ -1,7 +1,7 @@
 import curd from '../lib/crud';
 const Relation = new curd('relation');
 class relationControllers {
-    createRelation = async (from: string | undefined, to: string, status: string) => {
+    createRelation = async (from: string, to: string, status: string) => {
         try {
             const relation = await Relation.create({
                 set: {

@@ -176,9 +176,8 @@ class UserControllers {
         }
     };
 
-    logout = async (id: string | undefined) => {
+    logout = async (id: string) => {
         try {
-            if (id === undefined) throw new Error('id not found');
             const user = await this.getUser({ id: id });
             if (user === undefined)
                 return {

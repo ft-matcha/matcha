@@ -7,12 +7,11 @@ const redisOption = {
 
 class redisClient {
     private client: RedisClientType = createClient(redisOption);
-    constructor() {
-        this.client.connect();
-    }
+    constructor() {}
 
     async set(key: string, value: string, expire?: number) {
         try {
+            this.client.connect();
             expire ? await this.client.setEx(key, expire, value) : await this.client.set(key, value);
         } catch (error: any) {
             console.error('Redis set failed: ' + error.stack);
@@ -21,6 +20,7 @@ class redisClient {
     }
     async get(key: string) {
         try {
+            this.client.connect();
             const response = await this.client.get(key);
             return response;
         } catch (error: any) {
@@ -30,6 +30,7 @@ class redisClient {
     }
     async del(key: string) {
         try {
+            this.client.connect();
             await this.client.del(key);
         } catch (error: any) {
             console.error('Redis del failed: ' + error.stack);

@@ -131,7 +131,7 @@ class QueryBuilder {
         return this;
     }
 
-    set(data?: any | undefined) {
+    set(data?: any) {
         if (data === undefined) return this;
         this.query += ' SET ? ';
         Object.keys(data).forEach((key) => {

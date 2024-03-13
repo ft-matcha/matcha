@@ -29,10 +29,10 @@ export default {
                                     description: 'password',
                                     example: '1523',
                                 },
-                                phone: {
+                                gender: {
                                     type: 'string',
                                     description: 'phone',
-                                    example: '010-1234-5678',
+                                    example: 'man',
                                 },
                                 address: {
                                     type: 'string',

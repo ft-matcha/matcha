@@ -52,6 +52,10 @@ const signup = async (req: Request, res: Response) => {
 
 const logout = async (req: Request, res: Response) => {
     try {
+        if (req.id === undefined) {
+            res.status(400).json({ success: false, error: { message: 'Invalid id' } });
+            return;
+        }
         const response = await userControllers.logout(req.id);
         if (response.success === false) {
             res.status(400).json(response);

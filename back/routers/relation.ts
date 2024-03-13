@@ -1,4 +1,5 @@
 import relationControllers from '../controllers/relation-controllers';
+import roomControllers from '../controllers/room-controllers';
 import alertControllers from '../controllers/alert-controllers';
 import { Request, Response } from 'express';
 const requestFriend = async (req: Request, res: Response) => {
@@ -11,11 +12,17 @@ const requestFriend = async (req: Request, res: Response) => {
         const alert = await alertControllers.createAlert(req.id, req.body.id, 'request');
         if (response === undefined) {
             const create = await relationControllers.createRelation(req.id, req.body.id, 'FRIEND');
-            res.status(201).json({ success: true, data: create });
         } else {
             const update = await relationControllers.updateRelation(response.relationId, 'FRIEND');
-            res.status(201).json({ success: true, data: update });
         }
+        const relation = await relationControllers.getRelation(
+            { from: req.body.id, to: req.id, duplex: true },
+            'FRIEND'
+        );
+        if (relation) {
+            await roomControllers.create(req.id, req.body.id);
+        }
+        res.status(201).json({ success: true });
     } catch (error: any) {
         console.error('requestFriend failed: ' + error.stack);
         res.status(500).json({ success: false, error: { message: 'requestFriend failed : server error' } });
@@ -24,12 +31,25 @@ const requestFriend = async (req: Request, res: Response) => {
 
 const acceptFriend = async (req: Request, res: Response) => {
     try {
+        if (req.id === undefined) {
+            res.status(400).json({ success: false, error: { message: 'Invalid id' } });
+            return;
+        }
         const response: any = await relationControllers.getRelation({ from: req.id, to: req.body.id });
+        const alert = await alertControllers.createAlert(req.id, req.body.id, 'request');
         if (response === undefined) {
             const create = await relationControllers.createRelation(req.id, req.body.id, 'FRIEND');
         } else {
             const update = await relationControllers.updateRelation(response.id, 'FRIEND');
         }
+        const relation = await relationControllers.getRelation(
+            { from: req.body.id, to: req.id, duplex: true },
+            'FRIEND'
+        );
+        if (relation) {
+            await roomControllers.create(req.id, req.body.id);
+        }
+
         res.status(201).json({ success: true, data: response });
     } catch (error: any) {
         console.error('acceptFriend failed: ' + error.stack);
@@ -52,6 +72,10 @@ const getFriend = async (req: Request, res: Response) => {
 
 const hateUser = async (req: Request, res: Response) => {
     try {
+        if (req.id === undefined) {
+            res.status(400).json({ success: false, error: { message: 'Invalid id' } });
+            return;
+        }
         const relation = await relationControllers.getRelation({
             from: req.id,
             to: req.body.id,

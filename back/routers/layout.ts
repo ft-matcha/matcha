@@ -3,6 +3,10 @@ import alertControllers from '../controllers/alert-controllers';
 import { Request, Response } from 'express';
 const getProfileAlert = async (req: Request, res: Response) => {
     try {
+        if (req.id === undefined) {
+            res.status(400).json({ success: false, error: { message: 'Invalid id' } });
+            return;
+        }
         const user = await userControllers.getUser({ id: req.id });
         if (user === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
