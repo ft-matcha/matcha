@@ -16,21 +16,25 @@ const routes = createBrowserRouter([
     path: '',
     element: <ApiProvider />,
     children: [
-	{
-		path: '',
-		element: <AuthContainer/>
-	} ,
-    {
+      {
+        path: '',
+        element: <AuthContainer />,
+      },
+      {
         path: 'explorer',
-		element: <Layout/>,
-		children: [{
-			path: "recommend",
-        	element: <Recommend />,
-			children: [{
-				path: ':id',
-				element: <RecommendResult />,
-			}]
-		}]
+        element: <Layout />,
+        children: [
+          {
+            path: 'recommend',
+            element: <Recommend />,
+            children: [
+              {
+                path: ':id',
+                element: <RecommendResult />,
+              },
+            ],
+          },
+        ],
       },
       {
         path: 'profile',
