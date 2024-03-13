@@ -20,3 +20,10 @@
 	api 호출시 에에러  발생하면  토스트  
 remain 
 	axios intercepter code will be added.
+
+0312
+[ ] useApi를 debounce를 통해 감싸는 작업이 필요함
+[ ] useCallback 에대한 이해도 필요.
+
+0313
+[ ] promise 에 대해서 공부하기.

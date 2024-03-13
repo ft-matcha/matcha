@@ -1,12 +1,8 @@
-import CardList from '@/components/CardList';
-import ReactDOM, { createPortal } from 'react-dom';
-import { Link, useParams, useOutletContext, useNavigate } from 'react-router-dom';
-import styled from 'styled-components';
-import RecommendResult, { RecommendTest } from '@/page/recommend/RecommendResult';
+import { useParams, useNavigate } from 'react-router-dom';
+import { RecommendTest } from '@/page/recommend/RecommendResult';
 import { useContext, useEffect, useState } from 'react';
 import { ModalContext } from '@/provider/ModalProvider';
 import Nav from '@/components/ui/Nav';
-import { ModalContextProps } from '@/types';
 import portalWrapper from '@/utils/portalWrapper';
 
 const RecommendData = [
