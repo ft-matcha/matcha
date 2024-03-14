@@ -58,11 +58,15 @@ const Profile = () => {
   const fetchApi = async (e?: FormEvent<any>) => {
     e?.preventDefault();
     if (e && profile) {
-      await api('put', 'user', Object.assign(profile, { address: addressRef.current?.address }));
+      await api(
+        'put',
+        'user',
+        Object.assign(profile, { address: addressRef.current?.address }),
+        true,
+      );
       return;
     }
     const result = await api('get', 'user');
-    console.log(result.data);
     setProfile(result.data);
   };
   useEffect(() => {
@@ -86,13 +90,10 @@ const Profile = () => {
         <div style={{ display: 'flex', flexDirection: 'row' }}></div>
         <div>
           <Button>Update</Button>
-          <Link to="change_location">
-            <Button>change_location</Button>
-          </Link>
           <Link to="change_password">
             <Button>change_password</Button>
           </Link>
-          <GeoLocation addressRef={addressRef}></GeoLocation>
+          <GeoLocation addressRef={addressRef} location={profile?.address}></GeoLocation>
           <Span>{addressRef.current?.address}</Span>
         </div>
       </StyledProfile>

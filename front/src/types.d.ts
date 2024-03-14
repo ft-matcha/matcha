@@ -9,6 +9,14 @@ export interface IWindow extends Window {
   };
 }
 
+export interface LocationProps {
+  address: string;
+  coord: {
+    latitude: number;
+    longitude: number;
+  };
+}
+
 export interface InputContainerProps {
   type: string;
   id: string;

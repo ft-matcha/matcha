@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 const GeoLocation = ({
   addressRef,
   children,
+  location,
 }: {
   addressRef?: React.MutableRefObject<{
     address: string;
@@ -12,9 +13,18 @@ const GeoLocation = ({
       longitude: number;
     };
   } | null>;
+  location?:
+    | {
+        address: string;
+        coord: {
+          latitude: number;
+          longitude: number;
+        };
+      }
+    | string;
   children?: React.ReactNode;
 }) => {
-  const [address, setRef] = useKakao();
+  const [address, setRef] = useKakao(location);
   const kakaoRef = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {

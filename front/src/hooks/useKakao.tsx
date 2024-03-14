@@ -1,15 +1,23 @@
-import { IWindow } from '@/types';
+import { IWindow, LocationProps } from '@/types';
 import useGeolocation from '@/hooks/useGeolocation';
 import { useEffect, useRef, useState } from 'react';
 
 const { kakao } = window as unknown as IWindow;
 
-const useKakao = () => {
+const useKakao = (location?: LocationProps | string) => {
   const [obj, setObj] = useState<Element>();
   const [coord, setCoord] = useGeolocation();
-  const [latlng, setLatLng] = useState<[number, number]>([0, 0]);
+  const [latlng, setLatLng] = useState<[number, number]>(
+    location && typeof location !== 'string'
+      ? location?.coord
+        ? [location.coord.latitude, location.coord.longitude]
+        : [0, 0]
+      : [0, 0],
+  );
   const ref = useRef<any>(null);
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState(
+    typeof location === 'string' ? location : location?.address ? location.address : '',
+  );
 
   useEffect(() => {
     setCoord();
@@ -18,7 +26,6 @@ const useKakao = () => {
   useEffect(() => {
     if (coord[0] === 0 && coord[1] === 0) return;
     setLatLng(coord);
-
     if (!ref.current) {
       createKakaoMap();
       return;
