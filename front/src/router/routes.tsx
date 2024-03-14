@@ -3,6 +3,7 @@ import Main from '@/page/Main';
 import AuthContainer from '@/page/auth/AuthContainer';
 import Login from '@/page/auth/Login';
 import Register from '@/page/auth/register/Register';
+import GeoLocation from '@/page/location/GeoLocation';
 import Recommend from '@/page/recommend/Recommend';
 import RecommendResult from '@/page/recommend/RecommendResult';
 import Profile from '@/page/user/Profile';
@@ -40,6 +41,10 @@ const routes = createBrowserRouter([
         path: 'profile',
         element: <Profile />,
         children: [
+          {
+            path: 'change_password',
+            element: <>Change password</>,
+          },
           {
             path: ':id',
             element: <ProfileList />,

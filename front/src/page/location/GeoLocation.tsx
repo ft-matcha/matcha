@@ -2,15 +2,17 @@ import useKakao from '@/hooks/useKakao';
 import React, { useMemo } from 'react';
 
 const GeoLocation = ({
-  setFunnel,
   addressRef,
   children,
 }: {
-  setFunnel: (
-    props: (data: Record<string, any>) => Record<string, any> | Record<string, any>,
-  ) => void;
-  addressRef: React.MutableRefObject<string | null>;
-  children: React.ReactNode;
+  addressRef?: React.MutableRefObject<{
+    address: string;
+    coord: {
+      latitude: number;
+      longitude: number;
+    };
+  } | null>;
+  children?: React.ReactNode;
 }) => {
   const [address, setRef] = useKakao();
   const kakaoRef = React.useRef<HTMLDivElement>(null);
@@ -22,8 +24,7 @@ const GeoLocation = ({
   }, [kakaoRef]);
 
   React.useEffect(() => {
-    if (address) {
-      // setFunnel((prev) => ({ ...prev, address: address }));
+    if (address && addressRef) {
       addressRef.current = address;
     }
   }, [address]);

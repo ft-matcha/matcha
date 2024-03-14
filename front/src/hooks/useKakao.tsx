@@ -68,7 +68,7 @@ const useKakao = () => {
   const getAddress = () => {
     const geocoder = new kakao.maps.services.Geocoder();
     const coord = new kakao.maps.LatLng(latlng[0], latlng[1]);
-    const test = () => {
+    const geoCoord2Address = () => {
       return new Promise((resolve, reject) => {
         geocoder.coord2Address(coord.getLng(), coord.getLat(), (result: any, status: any) => {
           if (status === kakao.maps.services.Status.OK) {
@@ -80,7 +80,7 @@ const useKakao = () => {
         });
       });
     };
-    return test()
+    return geoCoord2Address()
       .then((res) => res)
       .catch(() => '');
   };
@@ -90,7 +90,16 @@ const useKakao = () => {
     setAddress(result as string);
   };
 
-  return [address, setRef, getAddress] as const;
+  return [
+    {
+      address,
+      coord: {
+        latitude: latlng[0],
+        longitude: latlng[1],
+      },
+    },
+    setRef,
+  ] as const;
 };
 
 export default useKakao;

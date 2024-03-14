@@ -3,16 +3,25 @@ import Button from '@/components/ui/Button';
 import Select from '@/components/ui/Select';
 import { userRegister } from '@/data/AuthData';
 import { ApiContainers  } from '@/provider/ApiContainerProvider';
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, {
+  FormEvent,
+  ReactEventHandler,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 import { userGender } from '../../data/AuthData';
 import { createPortal } from 'react-dom';
 import FormContainer, { formHandler } from '@/components/ui/Form';
 import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import SwitchContainer from '@/components/SwitchContainer';
-import Input from '@/components/ui/input';
 import Span from '@/components/ui/Span';
 import useApi from '@/hooks/useApi';
+import GeoLocation from '@/page/location/GeoLocation';
+import useKakao from '@/hooks/useKakao';
 
 export const StyledProfile = styled(FormContainer)`
   display: flex;
@@ -23,54 +32,50 @@ export const StyledProfile = styled(FormContainer)`
 `;
 
 const Profile = () => {
-  const main = document.getElementById('main');
   const navigator = useNavigate();
-  const [location, setLocation] = useState({ latitude: 0, longitude: 0 });
-  const { state } = useLocation();
+  const memoKakao = useMemo(() => GeoLocation, []);
+  const [profile, setProfile] = useState<{
+    address: string;
+    age: number | null;
+    email: string;
+    firstName: string;
+    gender: string;
+    id: string;
+    image: null;
+    lastName: string;
+    phone: string | null;
+    status: 'ACTIVE';
+    tag: string | null;
+  }>();
+  const addressRef = useRef<{
+    address: string;
+    coord: {
+      latitude: number;
+      longitude: number;
+    };
+  } | null>(null);
   const api = useApi();
-
-  let options = {
-    enableHighAccuracy: false,
-    timeout: 5000,
-    maximumAge: 0,
+  const fetchApi = async (e?: FormEvent<any>) => {
+    e?.preventDefault();
+    if (e && profile) {
+      await api('put', 'user', Object.assign(profile, { address: addressRef.current?.address }));
+      return;
+    }
+    const result = await api('get', 'user');
+    console.log(result.data);
+    setProfile(result.data);
   };
-
-  const fetchApi = async() => {
-	const result = await api('get', 'user');
-	if (!result) {
-		navigator('/')
-	}
-  }
   useEffect(() => {
-	fetchApi();
-    // const success = (pos: any) => {
-    //   const crd = pos.coords;
-    //   setLocation({ latitude: crd.latitude, longitude: crd.longitude });
-    // };
-    // const error = () => {
-    //   console.log('error');
-    // };
-    // navigator.geolocation.watchPosition(success, error, options);
+    fetchApi();
   }, []);
 
   return (
     <>
-      <StyledProfile
-	  	width="80%"
-		height="fit-content"
-        onSubmit={(e) => {
-          e.preventDefault();
-          const obj = formHandler(e.currentTarget);
-          api('put', 'user', obj);
-        }}
-      >
+      <StyledProfile width="80%" height="fit-content" onSubmit={fetchApi}>
         <div style={{ width: '100%', height: '40px', fontSize: '22px' }}>
           <h1>Change Profile</h1>
         </div>
-        {userRegister.map((item) => {
-          if (item.name === 'password') return null;
-          return <SwitchContainer key={'profile_' + item.name} {...item} required={false} />;
-        })}
+        <div>{profile?.firstName}</div>
         <Select id="gender" name="gender">
           {userGender.map((item: string) => (
             <option value={item} key={`gender_key${item}`}>
@@ -78,46 +83,19 @@ const Profile = () => {
             </option>
           ))}
         </Select>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <Span
-            name="latitud"
-            id="latitude"
-            type="text"
-            readOnly={true}
-            value={location.latitude + ''}
-          />
-          <Span
-            name="longitude"
-            id="longitude"
-            type="text"
-            readOnly={true}
-            value={location.longitude + ''}
-          />
-        </div>
+        <div style={{ display: 'flex', flexDirection: 'row' }}></div>
         <div>
           <Button>Update</Button>
+          <Link to="change_location">
+            <Button>change_location</Button>
+          </Link>
           <Link to="change_password">
             <Button>change_password</Button>
           </Link>
+          <GeoLocation addressRef={addressRef}></GeoLocation>
+          <Span>{addressRef.current?.address}</Span>
         </div>
       </StyledProfile>
-      {main &&
-        createPortal(
-          <div>
-            <Outlet
-              context={[
-                <Button
-                  onClick={() => {
-                    navigator(-1);
-                  }}
-                >
-                  Test
-                </Button>,
-              ]}
-            />
-          </div>,
-          main,
-        )}
     </>
   );
 };

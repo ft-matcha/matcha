@@ -23,7 +23,13 @@ const Register = ({ onClick }: { onClick: (prev: boolean) => void }) => {
     ['id', 'userinfo', 'address', 'gender', 'complete'] as const,
     'id',
   );
-  const addressRef = useRef<string | null>(null);
+  const addressRef = useRef<{
+    address: string;
+    coord: {
+      latitude: number;
+      longitude: number;
+    };
+  } | null>(null);
   const api = useApi();
   const [_, setCookie] = useCookies();
   const [funnelForm, setFunnelForm] = useState<RegisterFormProps>({
@@ -83,7 +89,7 @@ const Register = ({ onClick }: { onClick: (prev: boolean) => void }) => {
       </Funnel.Step>
       <Funnel.Step name="address">
         <Form onSubmit={async (e) => onSubmit(e, 'address', 'gender')}>
-          <GeoLocation setFunnel={setFunnelForm} addressRef={addressRef}>
+          <GeoLocation addressRef={addressRef}>
             <Button>집주소</Button>
           </GeoLocation>
         </Form>
