@@ -1,9 +1,9 @@
 import useFunnel from '@/hooks/useFunnel';
 import Select from '@/components/ui/Select';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useCookies } from 'react-cookie';
-import {  NavigateFunction, useNavigate } from 'react-router-dom';
-import {  getToken, setToken } from '@/utils/token';
+import { NavigateFunction, useNavigate } from 'react-router-dom';
+import { getToken, setToken } from '@/utils/token';
 import InputContainer from '@/components/InputContainer';
 import Button from '@/components/ui/Button';
 import Form, { formHandler } from '@/components/ui/Form';
@@ -12,6 +12,7 @@ import { ApiContainer } from '@/api/api';
 import EmailStep from '@/page/auth/register/EmailStep';
 import useApi from '@/hooks/useApi';
 import GeoLocation from '@/page/location/GeoLocation';
+import useKakao from '@/hooks/useKakao';
 
 interface RegisterFormProps {
   [key: string]: string | boolean | undefined;
@@ -22,6 +23,7 @@ const Register = ({ onClick }: { onClick: (prev: boolean) => void }) => {
     ['id', 'userinfo', 'address', 'gender', 'complete'] as const,
     'id',
   );
+  const addressRef = useRef<string | null>(null);
   const api = useApi();
   const [_, setCookie] = useCookies();
   const [funnelForm, setFunnelForm] = useState<RegisterFormProps>({
@@ -42,7 +44,14 @@ const Register = ({ onClick }: { onClick: (prev: boolean) => void }) => {
       return;
     }
     if (step === 'complete' && !nextStep) {
-      const data = await api('post', 'register', funnelForm, true);
+      console.log(Object.assign(funnelForm, { address: addressRef.current }));
+      console.log(addressRef.current);
+      const data = await api(
+        'post',
+        'register',
+        Object.assign(funnelForm, { address: addressRef.current }),
+        true,
+      );
     }
   };
   return (
@@ -74,7 +83,7 @@ const Register = ({ onClick }: { onClick: (prev: boolean) => void }) => {
       </Funnel.Step>
       <Funnel.Step name="address">
         <Form onSubmit={async (e) => onSubmit(e, 'address', 'gender')}>
-          <GeoLocation setFunnel={setFunnelForm}>
+          <GeoLocation setFunnel={setFunnelForm} addressRef={addressRef}>
             <Button>집주소</Button>
           </GeoLocation>
         </Form>
