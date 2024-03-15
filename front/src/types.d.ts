@@ -1,10 +1,12 @@
 export interface IWindow extends Window {
-	kakao: {
-		maps : {
-			Map: any;
-			LatLng: any;
-		}
-	};
+  kakao: {
+    maps: {
+      Map: any;
+      LatLng: any;
+      event: any;
+      services: any;
+    };
+  };
 }
 
 export interface InputContainerProps {
