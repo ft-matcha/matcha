@@ -25,10 +25,24 @@ const create = async (user: User, content: string, status?: string) => {
     }
 };
 
-const get = async (where: any, status?: string) => {
+const get = async (user: any, status?: string) => {
     try {
+        const where: {
+            OR: {
+                from: string;
+                to: string;
+                status?: string;
+            }[];
+        } = {
+            OR: [
+                { from: user.from, to: user.to },
+                { from: user.to, to: user.from },
+            ],
+        };
         if (status) {
-            where['status'] = status;
+            where.OR.forEach((item) => {
+                item['status'] = status;
+            });
         }
         const message = await Message.read({
             where: where,
