@@ -9,6 +9,7 @@ import useApi from '@/hooks/useApi';
 import { FaUserFriends } from 'react-icons/fa';
 import useKakao from '@/hooks/useKakao';
 import { useEffect, useRef, useState } from 'react';
+import Span from '@/components/ui/Span';
 
 const LayoutDefault = styled.section`
   display: grid;
@@ -33,13 +34,17 @@ const MainSection = styled.main`
 `;
 
 const MobileLayout = () => {
-  return <></>;
+  return (
+    <>
+      <div>
+        <FaUserFriends fontSize={'32px'} />
+      </div>
+    </>
+  );
 };
 
 const DesktopLayout = (props: any) => {
   const api = useApi();
-  const kakaoRef = useRef<HTMLDivElement>(null);
-  const [address, setRef] = useKakao();
   const [profile, setProfile] = useState({ id: '', firstName: '', lastName: '', address: '' });
   const fetchApi = async () => {
     const { data } = await api('get', 'user');
@@ -48,12 +53,6 @@ const DesktopLayout = (props: any) => {
   useEffect(() => {
     fetchApi();
   }, []);
-
-  useEffect(() => {
-    if (profile.address === '' && kakaoRef.current) {
-      setRef(kakaoRef.current);
-    }
-  }, [profile]);
 
   return (
     <>
@@ -67,7 +66,7 @@ const DesktopLayout = (props: any) => {
                 width={'fit-content'}
               >
                 <CgProfile />
-                {/* <span>{profile?.firstName + profile?.lastName}</span> */}
+                <Span border={'0px'} value={profile?.firstName + profile?.lastName} />
               </Nav.Item>
               <Nav.Item
                 to="/"
@@ -108,14 +107,9 @@ const DesktopLayout = (props: any) => {
           <Nav.Section id="nav-section">
             <Outlet />
           </Nav.Section>
-          <div>
-            <FaUserFriends fontSize={'32px'} />
-          </div>
         </Nav>
       </Aside>
-      <MainSection id="main">
-        <div ref={kakaoRef} style={{ width: '600px', height: '600px' }}></div>
-      </MainSection>
+      <MainSection id="main"></MainSection>
     </>
   );
 };

@@ -1,11 +1,11 @@
 import { useRef } from 'react';
 import styled from 'styled-components';
 
-const StyledSpan = styled.span`
+const StyledSpan = styled.span<{ border?: string }>`
   width: 100%;
   display: block;
   font-size: 22px;
-  border: 1px solid;
+  border: ${({ border }) => (border ? border : '1px solid')};
   padding: 5px 0px 0px 5px;
   margin-top: 5px;
   margin-bottom: 5px;

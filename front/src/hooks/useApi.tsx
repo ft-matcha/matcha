@@ -4,7 +4,8 @@ import { deleteToken, setToken } from "@/utils/token";
 import { useCallback, useContext } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router-dom";
-
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const useApi = () => {
   const api = useContext(ApiContainers);
@@ -33,16 +34,17 @@ const useApi = () => {
         navigator('/explorer');
         return;
       }
+      toast('success');
       return response;
     } catch (e) {
       const {
         response: { status },
       } = e as { response: { status?: number } };
-      console.log(status);
       removeAuthentic();
       navigator('/');
+      toast('failed');
     }
   };
   return fetchApi;
-}
+};
 export default useApi;
