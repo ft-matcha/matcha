@@ -115,15 +115,14 @@ class UserControllers {
         }
     };
 
-    getRecommend = async (id: string, tag?: string) => {
+    getRecommend = async (user: any, tag?: string) => {
         try {
-            const user = await this.getUser({ id: id });
             const should: any = [{ terms: { gender: user.preferences } }];
             if (tag) {
                 should.push({ terms: { tag: tag } });
             }
             const bool: any = {};
-            const relation = await relationControllers.getRelation({ from: id }, 'HATE');
+            const relation = await relationControllers.getRelation({ from: user.id }, 'HATE');
             if (relation.length > 0) {
                 const notUser = relation.map((item: any) => {
                     return item.email;

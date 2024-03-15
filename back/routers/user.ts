@@ -25,14 +25,14 @@ const checkEmail = async (req: Request, res: Response) => {
 
 const checkProfileVerify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const response = await userControllers.getUser({ id: req.id });
-        if (response === undefined) {
+        const user = req.data;
+        if (user === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
         }
-        if (response.verified === 1 && response.profile === 1) {
+        if (user.verified === 1 && user.profile === 1) {
             next();
-        } else if (response.profile === 0) {
+        } else if (user.profile === 0) {
             res.status(404).json({ success: false, error: { message: 'Profile not found' } });
         } else {
             res.status(401).json({ success: false, error: { message: 'User not verified' } });
@@ -48,26 +48,20 @@ const checkProfileVerify = async (req: Request, res: Response, next: NextFunctio
 
 const get = async (req: Request, res: Response) => {
     try {
-        const response = await userControllers.getUser({ id: req.params.id ? req.params.id : req.id });
-        if (response === undefined) {
-            res.status(404).json({ success: false, error: { message: 'User not found' } });
-            return;
+        if (req.params.id === undefined) {
+            res.status(200).json({ success: true, data: req.data });
         } else {
-            const { password, verified, profile, userId, profileId, ...rest } = response;
-            // if (req.email === req.params.email) {
-            //     rest['relaiton'] = 'me';
-            // }
-            //  else {
-            //     const relation = await relationControllers.getRelation({
-            //         from: req.email,
-            //         to: req.params.email,
-            //     });
-            //     // rest['relation'] = relation?.status;
-            // }
-            res.status(200).json({
-                success: true,
-                data: rest,
-            });
+            const user = await userControllers.getUser({ id: req.params.id });
+            if (user === undefined) {
+                res.status(404).json({ success: false, error: { message: 'User not found' } });
+                return;
+            } else {
+                // const { password, verified, profile, userId, profileId, ...rest } = user;
+                res.status(200).json({
+                    success: true,
+                    data: user,
+                });
+            }
         }
     } catch (error: any) {
         console.error('getUser failed: ' + error.stack);
@@ -81,7 +75,7 @@ const update = async (req: Request, res: Response) => {
             res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
             return;
         }
-        const user = await userControllers.getUser({ id: req.id });
+        const user = req.data;
         if (user === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
@@ -91,13 +85,13 @@ const update = async (req: Request, res: Response) => {
             if (response) req.body['profile'] = 1;
         }
         const data = await userControllers.updateUser(req.id, req.body);
-        const { password, verified, userId, profile, profileId, ...rest } = data;
-        if (verified === 1) {
-            await elastic.update(req.id, rest);
-        }
+        // const { password, verified, userId, profile, profileId, ...rest } = data;
+        // if (verified === 1) {
+        //     await elastic.update(req.id, rest);
+        // }
         res.status(201).json({
             success: true,
-            data: rest,
+            data: data,
         });
     } catch (error: any) {
         console.error('updateUser failed: ' + error.stack);

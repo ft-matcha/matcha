@@ -4,7 +4,7 @@ CREATE TABLE IF NOT EXISTS `user` (
     `email` varchar(255) NOT NULL,
     `firstName` varchar(255) NOT NULL,
     `lastName` varchar(255) NOT NULL,
-    `address` varchar(255) NOT NULL,
+    `address` JSON NOT NULL,
     `gender` varchar(255) NOT NULL,
     `status` varchar(255) NOT NULL DEFAULT 'ACTIVE',
     `verified` BOOLEAN NOT NULL DEFAULT FALSE,

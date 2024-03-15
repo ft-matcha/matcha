@@ -24,9 +24,11 @@ interface Data {
     join?: Array<{
         [key: string]: string | any;
     }>;
-    where?: {
-        [key: string]: string | number | undefined | Array<{ [key: string]: string | number }>;
-    };
+    where?:
+        | Array<{ [key: string]: string | number | undefined | Array<{ [key: string]: string | number }> }>
+        | {
+              [key: string]: string | number | undefined | Array<{ [key: string]: string | number }>;
+          };
     select?: string[];
 }
 

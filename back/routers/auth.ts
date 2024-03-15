@@ -71,18 +71,17 @@ const logout = async (req: Request, res: Response) => {
 
 const sendEmail = async (req: Request, res: Response) => {
     try {
-        const user = await userControllers.getUser({ id: req.id });
+        const user = req.data;
         if (user === undefined) {
             res.status(401).json({ success: false, error: { message: 'User not found' } });
-            return;
         } else if (user.verified === 1) {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
-            return;
+        } else {
+            await mailer.sendEmail(user.email);
+            res.status(201).json({
+                success: true,
+            });
         }
-        await mailer.sendEmail(user.email);
-        res.status(201).json({
-            success: true,
-        });
     } catch (error: any) {
         console.error('sendMail failed: ' + error.stack);
         res.status(500).json({ success: false, error: { message: 'sendMail failed : server error' } });
@@ -91,7 +90,7 @@ const sendEmail = async (req: Request, res: Response) => {
 
 const verifyEmail = async (req: Request, res: Response) => {
     try {
-        const user = await userControllers.getUser({ id: req.id });
+        const user = req.data;
         if (user === undefined) {
             res.status(401).json({ success: false, error: { message: 'User not found' } });
             return;

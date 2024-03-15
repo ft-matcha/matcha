@@ -25,6 +25,10 @@ const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
                     res.status(401).json({ success: false, error: { message: 'Invalid Token' } });
                 } else {
                     req.id = response.decoded['id'];
+                    req.data = await userControllers.getUser({ id: req.id });
+                    if (req.data === undefined) {
+                        res.status(401).json({ success: false, error: { message: 'Invalid Token' } });
+                    }
                     next();
                 }
             }
