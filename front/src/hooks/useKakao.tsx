@@ -1,6 +1,7 @@
 import { IWindow, LocationProps } from '@/types';
 import useGeolocation from '@/hooks/useGeolocation';
 import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const { kakao } = window as unknown as IWindow;
 
@@ -88,7 +89,12 @@ const useKakao = (location?: LocationProps | string) => {
       });
     };
     return geoCoord2Address()
-      .then((res) => res)
+      .then((res) => {
+        if (res !== '') {
+          toast(`${res}`);
+        }
+        return res;
+      })
       .catch(() => '');
   };
 

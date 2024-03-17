@@ -10,6 +10,7 @@ import { FaUserFriends } from 'react-icons/fa';
 import useKakao from '@/hooks/useKakao';
 import { useEffect, useRef, useState } from 'react';
 import Span from '@/components/ui/Span';
+import { useNavigate } from 'react-router-dom';
 
 const LayoutDefault = styled.section`
   display: grid;
@@ -45,10 +46,15 @@ const MobileLayout = () => {
 
 const DesktopLayout = (props: any) => {
   const api = useApi();
+  const navigator = useNavigate();
   const [profile, setProfile] = useState({ id: '', firstName: '', lastName: '', address: '' });
   const fetchApi = async () => {
-    const { data } = await api('get', 'user');
-    setProfile(data);
+    try {
+      const { data } = await api('get', 'user');
+      setProfile(data);
+    } catch {
+      console.error('..');
+    }
   };
   useEffect(() => {
     fetchApi();
@@ -73,7 +79,7 @@ const DesktopLayout = (props: any) => {
                 onClick={(e) => {
                   e.preventDefault();
                   deleteToken('accessToken');
-                  // navigator('/');
+                  navigator('/');
                 }}
                 width={'fit-content'}
               >

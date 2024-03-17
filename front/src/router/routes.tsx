@@ -7,7 +7,7 @@ import GeoLocation from '@/page/location/GeoLocation';
 import Recommend from '@/page/recommend/Recommend';
 import RecommendResult from '@/page/recommend/RecommendResult';
 import Profile from '@/page/user/Profile';
-import ProfileList from '@/page/user/ProfileList';
+import ProfileList from '@/page/user/ProfileOther';
 import { ApiProvider } from '@/provider/ApiContainerProvider';
 
 import { createBrowserRouter } from 'react-router-dom';
@@ -45,11 +45,11 @@ const routes = createBrowserRouter([
             path: 'change_password',
             element: <>Change password</>,
           },
-          {
-            path: ':id',
-            element: <ProfileList />,
-          },
         ],
+      },
+      {
+        path: 'profile/:id',
+        element: <ProfileList />,
       },
       {
         path: 'liked',

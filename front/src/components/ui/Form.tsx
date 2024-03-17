@@ -8,13 +8,13 @@ interface FormProps {
 }
 
 const FormContainer = styled.form<FormProps>`
-	display: flex;
-	flex-flow: column;
-	align-items: center;
-	justify-content: center;
-	width: ${({ width }) => (width ? width : '300px')};
-	height: ${({ height }) => (height ? height : '100%')};
-	max-width: 500px;
+  display: flex;
+  flex-flow: column;
+  align-items: center;
+  justify-content: center;
+  width: ${({ width }) => (width ? width : '300px')};
+  height: ${({ height }) => (height ? height : '100%')};
+  max-width: 500px;
 `;
 
 export const formHandler = (target: HTMLFormElement) => {

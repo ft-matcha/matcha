@@ -9,6 +9,22 @@ export interface IWindow extends Window {
   };
 }
 
+export interface RegisterFormProps {
+  [key: string]: string | boolean | number | undefined | null;
+  address: string;
+  age: number | null;
+  email: string;
+  firstName: string;
+  gender: string;
+  preference: string;
+  id: string;
+  image: null;
+  lastName: string;
+  phone: string | null;
+  status: 'ACTIVE' | 'INACTIVE';
+  tag: string | null;
+}
+
 export interface LocationProps {
   address: string;
   coord: {
