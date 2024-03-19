@@ -2,17 +2,29 @@ import userControllers from '../controllers/user-controllers';
 import mailControllers from '../controllers/mail-controllers';
 import elastic from '../lib/elastic';
 import { Request, Response } from 'express';
+import redisClient from '../lib/redisClient';
 const mailer = new mailControllers();
+import crypto from 'crypto';
+import jwt from '../utils/jwt';
 
 const login = async (req: Request, res: Response) => {
     try {
-        const response = await userControllers.login(req.body);
-        if (response === undefined) {
+        const user = await userControllers.getUser({ uid: req.body.uid });
+        if (user === undefined) {
+            console.log('User not found');
             res.status(404).json({ success: false, error: { message: 'User not found' } });
-        } else if (response.success === false) {
-            res.status(404).json(response);
+            return;
+        }
+        if (!process.env.secret) throw new Error('secret not found');
+        const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(req.body.password).digest('hex');
+        if (user.password !== cryptoPass) {
+            console.log('Incorrect password');
+            res.status(401).json({ success: false, error: { message: 'Incorrect password' } });
         } else {
-            const { accessToken, refreshToken } = response;
+            const accessToken = jwt.sign(user.id);
+            const refreshToken = await jwt.refresh();
+            await userControllers.updateUser(user.id, { status: 'ACTIVE' });
+            await redisClient.set(user.id, refreshToken);
             res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
             res.status(201).json({
                 success: true,
@@ -25,14 +37,15 @@ const login = async (req: Request, res: Response) => {
     }
 };
 
-const signup = async (req: Request, res: Response) => {
+const register = async (req: Request, res: Response) => {
     try {
-        const user = await userControllers.getUser({ email: req.body.email });
+        const user = await userControllers.getUser({ uid: req.body.uid });
         if (user === undefined) {
             const response = await userControllers.createUser(req.body);
-            console.log('signUp success');
+            console.log('register success');
             const { refreshToken, accessToken } = response;
             res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
+            await mailer.sendEmail(req.body.email);
             res.status(201).json({
                 success: true,
                 data: { accessToken: accessToken },
@@ -45,23 +58,24 @@ const signup = async (req: Request, res: Response) => {
             });
         }
     } catch (error: any) {
-        console.error('signUp failed: ' + error.stack);
-        res.status(500).json({ succes: false, error: { message: 'signUp failed : server error' } });
+        console.error('register failed: ' + error.stack);
+        res.status(500).json({ succes: false, error: { message: 'register failed : server error' } });
     }
 };
 
 const logout = async (req: Request, res: Response) => {
     try {
-        if (req.id === undefined) {
+        if (req.id === undefined || req.data === undefined) {
             res.status(400).json({ success: false, error: { message: 'Invalid id' } });
             return;
         }
-        const response = await userControllers.logout(req.id);
-        if (response.success === false) {
-            res.status(400).json(response);
+        const user = req.data;
+        if (user.status === 'ACTIVE') {
+            await redisClient.del(user.id);
+            await userControllers.updateUser(user.id, { status: 'INACTIVE' });
+            res.status(201).json({ success: true });
         } else {
-            res.clearCookie('refreshToken');
-            res.status(201).json(response);
+            res.status(409).json({ success: false, error: { message: 'User already logged out' } });
         }
     } catch (error: any) {
         console.error('logout failed: ' + error.stack);
@@ -94,13 +108,12 @@ const verifyEmail = async (req: Request, res: Response) => {
         if (user === undefined) {
             res.status(401).json({ success: false, error: { message: 'User not found' } });
             return;
-        }
-        if (user.verified === 1) {
+        } else if (user.verified === 1) {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
             return;
         }
-        const response = await mailer.verifyEmail(user.email, req.params.code);
-        if (response === true) {
+        const verify = await mailer.verifyEmail(user.email, req.params.code);
+        if (verify === true) {
             if (user.profile === 1) {
                 const { id, password, profile, verified, userId, profileId, ...rest } = user;
                 await elastic.update(user.email, rest);
@@ -116,4 +129,4 @@ const verifyEmail = async (req: Request, res: Response) => {
     }
 };
 
-export default { login, logout, signup, sendEmail, verifyEmail };
+export default { login, logout, register, sendEmail, verifyEmail };

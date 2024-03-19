@@ -3,12 +3,14 @@ const Message = new crud('message');
 interface User {
     from: string;
     to: string;
+}
+interface Room {
     room: string;
 }
 interface Data {
     [key: string]: string | number | undefined;
 }
-const create = async (user: User, content: string, status?: string) => {
+const create = async (user: User & Room, content: string, status?: string) => {
     try {
         const message = await Message.create({
             set: {
@@ -25,29 +27,9 @@ const create = async (user: User, content: string, status?: string) => {
     }
 };
 
-const get = async (user: any, status?: string) => {
+const get = async (where: User | Room, status?: string) => {
     try {
-        const where: {
-            OR: {
-                from: string;
-                to: string;
-                status?: string;
-            }[];
-        } = {
-            OR: [
-                { from: user.from, to: user.to },
-                { from: user.to, to: user.from },
-            ],
-        };
-        if (status) {
-            where.OR.forEach((item) => {
-                item['status'] = status;
-            });
-        }
-        const message = await Message.read({
-            where: where,
-        });
-        return message;
+        console.log(typeof where);
     } catch (error: any) {
         throw error;
     }

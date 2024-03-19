@@ -2,21 +2,39 @@ import userControllers from '../controllers/user-controllers';
 import elastic from '../lib/elastic';
 import { Request, Response, NextFunction } from 'express';
 
-const checkEmail = async (req: Request, res: Response) => {
+const checkDuplication = async (req: Request, res: Response) => {
     try {
-        if (typeof req.query['email'] === 'string') {
-            const response = await userControllers.getUser({ email: req.query['email'] });
+        if (req.query.email === undefined && req.query.uid === undefined) {
+            res.status(400).json({ success: false, error: { message: 'Invalid url' } });
+            return;
+        }
+        if (typeof req.query.email === 'string') {
+            const response = await userControllers.getUser({ email: req.query.email });
             if (response === undefined) {
                 res.status(200).json({ success: true });
                 return;
+            } else {
+                res.status(409).json({
+                    success: false,
+                    error: { message: 'User already exists' },
+                });
+                return;
             }
-            res.status(409).json({
-                success: false,
-                error: { message: 'User already exists' },
-            });
-        } else {
-            res.status(400).json({ success: false, error: { message: 'Invalid email' } });
         }
+        if (typeof req.query.uid === 'string') {
+            const response = await userControllers.getUser({ uid: req.query.uid });
+            if (response === undefined) {
+                res.status(200).json({ success: true });
+                return;
+            } else {
+                res.status(409).json({
+                    success: false,
+                    error: { message: 'User already exists' },
+                });
+                return;
+            }
+        }
+        res.status(400).json({ success: false, error: { message: 'Invalid url' } });
     } catch (error: any) {
         console.error('checkEmail failed: ' + error.stack);
         res.status(500).json({ success: false, error: { message: 'checkEmail failed : server error' } });
@@ -109,14 +127,4 @@ const getRecommend = async (req: any, res: any) => {
     }
 };
 
-const getTag = async (req: any, res: any) => {
-    try {
-        const response = await userControllers.getTag();
-        res.status(200).json({ success: true, data: response });
-    } catch (error: any) {
-        console.error('getTag failed: ' + error.stack);
-        res.status(500).json({ success: false, error: { message: 'getTag failed : server error' } });
-    }
-};
-
-export default { checkEmail, get, update, checkProfileVerify, getRecommend, getTag };
+export default { checkDuplication, get, update, checkProfileVerify, getRecommend };

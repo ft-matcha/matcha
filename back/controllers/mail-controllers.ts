@@ -11,7 +11,6 @@ const transporter = nodemailer.createTransport({
 
 export default class mailer {
     constructor() {}
-
     sendEmail = async (email: string) => {
         try {
             const code = crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
@@ -19,9 +18,8 @@ export default class mailer {
             const mailOptions = {
                 to: email,
                 subject: 'Email Verification',
-                text: code,
+                text: `link: http://localhost:3000/verify/${code}`,
             };
-            console.log(code);
             const response = await transporter.sendMail(mailOptions);
             console.log('Mail sent: ' + response.response);
         } catch (error: any) {

@@ -1,5 +1,6 @@
 CREATE TABLE IF NOT EXISTS `user` (
     `id` varchar(255) NOT NULL,
+    `uid` varchar(255) NOT NULL,
     `password` varchar(255) NOT NULL,
     `email` varchar(255) NOT NULL,
     `firstName` varchar(255) NOT NULL,
@@ -12,6 +13,7 @@ CREATE TABLE IF NOT EXISTS `user` (
 
     UNIQUE INDEX `user_email_key`(`email`),
     UNIQUE INDEX `user_id_key`(`id`),
+    UNIQUE INDEX `user_uid_key`(`uid`),
     PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;
 

@@ -6,10 +6,10 @@ import bodyParser from 'body-parser';
 import crud from './lib/crud';
 import elastic from './lib/elastic';
 import routers from './routers/index';
-import { Server } from 'socket.io';
+// import { Server } from 'socket.io';
+// import chat from './socket/socket';
 import cors from 'cors';
 import { Request, Response } from 'express';
-import chat from './socket/socket';
 
 const app = express();
 
@@ -38,8 +38,8 @@ app.use('/api/v1', routers);
 app.use((req: Request, res: Response) => {
     res.status(404).json({ success: false, error: { message: 'Not Found' } });
 });
-const io = new Server(server, { cors: corsOptions });
-chat(io);
+// const io = new Server(server, { cors: corsOptions });
+// chat(io);
 server.listen(port, () => {
     console.log(`Server is running on https://localhost:${port}`);
 });

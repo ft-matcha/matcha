@@ -68,7 +68,7 @@ export default {
             tags: ['user'],
             summary: '프로필 및 유저 정보 변경',
             description:
-                '프로필 변경(password, firstName, lastName, phone, address, status, gender, preferences, biography, tag, age, image, viewList)',
+                '프로필 변경(email, password, firstName, lastName, phone, address, status, gender, preferences, biography, tag, age, image, viewList)',
             security: [
                 {
                     bearerAuth: [],
@@ -79,6 +79,11 @@ export default {
                     'application/json': {
                         schema: {
                             properties: {
+                                email: {
+                                    type: 'string',
+                                    description: '이메일',
+                                    example: 'srdn45@gmail.com',
+                                },
                                 password: {
                                     type: 'string',
                                     description: '비밀번호',
@@ -102,14 +107,8 @@ export default {
                                 address: {
                                     type: 'string',
                                     description: '주소',
-                                    example: '서울시 강남구',
+                                    example: { location: '서울시 강남구' },
                                 },
-                                status: {
-                                    type: 'string',
-                                    description: '상태',
-                                    example: 'Active',
-                                },
-
                                 gender: {
                                     type: 'string',
                                     description: '성별',

@@ -72,7 +72,7 @@ class crud {
                 .selectJoin(data.selectJoin)
                 .where(data.where)
                 .build();
-            console.log(this.connection?.format(query, params));
+
             const response = await this.connection.query(query, params);
             this.connection.release();
             return response;
@@ -94,9 +94,7 @@ class crud {
                 .limit(1)
                 .build();
             this.connection = await this.getConnection();
-            console.log(this.connection.format(query, params));
             const [row] = await this.connection.query<mysql.RowDataPacket[]>(query, params);
-            console.log(row);
             this.connection.release();
             return row[0];
         } catch (error: any) {
