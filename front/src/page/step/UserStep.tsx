@@ -67,7 +67,6 @@ const UserStep = ({
         <EmailStep<['id' | 'userinfo' | 'address' | 'gender' | 'complete']>
           onSubmit={onSubmit}
           setFunnel={setFunnelForm}
-          email={funnelForm?.email as string | undefined}
           step={'id'}
           nextStep={'userinfo'}
           updated={updated}

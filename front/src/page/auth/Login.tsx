@@ -2,12 +2,9 @@ import Button from '@/components/ui/Button';
 import Form, { formHandler } from '@/components/ui/Form';
 import InputContainer from '@/components/InputContainer';
 import { userInfo } from '@/data/AuthData';
-import { ApiContainers } from '@/provider/ApiContainerProvider';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ModalContext } from '@/provider/ModalProvider';
-import { useCookies } from 'react-cookie';
-import { deleteToken, getToken, setToken } from '@/utils/token';
 import useApi from '@/hooks/useApi';
 
 export default function Login({onClick}: { onClick: (prev: boolean) => void; }) {
