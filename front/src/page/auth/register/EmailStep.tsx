@@ -1,62 +1,101 @@
-import { ApiContainer } from '@/api/api';
-import { uniqueEmail } from '@/api/uniqueEmail';
 import InputContainer from '@/components/InputContainer';
 import Button from '@/components/ui/Button';
 import Form from '@/components/ui/Form';
-import Span from '@/components/ui/Span';
 import useApi from '@/hooks/useApi';
-import { useRef, ReactNode, useState, useEffect } from 'react';
+import { RegisterFormProps } from '@/types';
+import { ReactNode, useState } from 'react';
 
 const EmailStep = <T extends readonly string[]>({
-	step,
-	nextStep,
-	setFunnel,
-	onSubmit,
-	email,
-	children
+  step,
+  nextStep,
+  setFunnel,
+  onSubmit,
+  data,
+  children,
+  updated,
+  focus,
 }: {
-	step: T[number];
-	nextStep: T[number];
-	setFunnel: (props: (data: Record<string, any>) => Record<string, any> | Record<string, any> ) => void;
-	email?: string,
-	children?: ReactNode;
-	onSubmit: (e: React.FormEvent<HTMLFormElement>, step?: T[number], nextStep?: T[number]) => void;
+  step: T[number];
+  nextStep: T[number];
+  setFunnel: React.Dispatch<React.SetStateAction<Partial<RegisterFormProps>>>;
+  data?: {
+    id: string;
+    email: string;
+  };
+  children?: ReactNode;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>, step?: T[number], nextStep?: T[number]) => void;
+  updated: boolean;
+  focus?: <T extends HTMLElement>(props: T) => boolean;
 }) => {
-	const api = useApi();
-	
-	return (
+  const api = useApi();
+  const [checkedEmail, setCheckedEmail] = useState<Partial<Record<string, string>>>({
+    id: data?.id || '',
+    email: data?.email || '',
+  });
+
+  const getExistsValue = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    const previous = e.currentTarget.previousElementSibling as HTMLElement;
+    const idValue = previous?.id;
+    const curValue = (previous as HTMLInputElement).value;
+
+    if (curValue !== checkedEmail[idValue as string]) {
+      const temp = `${idValue}`;
+      const response = await api('get', 'register', { [temp]: curValue });
+      if (response) {
+        setCheckedEmail((prev: Partial<Record<string, string>>) => ({
+          ...prev,
+          [idValue]: curValue,
+        }));
+        setFunnel((prev: Partial<Record<string, any>>) => ({
+          ...prev,
+          [idValue]: curValue,
+        }));
+      }
+    }
+  };
+
+  return (
     <>
       <Form
         onSubmit={async (e) => {
           e.preventDefault();
-          if (!email) {
-            const curEmail = e.currentTarget.email.value;
-            const response = await api('get', 'register', { email: curEmail });
-            if (response) {
-              setFunnel((prev) => ({ ...prev, email: curEmail }));
-            }
+          if (focus && focus(e.currentTarget)) {
             return;
           }
-          onSubmit(e, step, nextStep);
+          if (checkedEmail.id !== '' && checkedEmail.email !== '') {
+            onSubmit(e, step, nextStep);
+          }
         }}
       >
+        <InputContainer
+          name="id"
+          id="id"
+          type="text"
+          required={updated ? false : true}
+          defaultValue={data?.id}
+        >
+          <button type="button" onClick={getExistsValue}>
+            id 중복 확인
+          </button>
+        </InputContainer>
         <InputContainer
           name="email"
           id="email"
           type="email"
-          required={true}
-          value={email ? email : undefined}
-          readOnly={email ? true : false}
-          pattern={'.+@gmail.com'}
+          required={updated ? false : true}
+          defaultValue={data?.email}
+          pattern={'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$'}
         >
-          <Button disabled={email}>중복 확인</Button>
+          <Button as="button" onClick={getExistsValue}>
+            중복 확인
+          </Button>
         </InputContainer>
         <InputContainer
-          notFocus={email ? true : undefined}
+          notFocus={updated}
           name="password"
           id="password"
           type="password"
-          required={email ? true : undefined}
+          required={!updated ? (!data?.email ? false : true) : false}
           pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,16}$"
         />
         <Button>다음</Button>

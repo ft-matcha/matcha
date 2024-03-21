@@ -1,10 +1,9 @@
-import { ApiContainers } from "@/provider/ApiContainerProvider";
-import debounce from "@/utils/debounce";
-import { deleteToken, setToken } from "@/utils/token";
-import { useCallback, useContext } from "react";
-import { useCookies } from "react-cookie";
-import { useNavigate } from "react-router-dom";
-
+import { ApiContainers } from '@/provider/ApiContainerProvider';
+import { deleteToken, setToken } from '@/utils/token';
+import { useContext } from 'react';
+import { useCookies } from 'react-cookie';
+import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 const useApi = () => {
   const api = useContext(ApiContainers);
@@ -31,18 +30,17 @@ const useApi = () => {
       if (auth) {
         setAuthentic(response.data);
         navigator('/explorer');
+        toast('login success');
         return;
       }
+      toast('api success');
       return response;
     } catch (e) {
-      const {
-        response: { status },
-      } = e as { response: { status?: number } };
-      console.log(status);
       removeAuthentic();
       navigator('/');
+      toast('api fail');
     }
   };
   return fetchApi;
-}
+};
 export default useApi;

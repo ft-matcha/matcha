@@ -1,15 +1,24 @@
-import { IWindow } from '@/types';
+import { IWindow, LocationProps } from '@/types';
 import useGeolocation from '@/hooks/useGeolocation';
 import { useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 
 const { kakao } = window as unknown as IWindow;
 
-const useKakao = () => {
+const useKakao = (location?: LocationProps | string) => {
   const [obj, setObj] = useState<Element>();
   const [coord, setCoord] = useGeolocation();
-  const [latlng, setLatLng] = useState<[number, number]>([0, 0]);
+  const [latlng, setLatLng] = useState<[number, number]>(
+    location && typeof location !== 'string'
+      ? location?.coord
+        ? [location.coord.latitude, location.coord.longitude]
+        : [0, 0]
+      : [0, 0],
+  );
   const ref = useRef<any>(null);
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState(
+    typeof location === 'string' ? location : location?.address ? location.address : '',
+  );
 
   useEffect(() => {
     setCoord();
@@ -18,7 +27,6 @@ const useKakao = () => {
   useEffect(() => {
     if (coord[0] === 0 && coord[1] === 0) return;
     setLatLng(coord);
-
     if (!ref.current) {
       createKakaoMap();
       return;
@@ -68,7 +76,7 @@ const useKakao = () => {
   const getAddress = () => {
     const geocoder = new kakao.maps.services.Geocoder();
     const coord = new kakao.maps.LatLng(latlng[0], latlng[1]);
-    const test = () => {
+    const geoCoord2Address = () => {
       return new Promise((resolve, reject) => {
         geocoder.coord2Address(coord.getLng(), coord.getLat(), (result: any, status: any) => {
           if (status === kakao.maps.services.Status.OK) {
@@ -80,8 +88,13 @@ const useKakao = () => {
         });
       });
     };
-    return test()
-      .then((res) => res)
+    return geoCoord2Address()
+      .then((res) => {
+        if (res !== '') {
+          toast(`${res}`);
+        }
+        return res;
+      })
       .catch(() => '');
   };
 
@@ -90,7 +103,16 @@ const useKakao = () => {
     setAddress(result as string);
   };
 
-  return [address, setRef, getAddress] as const;
+  return [
+    {
+      address,
+      coord: {
+        latitude: latlng[0],
+        longitude: latlng[1],
+      },
+    },
+    setRef,
+  ] as const;
 };
 
 export default useKakao;
