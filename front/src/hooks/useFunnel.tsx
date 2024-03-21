@@ -3,11 +3,13 @@ import React, { Children, ForwardedRef, ReactNode, isValidElement, useMemo, useS
 interface FunnelProps<T extends readonly string[]> {
   step: T[number];
   children: ReactNode;
+  title?: string;
 }
 
 interface StepProps<T extends readonly string[]> {
   name: T[number];
   children?: ReactNode;
+  title?: string;
 }
 
 const Funnel = <T extends readonly string[]>({ step, children }: FunnelProps<T>) => {
@@ -20,17 +22,26 @@ const Funnel = <T extends readonly string[]>({ step, children }: FunnelProps<T>)
   return <>{targetElement}</>;
 };
 
-const Step = <T extends readonly string[]>({ children }: StepProps<T>) => {
-  return <>{children}</>;
+const Step = <T extends readonly string[]>({ children, title }: StepProps<T>) => {
+  return (
+    <>
+      {title ? <h2>{title}</h2> : null}
+      {children}
+    </>
+  );
 };
 
-const useFunnel = <T extends readonly string[]>(steps: T, defaultStep: T[number]) => {
+const useFunnel = <T extends readonly string[]>(
+  steps: T,
+  defaultStep: T[number],
+  title?: string,
+) => {
   const [step, setStep] = useState(defaultStep);
 
   const FunnelElement = Object.assign(
     (props: Omit<FunnelProps<T>, 'step'>) => <Funnel step={step} {...props} />,
     {
-      Step: (props: StepProps<T>) => <Step {...props} />,
+      Step: (props: StepProps<T>) => <Step {...props} title={title} />,
     },
   );
 
