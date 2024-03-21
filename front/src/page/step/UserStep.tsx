@@ -15,12 +15,14 @@ const UserStep = ({
   api,
   funnelData,
   updated = false,
+  focus,
 }: {
   title?: string;
   children: React.ReactNode;
   api: (obj: any, data: any) => any;
   funnelData?: RegisterFormProps;
   updated?: boolean;
+  focus?: <T extends HTMLElement>(props: T) => boolean;
 }) => {
   const [Funnel, setStep] = useFunnel(
     ['id', 'userinfo', 'address', 'gender', 'complete'] as const,
@@ -44,7 +46,6 @@ const UserStep = ({
           preference: 'female',
         },
   );
-  console.log(funnelForm);
   const onSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
     step?: 'id' | 'userinfo' | 'address' | 'gender' | 'complete',
@@ -70,12 +71,18 @@ const UserStep = ({
           step={'id'}
           nextStep={'userinfo'}
           updated={updated}
+          focus={focus ? focus : undefined}
         >
           {children}
         </EmailStep>
       </Funnel.Step>
       <Funnel.Step name="userinfo">
-        <Form onSubmit={async (e) => onSubmit(e, 'userinfo', 'address')}>
+        <Form
+          onSubmit={async (e) => {
+            if (focus && focus<HTMLFormElement>(e.currentTarget as HTMLFormElement)) return;
+            onSubmit(e, 'userinfo', 'address');
+          }}
+        >
           <InputContainer
             name="firstName"
             id="firstName"
@@ -88,7 +95,6 @@ const UserStep = ({
             id="lastName"
             type="text"
             required={true}
-            notFocus={true}
             defaultValue={funnelForm?.lastName as string}
           />
           <Button>다음</Button>

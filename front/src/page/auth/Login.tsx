@@ -18,7 +18,6 @@ export default function Login({ onClick }: { onClick: (prev: boolean) => void })
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (setFocus<HTMLDivElement>(ref.current as HTMLDivElement)) return;
-
     const obj = formHandler(e.currentTarget);
     const response = await api('post', 'login', obj, true);
     if (response) {

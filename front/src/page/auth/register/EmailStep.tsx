@@ -13,6 +13,7 @@ const EmailStep = <T extends readonly string[]>({
   data,
   children,
   updated,
+  focus,
 }: {
   step: T[number];
   nextStep: T[number];
@@ -24,6 +25,7 @@ const EmailStep = <T extends readonly string[]>({
   children?: ReactNode;
   onSubmit: (e: React.FormEvent<HTMLFormElement>, step?: T[number], nextStep?: T[number]) => void;
   updated: boolean;
+  focus?: <T extends HTMLElement>(props: T) => boolean;
 }) => {
   const api = useApi();
   const [checkedEmail, setCheckedEmail] = useState<Partial<Record<string, string>>>({
@@ -57,7 +59,8 @@ const EmailStep = <T extends readonly string[]>({
       <Form
         onSubmit={async (e) => {
           e.preventDefault();
-          if (data?.id && data?.email) {
+          if (focus && focus(e.currentTarget)) {
+            return;
           }
           if (checkedEmail.id !== '' && checkedEmail.email !== '') {
             onSubmit(e, step, nextStep);
