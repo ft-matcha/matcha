@@ -4,17 +4,21 @@ interface User {
     from: string;
     to: string;
 }
+interface Room {
+    room: string;
+}
 interface Data {
     [key: string]: string | number | undefined;
 }
-const create = async (user: User, content: string, status: string) => {
+const create = async (user: User & Room, content: string, status?: string) => {
     try {
         const message = await Message.create({
             set: {
-                fromId: user.from,
-                toId: user.to,
+                room: user.room,
+                from: user.from,
+                to: user.to,
                 content: content,
-                status: status,
+                status: status ? status : 'pending',
             },
         });
         return message;
@@ -23,30 +27,18 @@ const create = async (user: User, content: string, status: string) => {
     }
 };
 
-const get = async (user: User, status?: string) => {
+const get = async (where: User | Room, status?: string) => {
     try {
-        const where = {
-            OR: [
-                { fromId: user.from, toId: user.to },
-                { fromId: user.to, toId: user.from },
-            ],
-        };
-        if (status) {
-            where.OR.map((item: any) => (item['status'] = status));
-        }
-        const message = await Message.read({
-            where: where,
-        });
-        return message;
+        console.log(typeof where);
     } catch (error: any) {
         throw error;
     }
 };
 
-const update = async (user: User, data: Data) => {
+const update = async (where: any, data: Data) => {
     try {
         const message = await Message.update({
-            where: { fromId: user.from, toId: user.to },
+            where: where,
             set: data,
         });
         return message;

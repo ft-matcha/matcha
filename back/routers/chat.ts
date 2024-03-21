@@ -1,8 +1,12 @@
 import messageControllers from '../controllers/message-controllers';
-
-const getHistory = async (req: any, res: any) => {
+import { Request, Response } from 'express';
+const getHistory = async (req: Request, res: any) => {
     try {
-        const history = await messageControllers.get(req.email, req.query.email);
+        if (req.id === undefined || req.query.id === undefined || typeof req.query.id !== 'string') {
+            res.status(400).json({ success: false, error: { message: 'Invalid id' } });
+            return;
+        }
+        const history = await messageControllers.get({ from: req.id, to: req.query.id });
         res.status(200).json({ success: true, data: history });
     } catch (error: any) {
         console.error('getHistory failed: ' + error.stack);
@@ -12,7 +16,7 @@ const getHistory = async (req: any, res: any) => {
 
 const getChatList = async (req: any, res: any) => {
     try {
-        const chatList = await messageControllers.get(req.email);
+        const chatList = await messageControllers.get(req.id);
         res.status(200).json({ success: true, data: chatList });
     } catch (error: any) {
         console.error('getChatList failed: ' + error.stack);

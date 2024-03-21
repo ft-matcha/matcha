@@ -9,6 +9,11 @@ export default {
                     'application/json': {
                         schema: {
                             properties: {
+                                uid: {
+                                    type: 'string',
+                                    description: 'uid',
+                                    example: 'srdn45',
+                                },
                                 email: {
                                     type: 'string',
                                     description: 'email',
@@ -29,15 +34,15 @@ export default {
                                     description: 'password',
                                     example: '1523',
                                 },
-                                phone: {
+                                gender: {
                                     type: 'string',
                                     description: 'phone',
-                                    example: '010-1234-5678',
+                                    example: 'man',
                                 },
                                 address: {
-                                    type: 'string',
+                                    type: 'object',
                                     description: 'address',
-                                    example: '서울시 강남구',
+                                    example: {},
                                 },
                             },
                         },
@@ -97,17 +102,24 @@ export default {
         },
         get: {
             tags: ['user'],
-            summary: 'Check user email exist',
-            description: 'Check user email exist',
+            summary: 'Check user id, email exist',
+            description: 'Check user id, email exist',
             parameters: [
                 {
                     in: 'query',
                     name: 'email',
-                    required: true,
                     schema: {
                         type: 'string',
                     },
-                    description: '유저 이메일',
+                    description: 'email',
+                },
+                {
+                    in: 'query',
+                    name: 'uid',
+                    schema: {
+                        type: 'string',
+                    },
+                    description: 'id',
                 },
             ],
             responses: {

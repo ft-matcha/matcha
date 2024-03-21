@@ -24,9 +24,11 @@ interface Data {
     join?: Array<{
         [key: string]: string | any;
     }>;
-    where?: {
-        [key: string]: string | number | undefined | Array<{ [key: string]: string | number }>;
-    };
+    where?:
+        | Array<{ [key: string]: string | number | undefined | Array<{ [key: string]: string | number }> }>
+        | {
+              [key: string]: string | number | undefined | Array<{ [key: string]: string | number }>;
+          };
     select?: string[];
 }
 
@@ -36,7 +38,6 @@ class crud {
     private table: string;
     private static migration: boolean = false;
     constructor(table: string) {
-        this.getConnection();
         this.table = table;
     }
     async migrate() {
@@ -64,13 +65,13 @@ class crud {
     async create(data: Data) {
         try {
             this.connection = await this.getConnection();
-            const { query, params } = new QueryBuilder()
+            const { query, params } = QueryBuilder.init()
                 .insert(this.table)
                 .set(data.set)
                 .selectJoin(data.selectJoin)
                 .where(data.where)
                 .build();
-            console.log(this.connection?.format(query, params));
+
             const response = await this.connection.query(query, params);
             this.connection.release();
             return response;
@@ -83,7 +84,7 @@ class crud {
 
     async readOne(data: Data): Promise<any> {
         try {
-            const { query, params } = new QueryBuilder()
+            const { query, params } = QueryBuilder.init()
                 .select([data.join ? this.table + '.*' : '*'])
                 .from(this.table)
                 .join(data.join)
@@ -92,9 +93,7 @@ class crud {
                 .limit(1)
                 .build();
             this.connection = await this.getConnection();
-            console.log(this.connection.format(query, params));
             const [row] = await this.connection.query<mysql.RowDataPacket[]>(query, params);
-            console.log(row);
             this.connection.release();
             return row[0];
         } catch (error: any) {
@@ -106,7 +105,7 @@ class crud {
     async read(data: Data) {
         try {
             this.connection = await this.getConnection();
-            const { query, params } = new QueryBuilder()
+            const { query, params } = QueryBuilder.init()
                 .select([data.join ? this.table + '.*' : '*'], data.select)
                 .from(this.table)
                 .join(data.join)
@@ -125,7 +124,7 @@ class crud {
 
     async update(data: Data) {
         try {
-            const { query, params } = new QueryBuilder()
+            const { query, params } = QueryBuilder.init()
                 .update(this.table)
                 .include(data.include)
                 .join(data.join)

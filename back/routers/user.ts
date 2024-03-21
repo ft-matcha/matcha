@@ -1,22 +1,41 @@
 import userControllers from '../controllers/user-controllers';
-import elastic from '../lib/elastic';
+import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 
-const checkEmail = async (req: Request, res: Response) => {
+const checkDuplication = async (req: Request, res: Response) => {
     try {
-        if (typeof req.query['email'] === 'string') {
-            const response = await userControllers.getUser({ email: req.query['email'] });
+        console.log(req.query);
+        if (req.query.email === undefined && req.query.uid === undefined) {
+            res.status(400).json({ success: false, error: { message: 'Invalid url' } });
+            return;
+        }
+        if (typeof req.query.email === 'string') {
+            const response = await userControllers.getUser({ email: req.query.email });
             if (response === undefined) {
                 res.status(200).json({ success: true });
                 return;
+            } else {
+                res.status(409).json({
+                    success: false,
+                    error: { message: 'User already exists' },
+                });
+                return;
             }
-            res.status(409).json({
-                success: false,
-                error: { message: 'User already exists' },
-            });
-        } else {
-            res.status(400).json({ success: false, error: { message: 'Invalid email' } });
         }
+        if (typeof req.query.uid === 'string') {
+            const response = await userControllers.getUser({ uid: req.query.uid });
+            if (response === undefined) {
+                res.status(200).json({ success: true });
+                return;
+            } else {
+                res.status(409).json({
+                    success: false,
+                    error: { message: 'User already exists' },
+                });
+                return;
+            }
+        }
+        res.status(400).json({ success: false, error: { message: 'Invalid url' } });
     } catch (error: any) {
         console.error('checkEmail failed: ' + error.stack);
         res.status(500).json({ success: false, error: { message: 'checkEmail failed : server error' } });
@@ -25,14 +44,14 @@ const checkEmail = async (req: Request, res: Response) => {
 
 const checkProfileVerify = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const response = await userControllers.getUser({ id: req.id });
-        if (response === undefined) {
+        const user = req.data;
+        if (user === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
         }
-        if (response.verified === 1 && response.profile === 1) {
+        if (user.verified === 1 && user.profile === 1) {
             next();
-        } else if (response.profile === 0) {
+        } else if (user.profile === 0) {
             res.status(404).json({ success: false, error: { message: 'Profile not found' } });
         } else {
             res.status(401).json({ success: false, error: { message: 'User not verified' } });
@@ -48,26 +67,19 @@ const checkProfileVerify = async (req: Request, res: Response, next: NextFunctio
 
 const get = async (req: Request, res: Response) => {
     try {
-        const response = await userControllers.getUser({ id: req.params.id ? req.params.id : req.id });
-        if (response === undefined) {
-            res.status(404).json({ success: false, error: { message: 'User not found' } });
-            return;
+        if (req.params.id === undefined) {
+            res.status(200).json({ success: true, data: req.data });
         } else {
-            const { password, verified, profile, userId, profileId, ...rest } = response;
-            // if (req.email === req.params.email) {
-            //     rest['relaiton'] = 'me';
-            // }
-            //  else {
-            //     const relation = await relationControllers.getRelation({
-            //         from: req.email,
-            //         to: req.params.email,
-            //     });
-            //     // rest['relation'] = relation?.status;
-            // }
-            res.status(200).json({
-                success: true,
-                data: rest,
-            });
+            const user = await userControllers.getUser({ id: req.params.id });
+            if (user === undefined) {
+                res.status(404).json({ success: false, error: { message: 'User not found' } });
+                return;
+            } else {
+                res.status(200).json({
+                    success: true,
+                    data: user,
+                });
+            }
         }
     } catch (error: any) {
         console.error('getUser failed: ' + error.stack);
@@ -81,23 +93,31 @@ const update = async (req: Request, res: Response) => {
             res.status(401).json({ success: false, error: { message: 'Unauthorized' } });
             return;
         }
-        const user = await userControllers.getUser({ id: req.id });
+        const user = req.data;
         if (user === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
+        }
+        if (req.body.password) {
+            if (!process.env.secret) throw new Error('secret not found');
+            const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(req.body.password).digest('hex');
+            req.body.password = cryptoPass;
+        }
+        if (req.body.email !== undefined && req.body.email !== user.email) {
+            req.body.verified = 0;
         }
         if (user.profile === 0) {
             const response = await userControllers.createProfile(req.id, req.body);
             if (response) req.body['profile'] = 1;
         }
         const data = await userControllers.updateUser(req.id, req.body);
-        const { password, verified, userId, profile, profileId, ...rest } = data;
-        if (verified === 1) {
-            await elastic.update(req.id, rest);
-        }
+        // const { password, verified, userId, profile, profileId, ...rest } = data;
+        // if (verified === 1) {
+        //     await elastic.update(req.id, rest);
+        // }
         res.status(201).json({
             success: true,
-            data: rest,
+            data: data,
         });
     } catch (error: any) {
         console.error('updateUser failed: ' + error.stack);
@@ -115,14 +135,4 @@ const getRecommend = async (req: any, res: any) => {
     }
 };
 
-const getTag = async (req: any, res: any) => {
-    try {
-        const response = await userControllers.getTag();
-        res.status(200).json({ success: true, data: response });
-    } catch (error: any) {
-        console.error('getTag failed: ' + error.stack);
-        res.status(500).json({ success: false, error: { message: 'getTag failed : server error' } });
-    }
-};
-
-export default { checkEmail, get, update, checkProfileVerify, getRecommend, getTag };
+export default { checkDuplication, get, update, checkProfileVerify, getRecommend };

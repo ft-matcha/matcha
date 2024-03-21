@@ -1,61 +1,93 @@
 import messageControllers from '../controllers/message-controllers';
 import jwt from '../utils/jwt';
-const eventHandler = (socket: any) => {
-    console.log(socket);
-    const room = 1;
-    socket.join(room);
-    messageControllers.update(
-        {
-            from: socket.request.email,
-            to: socket.requset.email,
-        },
-        { status: 'READ' }
-    );
-    socket.on('message', (msg: any) => {
-        // messageControllers.createMessage({});
-        if (socket.rooms.size === 1) {
-        } else {
-            // socket.to(room).emit('message', msg);
-        }
-    });
-    socket.on('leave', (msg: any) => {
-        // socket.to(room).emit('leave', msg);
-        if (socket.rooms.size === 2) {
-            // socket.to(room).emit('leave', msg);
-        }
-    });
-    socket.on('disconnect', () => {
-        // socket.leave(room);
-        console.log('user disconnected');
-    });
-};
-
-const verifyJWT = async (req: any, res: any, next: any) => {
+import roomControllers from '../controllers/room-controllers';
+import { Server, Socket } from 'socket.io';
+import userControllers from '../controllers/user-controllers';
+import alertControllers from '../controllers/alert-controllers';
+const eventHandler = async (socket: Socket, error?: any) => {
     try {
-        if (req.headers.authorization) {
-            const token = req.headers.authorization.split('Bearer ')[1];
-            const response = jwt.verify(token);
-            if (response.status === false) {
-                const decode = jwt.decode(token);
-                res.status(401).json({ success: false, error: { message: 'Expired Token' } });
-                return;
-            } else if (typeof response.decoded === 'object') {
-                if (response.decoded['email'] === undefined) {
-                    res.status(401).json({ success: false, error: { message: 'Invalid Token' } });
-                } else {
-                    req.email = response.decoded['email'];
-                    next();
-                    return;
-                }
-            }
-            res.status(401).json({ success: false, error: { message: 'Invalid Token' } });
-        } else {
-            res.status(401).json({ success: false, error: { message: 'token does not exist' } });
+        if (error) {
+            console.error('eventHandler failed: ' + error.stack);
+            return;
         }
+        const { id, toId } = socket.handshake.headers;
+
+        if (id === undefined || typeof id !== 'string' || toId === undefined || typeof toId !== 'string') {
+            throw new Error('Invalid id');
+        }
+        const roomData = await roomControllers.get(id, toId);
+        if (roomData === undefined) {
+            throw new Error('room not found');
+        }
+        socket.join(roomData.roomId);
+        await messageControllers.update(
+            { from: id, to: toId, room: roomData.roomId, status: 'PENDING' },
+            { status: 'READ' }
+        );
+        socket.on('message', async (msg: any) => {
+            console.log(msg);
+            socket.to(roomData.roomId).emit('message', {
+                from: id,
+                message: msg,
+            });
+            await messageControllers.create(
+                {
+                    from: id,
+                    to: toId,
+                    room: roomData.roomId,
+                },
+                msg,
+                socket.rooms.size === 2 ? 'READ' : 'PENDING'
+            );
+            if (socket.rooms.size === 1) {
+                await alertControllers.createAlert(id, toId, 'message', msg);
+            }
+        });
+
+        socket.on('leave', (msg: any) => {
+            socket.leave(roomData.roomId);
+        });
+
+        socket.on('disconnect', () => {
+            console.log('user disconnected');
+        });
     } catch (error: any) {
-        console.error('verifyJWT failed: ' + error.stack);
-        res.status(500).json({ success: false, error: { message: 'verifyJWT failed : server error' } });
+        console.error('eventHandler failed: ' + error.stack);
     }
 };
 
-export default { eventHandler };
+const authSocket = async (socket: Socket, next: any) => {
+    try {
+        console.log(socket.handshake.headers.auth);
+        if (socket.handshake.headers.auth && typeof socket.handshake.headers.auth === 'string') {
+            const token = socket.handshake.headers.auth.split('Bearer ')[1];
+            const response = jwt.verify(token);
+            if (response.status === false) {
+                const decode = jwt.decode(token);
+                next(socket, new Error('Expired Token'));
+            } else if (typeof response.decoded === 'object') {
+                if (response.decoded['id'] === undefined) {
+                    next(socket, new Error('Invalid Token'));
+                } else {
+                    const user = await userControllers.getUser({ id: response.decoded['id'] });
+                    if (user === undefined) {
+                        next(socket, new Error('Invalid Token'));
+                    }
+                    socket.handshake.headers.user = user;
+                    next(socket);
+                }
+            }
+        } else {
+            next(socket, new Error('token does not exist'));
+        }
+    } catch (error: any) {
+        console.error('authSocket failed: ' + error.stack);
+    }
+};
+
+const chat = (io: Server) => {
+    io.on('connection', (socket) => {
+        authSocket(socket, eventHandler);
+    });
+};
+export default chat;

@@ -9,10 +9,10 @@ export default {
                     'application/json': {
                         schema: {
                             properties: {
-                                email: {
+                                uid: {
                                     type: 'string',
-                                    description: 'email',
-                                    example: 'srdn45@gmail.com',
+                                    description: 'uid',
+                                    example: 'srdn45',
                                 },
                                 password: {
                                     type: 'string',

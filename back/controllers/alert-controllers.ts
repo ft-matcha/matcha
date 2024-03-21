@@ -18,7 +18,7 @@ class alertControllers {
         }
     };
 
-    getAlert = async (user: string | undefined, type: string) => {
+    getAlert = async (user: string, type: string) => {
         try {
             const alert = await Alert.read({
                 where: { toId: user, type: type },

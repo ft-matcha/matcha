@@ -17,7 +17,7 @@ db :
 
 fclean : down
 	docker compose down --rmi all
-	# docker volume rm $(docker volume ls -q) -f
+	docker volume rm $$(docker volume ls -q) -f
 	docker system prune --volumes --force --all
 
 re :
