@@ -1,9 +1,10 @@
 import userControllers from '../controllers/user-controllers';
-import elastic from '../lib/elastic';
+import crypto from 'crypto';
 import { Request, Response, NextFunction } from 'express';
 
 const checkDuplication = async (req: Request, res: Response) => {
     try {
+        console.log(req.query);
         if (req.query.email === undefined && req.query.uid === undefined) {
             res.status(400).json({ success: false, error: { message: 'Invalid url' } });
             return;
@@ -74,7 +75,6 @@ const get = async (req: Request, res: Response) => {
                 res.status(404).json({ success: false, error: { message: 'User not found' } });
                 return;
             } else {
-                // const { password, verified, profile, userId, profileId, ...rest } = user;
                 res.status(200).json({
                     success: true,
                     data: user,
@@ -97,6 +97,14 @@ const update = async (req: Request, res: Response) => {
         if (user === undefined) {
             res.status(404).json({ success: false, error: { message: 'User not found' } });
             return;
+        }
+        if (req.body.password) {
+            if (!process.env.secret) throw new Error('secret not found');
+            const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(req.body.password).digest('hex');
+            req.body.password = cryptoPass;
+        }
+        if (req.body.email !== undefined && req.body.email !== user.email) {
+            req.body.verified = 0;
         }
         if (user.profile === 0) {
             const response = await userControllers.createProfile(req.id, req.body);

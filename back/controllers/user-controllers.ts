@@ -4,7 +4,6 @@ import redis from '../lib/redisClient';
 import elastic from '../lib/elastic';
 import crypto, { randomUUID } from 'crypto';
 import relationControllers from './relation-controllers';
-import QueryString from 'qs';
 const User = new crud('user');
 const Profile = new crud('profile');
 interface User {
@@ -68,11 +67,6 @@ class UserControllers {
 
     updateUser = async (id: string, set: any) => {
         try {
-            if (set.password) {
-                if (!process.env.secret) throw new Error('secret not found');
-                const cryptoPass = crypto.createHmac('sha256', process.env.secret).update(set.password).digest('hex');
-                set.password = cryptoPass;
-            }
             Object.keys(set).forEach((key) => {
                 if (set[key] === undefined) delete set[key];
             });

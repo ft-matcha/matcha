@@ -1,6 +1,6 @@
 class QueryBuilder {
     private query: string;
-    private params: any[];
+    private params: Array<string | { [key: string]: string | Number }>;
     private index: number;
     private table: string;
 
@@ -10,7 +10,13 @@ class QueryBuilder {
         this.index = 0;
         this.table = '';
     }
-
+    init() {
+        this.query = '';
+        this.params = [];
+        this.index = 0;
+        this.table = '';
+        return this;
+    }
     insert(table: string) {
         if (table === undefined) return this;
         this.query += 'INSERT INTO ' + table;
@@ -171,4 +177,4 @@ class QueryBuilder {
     }
 }
 
-export default QueryBuilder;
+export default new QueryBuilder();

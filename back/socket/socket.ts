@@ -3,6 +3,7 @@ import jwt from '../utils/jwt';
 import roomControllers from '../controllers/room-controllers';
 import { Server, Socket } from 'socket.io';
 import userControllers from '../controllers/user-controllers';
+import alertControllers from '../controllers/alert-controllers';
 const eventHandler = async (socket: Socket, error?: any) => {
     try {
         if (error) {
@@ -12,7 +13,7 @@ const eventHandler = async (socket: Socket, error?: any) => {
         const { id, toId } = socket.handshake.headers;
 
         if (id === undefined || typeof id !== 'string' || toId === undefined || typeof toId !== 'string') {
-            return;
+            throw new Error('Invalid id');
         }
         const roomData = await roomControllers.get(id, toId);
         if (roomData === undefined) {
@@ -38,6 +39,9 @@ const eventHandler = async (socket: Socket, error?: any) => {
                 msg,
                 socket.rooms.size === 2 ? 'READ' : 'PENDING'
             );
+            if (socket.rooms.size === 1) {
+                await alertControllers.createAlert(id, toId, 'message', msg);
+            }
         });
 
         socket.on('leave', (msg: any) => {

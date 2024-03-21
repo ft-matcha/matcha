@@ -3,6 +3,7 @@ import { Socket } from 'socket.io';
 
 interface User {
     id: string;
+    uid: string;
     email: string;
     password: string;
     lastName: string;
