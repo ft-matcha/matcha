@@ -19,7 +19,7 @@ const EmailStep = <T extends readonly string[]>({
   nextStep: T[number];
   setFunnel: React.Dispatch<React.SetStateAction<Partial<RegisterFormProps>>>;
   data?: {
-    id: string;
+    uid: string;
     email: string;
   };
   children?: ReactNode;
@@ -29,7 +29,7 @@ const EmailStep = <T extends readonly string[]>({
 }) => {
   const api = useApi();
   const [checkedEmail, setCheckedEmail] = useState<Partial<Record<string, string>>>({
-    id: data?.id || '',
+    uid: data?.uid || '',
     email: data?.email || '',
   });
 
@@ -39,8 +39,7 @@ const EmailStep = <T extends readonly string[]>({
     const curValue = (previous as HTMLInputElement).value;
 
     if (curValue !== checkedEmail[idValue as string]) {
-      const temp = `${idValue}`;
-      const response = await api('get', 'register', { [temp]: curValue });
+      const response = await api('get', 'register', { [idValue]: curValue });
       if (response) {
         setCheckedEmail((prev: Partial<Record<string, string>>) => ({
           ...prev,
@@ -62,17 +61,17 @@ const EmailStep = <T extends readonly string[]>({
           if (focus && focus(e.currentTarget)) {
             return;
           }
-          if (checkedEmail.id !== '' && checkedEmail.email !== '') {
+          if (checkedEmail.uid !== '' && checkedEmail.email !== '') {
             onSubmit(e, step, nextStep);
           }
         }}
       >
         <InputContainer
-          name="id"
-          id="id"
+          name="uid"
+          id="uid"
           type="text"
           required={updated ? false : true}
-          defaultValue={data?.id}
+          defaultValue={data?.uid}
         >
           <button type="button" onClick={getExistsValue}>
             id 중복 확인
