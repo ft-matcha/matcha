@@ -2,11 +2,10 @@ import { InputContainerProps } from '@/types';
 
 export const userInfo: InputContainerProps[] = [
   {
-    name: 'email',
-    id: 'email',
-    type: 'email',
-    required: true,
-    placeholder: 'test@example.com',
+    name: 'id',
+    id: 'id',
+    type: 'id',
+    placeholder: 'test',
   },
   {
     name: 'password',
