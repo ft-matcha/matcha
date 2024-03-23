@@ -9,7 +9,6 @@ const requestFriend = async (req: Request, res: Response) => {
             return;
         }
         const response: any = await relationControllers.getRelation({ from: req.id, to: req.body.id });
-        const alert = await alertControllers.createAlert(req.id, req.body.id, 'request');
         if (response === undefined) {
             const create = await relationControllers.createRelation(req.id, req.body.id, 'FRIEND');
         } else {
@@ -19,6 +18,7 @@ const requestFriend = async (req: Request, res: Response) => {
             { from: req.body.id, to: req.id, duplex: true },
             'FRIEND'
         );
+        const alert = await alertControllers.createAlert(req.id, req.body.id, relation ? 'ACCEPT' : 'REQUEST');
         if (relation) {
             await roomControllers.create(req.id, req.body.id);
         }
@@ -26,34 +26,6 @@ const requestFriend = async (req: Request, res: Response) => {
     } catch (error: any) {
         console.error('requestFriend failed: ' + error.stack);
         res.status(500).json({ success: false, error: { message: 'requestFriend failed : server error' } });
-    }
-};
-
-const acceptFriend = async (req: Request, res: Response) => {
-    try {
-        if (req.id === undefined) {
-            res.status(400).json({ success: false, error: { message: 'Invalid id' } });
-            return;
-        }
-        const response: any = await relationControllers.getRelation({ from: req.id, to: req.body.id });
-        const alert = await alertControllers.createAlert(req.id, req.body.id, 'request');
-        if (response === undefined) {
-            const create = await relationControllers.createRelation(req.id, req.body.id, 'FRIEND');
-        } else {
-            const update = await relationControllers.updateRelation(response.id, 'FRIEND');
-        }
-        const relation = await relationControllers.getRelation(
-            { from: req.body.id, to: req.id, duplex: true },
-            'FRIEND'
-        );
-        if (relation) {
-            await roomControllers.create(req.id, req.body.id);
-        }
-
-        res.status(201).json({ success: true, data: response });
-    } catch (error: any) {
-        console.error('acceptFriend failed: ' + error.stack);
-        res.status(500).json({ success: false, error: { message: 'acceptFriend failed : server error' } });
     }
 };
 
@@ -94,7 +66,6 @@ const hateUser = async (req: Request, res: Response) => {
 
 export default {
     requestFriend,
-    acceptFriend,
     getFriend,
     hateUser,
 };

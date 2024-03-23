@@ -55,24 +55,34 @@ class QueryBuilder {
     where(conditions: any) {
         if (conditions === undefined) return this;
         const keys = Object.keys(conditions);
+        let where: Boolean = false;
         this.query += ' WHERE ';
         this.query += keys
             .map((key) => {
+                if (key === 'OR') return '';
                 this.params.push(conditions[key]);
+                where = true;
                 return key + ' = ?';
             })
             .join(' AND ');
         if (conditions.OR !== undefined) {
-            conditions.OR.map((item: any) => {
-                const keys = Object.keys(item);
-                this.query += ' OR ';
-                this.query += keys
-                    .map((key) => {
-                        this.params.push(item[key]);
-                        return key + ' = ?';
-                    })
-                    .join(' AND ');
-            });
+            const or = conditions.OR;
+            if (where === true) {
+                this.query += ' AND (';
+            }
+
+            this.query += or
+                .map((item: any) => {
+                    const keys = Object.keys(item);
+                    return keys
+                        .map((key) => {
+                            this.params.push(item[key]);
+                            return key + ' = ?';
+                        })
+                        .join(' AND ');
+                })
+                .join(' OR ');
+            where = true;
         }
         return this;
     }
@@ -114,15 +124,31 @@ class QueryBuilder {
         return this;
     }
 
+    innerJoinSelect(data?: any) {
+        if (data === undefined) return this;
+        const alias = 'a' + this.index.toString();
+        this.index++;
+        const { table, fields, on } = data;
+        this.query += ' INNER JOIN ';
+        this.query += ' (SELECT ' + fields.join(', ') + ' FROM ' + table + ' GROUP BY ' + this.table + ') ';
+        this.query += ' AS ' + alias;
+        this.query += ' ON ';
+        Object.keys(on).map((key, index) => {
+            if (index !== 0) this.query += ' AND ';
+            this.query += `${key} = ${on[key]}`;
+        });
+        return this;
+    }
+
     join(data?: any) {
         if (data === undefined) return this;
         data.forEach((item: any) => {
             const alias = 'a' + this.index.toString();
             this.index++;
-            this.query += ' JOIN ' + item.table + ` ${alias}` + ' ON ';
+            this.query += ' LEFT JOIN ' + item.table + ` ${alias}` + ' ON ';
             Object.keys(item.on).map((key, index) => {
                 if (index !== 0) this.query += ' AND ';
-                this.query += `${key} = ${this.table}.${item.on[key]}`;
+                this.query += `${key} = ${item.on[key]}`;
             });
         });
         return this;

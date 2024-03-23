@@ -118,7 +118,7 @@ const verifyEmail = async (req: Request, res: Response) => {
                 const { id, password, profile, verified, userId, profileId, ...rest } = user;
                 await elastic.update(user.email, rest);
             }
-            await userControllers.updateUser(user.email, { verified: 1 });
+            await userControllers.updateUser(user.id, { verified: 1 });
             res.status(201).json({ success: true });
         } else {
             res.status(401).json({ success: false, error: { message: 'Invalid code' } });

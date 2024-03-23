@@ -21,6 +21,9 @@ interface Data {
     selectJoin?: {
         [key: string]: string;
     };
+    innerJoinSelect?: {
+        [key: string]: string | string[] | { [key: string]: string };
+    };
     join?: Array<{
         [key: string]: string | any;
     }>;
@@ -87,6 +90,7 @@ class crud {
             const { query, params } = QueryBuilder.init()
                 .select([data.join ? this.table + '.*' : '*'])
                 .from(this.table)
+                .innerJoinSelect(data.innerJoinSelect)
                 .join(data.join)
                 .include(data.include)
                 .where(data.where)
@@ -108,10 +112,14 @@ class crud {
             const { query, params } = QueryBuilder.init()
                 .select([data.join ? this.table + '.*' : '*'], data.select)
                 .from(this.table)
+                .innerJoinSelect(data.innerJoinSelect)
                 .join(data.join)
                 .include(data.include)
                 .where(data.where)
                 .build();
+            console.log(params);
+            const log = await this.connection.format(query, params);
+            console.log(log);
             const [row] = await this.connection.query<mysql.RowDataPacket[]>(query, params);
             this.connection.release();
             return row;

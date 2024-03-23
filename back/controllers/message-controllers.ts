@@ -1,22 +1,23 @@
 import crud from '../lib/crud';
 const Message = new crud('message');
 interface User {
-    from: string;
-    to: string;
+    fromId?: string;
+    toId: string;
+    roomId?: string;
+    [key: string]: string | undefined;
 }
-interface Room {
-    room: string;
-}
+
 interface Data {
-    [key: string]: string | number | undefined;
+    [key: string]: string | undefined;
 }
-const create = async (user: User & Room, content: string, status?: string) => {
+
+const create = async (user: User, content: string, status?: string) => {
     try {
         const message = await Message.create({
             set: {
-                room: user.room,
-                from: user.from,
-                to: user.to,
+                roomId: user.roomId,
+                fromId: user.fromId,
+                toId: user.toId,
                 content: content,
                 status: status ? status : 'pending',
             },
@@ -27,9 +28,12 @@ const create = async (user: User & Room, content: string, status?: string) => {
     }
 };
 
-const get = async (where: User | Room, status?: string) => {
+const get = async (roomId: number) => {
     try {
-        console.log(typeof where);
+        const message = await Message.read({
+            where: { roomId: roomId },
+        });
+        return message;
     } catch (error: any) {
         throw error;
     }

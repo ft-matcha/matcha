@@ -32,8 +32,9 @@ router.use(user.checkProfileVerify);
 router.get('/user/:email', user.get);
 router.get('/recommend', user.getRecommend);
 router.get('/friend', relation.getFriend);
+router.get('/chatList', chat.getChatList);
 router.post('/friend/request', relation.requestFriend);
-router.put('/friend/accept', relation.acceptFriend);
+// router.put('/friend/accept', relation.acceptFriend);
 router.post('/hate', relation.hateUser);
 router.get('/layout', layout.getProfileAlert);
 

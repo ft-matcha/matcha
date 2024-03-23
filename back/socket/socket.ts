@@ -7,7 +7,7 @@ import alertControllers from '../controllers/alert-controllers';
 const eventHandler = async (socket: Socket, error?: any) => {
     try {
         if (error) {
-            console.error('eventHandler failed: ' + error.stack);
+            console.error('socket connect failed: ' + error.stack);
             return;
         }
         const { id, toId } = socket.handshake.headers;
@@ -21,7 +21,7 @@ const eventHandler = async (socket: Socket, error?: any) => {
         }
         socket.join(roomData.roomId);
         await messageControllers.update(
-            { from: id, to: toId, room: roomData.roomId, status: 'PENDING' },
+            { fromId: id, toId: toId, roomId: roomData.roomId, status: 'PENDING' },
             { status: 'READ' }
         );
         socket.on('message', async (msg: any) => {
@@ -32,8 +32,8 @@ const eventHandler = async (socket: Socket, error?: any) => {
             });
             await messageControllers.create(
                 {
-                    from: id,
-                    to: toId,
+                    fromId: id,
+                    toId: toId,
                     room: roomData.roomId,
                 },
                 msg,
@@ -44,7 +44,10 @@ const eventHandler = async (socket: Socket, error?: any) => {
             }
         });
 
-        socket.on('leave', (msg: any) => {
+        socket.on('leave', () => {
+            socket.to(roomData.roomId).emit('leave', {
+                from: id,
+            });
             socket.leave(roomData.roomId);
         });
 
@@ -53,6 +56,7 @@ const eventHandler = async (socket: Socket, error?: any) => {
         });
     } catch (error: any) {
         console.error('eventHandler failed: ' + error.stack);
+        return;
     }
 };
 

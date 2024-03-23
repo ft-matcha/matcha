@@ -1,14 +1,14 @@
 import { randomUUID } from 'crypto';
 import crud from '../lib/crud';
 const Room = new crud('room');
-const create = async (from: string, to: string) => {
+const create = async (fromId: string, toId: string) => {
     try {
         const id = randomUUID();
         const room = await Room.create({
             set: {
-                id: id,
-                from: from,
-                to: to,
+                roomId: id,
+                from: fromId,
+                to: toId,
             },
         });
         return room;
@@ -17,20 +17,57 @@ const create = async (from: string, to: string) => {
     }
 };
 
-const get = async (from: string, to: string) => {
+const get = async (fromId: string, toId?: string) => {
     try {
-        const room = await Room.read({
-            where: {
-                OR: [
-                    { from: from, to: to },
-                    { from: to, to: from },
-                ],
-            },
-        });
-        return room ? room[0] : room;
+        if (toId === undefined) {
+            const room = await Room.read({
+                where: {
+                    OR: [{ fromId: fromId }, { toId: fromId }],
+                },
+            });
+            return room;
+        } else {
+            const room = await Room.readOne({
+                where: {
+                    OR: [
+                        { fromId: fromId, toId: toId },
+                        { fromId: toId, toId: fromId },
+                    ],
+                },
+            });
+            return room;
+        }
     } catch (error: any) {
         throw error;
     }
 };
 
-export default { create, get };
+const getWithMessage = async (user: string) => {
+    try {
+        const room = await Room.read({
+            innerJoinSelect: {
+                table: 'message',
+                fields: ['room', 'Max(messageId) AS messageId'],
+                on: {
+                    'room.roomId': 'a0.roomId',
+                },
+            },
+            join: [
+                {
+                    table: 'message',
+                    on: {
+                        'a0.messageId': 'a1.messageId',
+                    },
+                },
+            ],
+            where: {
+                OR: [{ 'room.fromId': user }, { 'room.toId': user }],
+            },
+        });
+        return room;
+    } catch (error: any) {
+        throw error;
+    }
+};
+
+export default { create, get, getWithMessage };

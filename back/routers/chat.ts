@@ -1,4 +1,5 @@
 import messageControllers from '../controllers/message-controllers';
+import roomControllers from '../controllers/room-controllers';
 import { Request, Response } from 'express';
 const getHistory = async (req: Request, res: any) => {
     try {
@@ -6,8 +7,8 @@ const getHistory = async (req: Request, res: any) => {
             res.status(400).json({ success: false, error: { message: 'Invalid id' } });
             return;
         }
-        const history = await messageControllers.get({ from: req.id, to: req.query.id });
-        res.status(200).json({ success: true, data: history });
+        // const history = await messageControllers.get({ from: req.id, to: req.query.id });
+        // res.status(200).json({ success: true, data: history });
     } catch (error: any) {
         console.error('getHistory failed: ' + error.stack);
         res.status(500).json({ success: false, error: { message: 'getHistory failed : server error' } });
@@ -16,7 +17,7 @@ const getHistory = async (req: Request, res: any) => {
 
 const getChatList = async (req: any, res: any) => {
     try {
-        const chatList = await messageControllers.get(req.id);
+        const chatList = await roomControllers.getWithMessage(req.id);
         res.status(200).json({ success: true, data: chatList });
     } catch (error: any) {
         console.error('getChatList failed: ' + error.stack);
