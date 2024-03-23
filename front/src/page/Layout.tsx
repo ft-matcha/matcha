@@ -7,8 +7,7 @@ import { CgProfile } from 'react-icons/cg';
 import { deleteToken } from '@/utils/token';
 import useApi from '@/hooks/useApi';
 import { FaUserFriends } from 'react-icons/fa';
-import useKakao from '@/hooks/useKakao';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Span from '@/components/ui/Span';
 import { useNavigate } from 'react-router-dom';
 import RecommendCard from '@/page/recommend/RecommendCard';
@@ -49,6 +48,7 @@ const DesktopLayout = (props: any) => {
   const api = useApi();
   const navigator = useNavigate();
   const [profile, setProfile] = useState({ id: '', firstName: '', lastName: '', address: '' });
+  console.log('api called');
   const fetchApi = async () => {
     try {
       const { data } = await api('get', 'user');
@@ -118,11 +118,14 @@ const DesktopLayout = (props: any) => {
       </Aside>
       <MainSection id="main">
         <RecommendCard
-          profileList={[
-            'https://i.namu.wiki/i/v9mjVvN1z88ez3EY_ECy3CIHXuaCmMicz_awziQW7Na5lluUpBwLMTb_2RluVPuDAjAwzazdBzSm0wLOhdJNmw.webp',
-            'https://i.namu.wiki/i/JQQdOENy3aGlgcFmecRY5D7iIWDhyS5xIB1A2Tck_28Z792LbybVgWidMlKFyJZj-OlV6TUIIbkronpdJFSNBA.webp',
-            'https://i.namu.wiki/i/PHPaxu5UjnztUXHx5OHKnYH615-z4-IFOuBSunSxPahvTCbI2JgYKQfW3j8JEEBiXEOaB40SuVLIiw3rXHeGyQ.webp',
-          ]}
+          randomData={{
+            id: '1234',
+            profileList: [
+              'https://i.namu.wiki/i/v9mjVvN1z88ez3EY_ECy3CIHXuaCmMicz_awziQW7Na5lluUpBwLMTb_2RluVPuDAjAwzazdBzSm0wLOhdJNmw.webp',
+              'https://i.namu.wiki/i/JQQdOENy3aGlgcFmecRY5D7iIWDhyS5xIB1A2Tck_28Z792LbybVgWidMlKFyJZj-OlV6TUIIbkronpdJFSNBA.webp',
+              'https://i.namu.wiki/i/PHPaxu5UjnztUXHx5OHKnYH615-z4-IFOuBSunSxPahvTCbI2JgYKQfW3j8JEEBiXEOaB40SuVLIiw3rXHeGyQ.webp',
+            ],
+          }}
         />
       </MainSection>
     </>

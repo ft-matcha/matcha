@@ -4,6 +4,7 @@ import styled from 'styled-components';
 interface ImageProps<T extends readonly string[]> {
   img: T[number];
   children: ReactNode;
+  onClick?: (props: any) => void;
 }
 
 const ImageContainer = styled.div`
@@ -28,10 +29,19 @@ const ButtonContainer = styled.div`
   }
 `;
 
-const SliderImage = ({ img, children }: { img: string; children?: React.ReactNode }) => {
+const SliderImage = ({
+  img,
+  children,
+  onClick,
+}: {
+  img: string;
+  children?: React.ReactNode;
+  onClick?: (props: any) => void;
+}) => {
+  console.log(onClick);
   return (
     <ImageContainer>
-      <img src={img} alt={img} />
+      <img src={img} alt={img} onClick={onClick} />
       <ButtonContainer>{children}</ButtonContainer>
     </ImageContainer>
   );
