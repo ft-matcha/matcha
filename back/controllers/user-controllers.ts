@@ -44,6 +44,7 @@ class UserControllers {
             const accessToken = await jwt.sign(id);
             const refreshToken = await jwt.refresh();
             return {
+                id,
                 accessToken,
                 refreshToken,
             };

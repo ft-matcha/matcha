@@ -11,10 +11,10 @@ const transporter = nodemailer.createTransport({
 
 export default class mailer {
     constructor() {}
-    sendEmail = async (email: string) => {
+    sendEmail = async (id: string, email: string) => {
         try {
             const code = crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
-            redisClient.set(email, code, 300);
+            redisClient.set(code, id, 300);
             const mailOptions = {
                 to: email,
                 subject: 'Email Verification',
@@ -27,15 +27,14 @@ export default class mailer {
             throw error;
         }
     };
-    verifyEmail = async (email: string, code: string) => {
+    verifyEmail = async (code: string) => {
         try {
-            const redisCode = await redisClient.get(email);
+            const redisCode = await redisClient.get(code);
             if (redisCode === null) {
                 return false;
-            } else if (redisCode === code) {
-                return true;
+            } else {
+                return redisCode;
             }
-            return false;
         } catch (error: any) {
             console.error('Mail verify failed: ' + error.stack);
             throw error;

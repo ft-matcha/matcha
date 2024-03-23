@@ -45,7 +45,7 @@ const register = async (req: Request, res: Response) => {
             console.log('register success');
             const { refreshToken, accessToken } = response;
             res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
-            await mailer.sendEmail(req.body.email);
+            await mailer.sendEmail(response.id, req.body.email);
             res.status(201).json({
                 success: true,
                 data: { accessToken: accessToken },
@@ -91,7 +91,7 @@ const sendEmail = async (req: Request, res: Response) => {
         } else if (user.verified === 1) {
             res.status(409).json({ success: false, error: { message: 'User already verified' } });
         } else {
-            await mailer.sendEmail(user.email);
+            await mailer.sendEmail(user.id, user.email);
             res.status(201).json({
                 success: true,
             });
@@ -104,21 +104,9 @@ const sendEmail = async (req: Request, res: Response) => {
 
 const verifyEmail = async (req: Request, res: Response) => {
     try {
-        const user = req.data;
-        if (user === undefined) {
-            res.status(401).json({ success: false, error: { message: 'User not found' } });
-            return;
-        } else if (user.verified === 1) {
-            res.status(409).json({ success: false, error: { message: 'User already verified' } });
-            return;
-        }
-        const verify = await mailer.verifyEmail(user.email, req.params.code);
-        if (verify === true) {
-            if (user.profile === 1) {
-                const { id, password, profile, verified, userId, profileId, ...rest } = user;
-                await elastic.update(user.email, rest);
-            }
-            await userControllers.updateUser(user.id, { verified: 1 });
+        const verify = await mailer.verifyEmail(req.params.code);
+        if (verify !== false) {
+            await userControllers.updateUser(verify, { verified: 1 });
             res.status(201).json({ success: true });
         } else {
             res.status(401).json({ success: false, error: { message: 'Invalid code' } });
