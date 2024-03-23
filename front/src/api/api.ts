@@ -1,6 +1,6 @@
 import type { Api } from '@/api/api-types';
 import { responsePipe } from '@/api/apiWrapper';
-import { deleteToken, getToken, setToken } from '@/utils/token';
+import { getToken } from '@/utils/token';
 
 export class ApiCall {
   private readonly apiInstance: Api.ApiInstance;
@@ -28,7 +28,6 @@ export class ApiCall {
   }
 
   fetchApi(type: string, params: any, url?: string) {
-    console.log(this.baseUrl);
     if (url) {
       return this.callApi(type, url, params);
     }
@@ -87,7 +86,6 @@ export class ApiContainer {
 
   async call(type: 'get' | 'post' | 'put', target: string, dataParams?: any, url?: string) {
     const bearer = this.setBearerTokenInHeader(type, dataParams);
-    console.log(bearer);
     const result = this.run(type, target, bearer, url);
     const response = await responsePipe(result as Promise<Api.BackendResponse>);
     return response;
