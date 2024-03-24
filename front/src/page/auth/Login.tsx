@@ -32,8 +32,8 @@ export default function Login({ onClick }: { onClick: (prev: boolean) => void })
         <p>Enter your email below to login to your account</p>
       </div>
       <div ref={ref}>
-        {userInfo.map((item, i) => (
-          <InputContainer notFocus={i !== 0} {...item} key={`user_${item.id}`} />
+        {userInfo.map((item) => (
+          <InputContainer {...item} key={`user_${item.id}`} />
         ))}
         <Button type="submit">Sign In</Button>
         {modal.modalProp.modalType === 'loginModal' ? (

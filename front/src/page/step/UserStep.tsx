@@ -59,6 +59,7 @@ const UserStep = ({
       return;
     }
     if (step === 'complete' && !nextStep) {
+      console.log(funnelForm);
       api(funnelForm, addressRef.current);
     }
   };

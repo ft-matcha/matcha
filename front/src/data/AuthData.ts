@@ -2,8 +2,8 @@ import { InputContainerProps } from '@/types';
 
 export const userInfo: InputContainerProps[] = [
   {
-    name: 'id',
-    id: 'id',
+    name: 'uid',
+    id: 'uid',
     type: 'id',
     placeholder: 'test',
   },
