@@ -124,7 +124,7 @@ export default {
             ],
             responses: {
                 200: {
-                    description: 'email not exist',
+                    description: 'uid or email not exist',
                     content: {
                         'application/json': {
                             schema: {
@@ -140,8 +140,8 @@ export default {
                         },
                     },
                 },
-                400: {
-                    description: 'Check user email fail',
+                409: {
+                    description: 'Check user email or uid already exist',
                     content: {
                         'application/json': {
                             schema: {
@@ -152,10 +152,15 @@ export default {
                                         description: '성공여부',
                                         example: false,
                                     },
-                                    message: {
-                                        type: 'string',
-                                        description: '메시지',
-                                        example: 'email already exist',
+                                    error: {
+                                        type: 'object',
+                                        properties: {
+                                            message: {
+                                                type: 'string',
+                                                description: '메시지',
+                                                example: 'uid or email already exist',
+                                            },
+                                        },
                                     },
                                 },
                             },

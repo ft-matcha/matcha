@@ -1,11 +1,10 @@
 import userControllers from '../controllers/user-controllers';
-import mailControllers from '../controllers/mail-controllers';
 import elastic from '../lib/elastic';
 import { Request, Response } from 'express';
 import redisClient from '../lib/redisClient';
-const mailer = new mailControllers();
 import crypto from 'crypto';
 import jwt from '../utils/jwt';
+import mailer from '../lib/mailer';
 
 const login = async (req: Request, res: Response) => {
     try {
@@ -43,9 +42,9 @@ const register = async (req: Request, res: Response) => {
         if (user === undefined) {
             const response = await userControllers.createUser(req.body);
             console.log('register success');
-            const { refreshToken, accessToken } = response;
+            const { id, refreshToken, accessToken } = response;
             res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true, sameSite: 'none' });
-            await mailer.sendEmail(response.id, req.body.email);
+            await mailer.send(id, req.body.email);
             res.status(201).json({
                 success: true,
                 data: { accessToken: accessToken },
@@ -83,38 +82,4 @@ const logout = async (req: Request, res: Response) => {
     }
 };
 
-const sendEmail = async (req: Request, res: Response) => {
-    try {
-        const user = req.data;
-        if (user === undefined) {
-            res.status(401).json({ success: false, error: { message: 'User not found' } });
-        } else if (user.verified === 1) {
-            res.status(409).json({ success: false, error: { message: 'User already verified' } });
-        } else {
-            await mailer.sendEmail(user.id, user.email);
-            res.status(201).json({
-                success: true,
-            });
-        }
-    } catch (error: any) {
-        console.error('sendMail failed: ' + error.stack);
-        res.status(500).json({ success: false, error: { message: 'sendMail failed : server error' } });
-    }
-};
-
-const verifyEmail = async (req: Request, res: Response) => {
-    try {
-        const verify = await mailer.verifyEmail(req.params.code);
-        if (verify !== false) {
-            await userControllers.updateUser(verify, { verified: 1 });
-            res.status(201).json({ success: true });
-        } else {
-            res.status(401).json({ success: false, error: { message: 'Invalid code' } });
-        }
-    } catch (error: any) {
-        console.error('verifyEmail failed: ' + error.stack);
-        res.status(500).json({ success: false, error: { message: 'verifyEmail failed : server error' } });
-    }
-};
-
-export default { login, logout, register, sendEmail, verifyEmail };
+export default { login, logout, register };

@@ -54,10 +54,15 @@ export default {
                                         description: '성공여부',
                                         example: false,
                                     },
-                                    message: {
-                                        type: 'string',
-                                        description: '메시지',
-                                        example: '친구 요청 실패',
+                                    error: {
+                                        type: 'object',
+                                        properties: {
+                                            message: {
+                                                type: 'string',
+                                                description: '메시지',
+                                                example: '친구 요청 실패',
+                                            },
+                                        },
                                     },
                                 },
                             },

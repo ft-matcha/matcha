@@ -27,9 +27,9 @@ export default {
                                         items: {
                                             type: 'object',
                                             properties: {
-                                                email: {
+                                                id: {
                                                     type: 'string',
-                                                    description: '이메일',
+                                                    description: 'user id',
                                                     example: '',
                                                 },
                                             },
