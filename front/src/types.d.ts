@@ -8,6 +8,14 @@ export interface IWindow extends Window {
     };
   };
 }
+export interface FormProps {
+  width?: string;
+  height?: string;
+  children?: React.ReactNode;
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
+  ref?: RefObject<HTMLFormElement>;
+}
+
 
 export interface RegisterFormProps {
   [key: string]: string | boolean | number | undefined | null;

@@ -2,29 +2,19 @@ import InputContainer from '@/components/InputContainer';
 import Button from '@/components/ui/Button';
 import Form, { formHandler } from '@/components/ui/Form';
 import useApi from '@/hooks/useApi';
-import { RegisterFormProps } from '@/types';
-import { ReactNode, forwardRef, useRef, useState } from 'react';
+import { FormProps, RegisterFormProps } from '@/types';
+import { ReactNode, RefObject, forwardRef, useRef, useState } from 'react';
 
-/*
-        <InputContainer
-          name="email"
-          id="email"
-          type="email"
-          defaultValue={data?.email}
-          pattern={'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+.[a-zA-Z]{2,}$'}
-        >
-          <Button onClick={(e) => submitHandler('button2')(e)}>중복 확인</Button>
-        </InputContainer>
-        <InputContainer
-          name="password"
-          id="password"
-          type="password"
-          pattern="^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{8,16}$"
-        />
-        */
-
-const ForwardForm = forwardRef<HTMLFormElement>(function (props, ref) {
-  return <Form ref={ref} {...props} />;
+const ForwardForm = forwardRef<HTMLFormElement, FormProps>(function (
+  { onSubmit, children, ...rest },
+  ref,
+) {
+  const formRef: RefObject<HTMLFormElement> = ref as RefObject<HTMLFormElement>;
+  return (
+    <Form ref={formRef} {...rest} onSubmit={onSubmit} {...rest}>
+      {children}
+    </Form>
+  );
 });
 
 const EmailStep = <T extends readonly string[]>({
@@ -49,7 +39,7 @@ const EmailStep = <T extends readonly string[]>({
   updated: boolean;
   focus?: <T extends HTMLElement>(props: T) => boolean;
 }) => {
-  const ref = useRef<HTMLFormElement>();
+  const ref = useRef<HTMLFormElement>(null);
   const api = useApi();
   const [verifyData, setVerifyData] = useState<Partial<Record<string, string>>>({
     uid: data?.uid || '',

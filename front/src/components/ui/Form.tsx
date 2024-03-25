@@ -1,14 +1,6 @@
+import { FormProps } from '@/types';
 import { RefObject } from 'react';
 import styled from 'styled-components';
-
-interface FormProps {
-  width?: string;
-  height?: string;
-  children?: React.ReactNode;
-  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
-  ref: any;
-  // ref?: RefObject<HTMLFormElement>;
-}
 
 const FormContainer = styled.form<FormProps>`
   display: flex;
