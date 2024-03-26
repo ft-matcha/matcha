@@ -1,6 +1,6 @@
 import useFunnel from '@/hooks/useFunnel';
 import Select from '@/components/ui/Select';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import InputContainer from '@/components/InputContainer';
 import Button from '@/components/ui/Button';
 import Form, { formHandler } from '@/components/ui/Form';
@@ -8,6 +8,8 @@ import { userGender } from '@/data/AuthData';
 import EmailStep from '@/page/auth/register/EmailStep';
 import GeoLocation from '@/page/location/GeoLocation';
 import { RegisterFormProps } from '@/types';
+import DatePicker from '@/components/DatePicker';
+import BackendConnectedStep from '@/page/auth/register/EmailStep';
 
 const UserStep = ({
   title,
@@ -25,8 +27,8 @@ const UserStep = ({
   focus?: <T extends HTMLElement>(props: T) => boolean;
 }) => {
   const [Funnel, setStep] = useFunnel(
-    ['id', 'userinfo', 'address', 'gender', 'complete'] as const,
-    'id',
+    ['id', 'email', 'userinfo', 'age', 'address', 'gender', 'complete'] as const,
+    'age',
     title,
   );
   const addressRef = useRef<{
@@ -48,8 +50,8 @@ const UserStep = ({
   );
   const onSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
-    step?: 'id' | 'userinfo' | 'address' | 'gender' | 'complete',
-    nextStep?: 'id' | 'userinfo' | 'address' | 'gender' | 'complete',
+    step?: 'id' | 'email' | 'userinfo' | 'age' | 'address' | 'gender' | 'complete',
+    nextStep?: 'id' | 'email' | 'userinfo' | 'age' | 'address' | 'gender' | 'complete',
   ) => {
     e.preventDefault();
     if (nextStep) {
@@ -59,24 +61,11 @@ const UserStep = ({
       return;
     }
     if (step === 'complete' && !nextStep) {
-      console.log(funnelForm);
       api(funnelForm, addressRef.current);
     }
   };
   return (
     <Funnel>
-      <Funnel.Step name="id">
-        <EmailStep<['id' | 'userinfo' | 'address' | 'gender' | 'complete']>
-          onSubmit={onSubmit}
-          setFunnel={setFunnelForm}
-          step={'id'}
-          nextStep={'userinfo'}
-          updated={updated}
-          focus={focus ? focus : undefined}
-        >
-          {children}
-        </EmailStep>
-      </Funnel.Step>
       <Funnel.Step name="userinfo">
         <Form
           onSubmit={async (e) => {
@@ -100,6 +89,22 @@ const UserStep = ({
           />
           <Button>다음</Button>
           {children}
+        </Form>
+      </Funnel.Step>
+      <Funnel.Step name="age">
+        <Form onSubmit={(e) => onSubmit(e, 'age', 'email')}>
+          <DatePicker setFunnel={setFunnelForm} date={funnelForm.date} />
+          <Button>다음</Button>
+        </Form>
+      </Funnel.Step>
+      {/* <Funnel.Step name="id">{children}</Funnel.Step> */}
+      <Funnel.Step name="email">
+        <Form onSubmit={(e) => onSubmit(e, 'email', 'address')}>
+          <BackendConnectedStep
+            setFunnel={setFunnelForm}
+            name="email"
+            data="email"
+          ></BackendConnectedStep>
         </Form>
       </Funnel.Step>
       <Funnel.Step name="address">

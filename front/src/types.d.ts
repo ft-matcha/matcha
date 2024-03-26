@@ -18,9 +18,9 @@ export interface FormProps {
 
 
 export interface RegisterFormProps {
-  [key: string]: string | boolean | number | undefined | null;
+  [key: keyof RegisterFormProps]: RegisterFormProps[key];
   address: string;
-  age: number | null;
+  date: string | undefined;
   email: string;
   firstName: string;
   gender: string;
@@ -42,6 +42,7 @@ export interface LocationProps {
 }
 
 export interface InputContainerProps {
+  [k: keyof InputContainer]: InputContainerProps[k];
   type: string;
   id: string;
   name: string;
