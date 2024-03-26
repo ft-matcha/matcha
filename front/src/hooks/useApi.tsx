@@ -36,9 +36,9 @@ const useApi = () => {
       toast('api success');
       return response;
     } catch (e) {
-      // removeAuthentic();
-      // navigator('/');
-      // toast('api fail');
+      removeAuthentic();
+      navigator('/');
+      toast('api fail');
     }
   };
   return fetchApi;

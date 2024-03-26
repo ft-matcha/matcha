@@ -10,16 +10,10 @@ const DatePicker = ({
     props: (prev: Record<string, any>) => Record<string, any> | Record<string, any>,
   ) => void;
 }) => {
-  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.currentTarget.value);
-    setFunnel((prev: Record<string, any>) => ({
-      ...prev,
-      [e.currentTarget.name]: e.currentTarget.value,
-    }));
-  };
+  console.log(date);
   return (
     <>
-      <InputContainer type="date" name="date" id="date" onChange={onChange} value={date} />
+      <InputContainer type="date" name="date" id="date" value={date} />
     </>
   );
 };

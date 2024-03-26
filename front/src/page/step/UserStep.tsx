@@ -56,7 +56,8 @@ const UserStep = ({
     e.preventDefault();
     if (nextStep) {
       const data = formHandler(e.currentTarget);
-      setFunnelForm((prev: any) => ({ ...prev, ...data }));
+      console.log(data);
+      setFunnelForm((prev?: Partial<RegisterFormProps>) => ({ ...prev, ...data }));
       setStep(nextStep);
       return;
     }
@@ -99,12 +100,20 @@ const UserStep = ({
       </Funnel.Step>
       {/* <Funnel.Step name="id">{children}</Funnel.Step> */}
       <Funnel.Step name="email">
-        <Form onSubmit={(e) => onSubmit(e, 'email', 'address')}>
+        <Form onSubmit={(e) => onSubmit(e, 'email', 'userinfo')}>
           <BackendConnectedStep
             setFunnel={setFunnelForm}
             name="email"
             data="email"
           ></BackendConnectedStep>
+          <Button
+            type="button"
+            onClick={(e) => {
+              console.log('...."');
+            }}
+          >
+            testtest
+          </Button>
         </Form>
       </Funnel.Step>
       <Funnel.Step name="address">
