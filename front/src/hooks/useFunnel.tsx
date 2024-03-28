@@ -1,16 +1,5 @@
+import { FunnelProps, StepProps } from '@/types';
 import React, { Children, ForwardedRef, ReactNode, isValidElement, useMemo, useState } from 'react';
-
-interface FunnelProps<T extends readonly string[]> {
-  step: T[number];
-  children: ReactNode;
-  title?: string;
-}
-
-interface StepProps<T extends readonly string[]> {
-  name: T[number];
-  children?: ReactNode;
-  title?: string;
-}
 
 const Funnel = <T extends readonly string[]>({ step, children }: FunnelProps<T>) => {
   const validElement = Children.toArray(children).filter(isValidElement);

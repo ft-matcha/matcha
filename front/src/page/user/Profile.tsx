@@ -66,7 +66,6 @@ const Profile = () => {
           }),
         );
       }}
-      updated={true}
       funnelData={profile}
     >
       <Button onClick={() => navigator('/explorer')}>Home</Button>

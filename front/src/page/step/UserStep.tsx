@@ -1,34 +1,77 @@
 import useFunnel from '@/hooks/useFunnel';
-import Select from '@/components/ui/Select';
 import { useRef, useState } from 'react';
 import InputContainer from '@/components/InputContainer';
 import Button from '@/components/ui/Button';
 import Form, { formHandler } from '@/components/ui/Form';
-import { userGender } from '@/data/AuthData';
-import EmailStep from '@/page/auth/register/EmailStep';
-import GeoLocation from '@/page/location/GeoLocation';
-import { RegisterFormProps } from '@/types';
+import { FunnelProps, RegisterFormProps, StepProps } from '@/types';
 import DatePicker from '@/components/DatePicker';
-import BackendConnectedStep from '@/page/auth/register/EmailStep';
+import { userRegister } from '@/data/AuthData';
+
+const userGen = <T extends string>(
+  Funnel: ((props: Omit<FunnelProps<T[]>, 'step'>) => JSX.Element) & {
+    Step: (props: StepProps<T[]>) => JSX.Element;
+  },
+  item: {
+    name: T;
+    id: T;
+    type: string;
+    next?: T;
+  }[],
+  setFunnel: React.Dispatch<React.SetStateAction<Partial<RegisterFormProps | undefined>>>,
+  setStep: React.Dispatch<React.SetStateAction<T>>,
+) => {
+  const onNext = (cur: T) => (next: T) => (value: string) => {
+    // todo check is true data
+    if (cur === 'id' || cur === 'email') {
+      console.log('will be checked duplicated');
+    }
+    setFunnel((prev) => (prev ? { ...prev, [cur]: value } : { [cur]: value }));
+    setStep(next);
+  };
+  return item.map(({ name, id, type, next, ...rest }) => (
+    <Funnel.Step name={name} key={`funnel_${name}`}>
+      <InputContainer
+        name={name}
+        id={id}
+        type={type}
+        required={true}
+        placeholder={name}
+        onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => {
+          if (e.key === 'Enter') {
+            onNext(name)(next as T)(e.currentTarget.value);
+          }
+        }}
+        {...rest}
+      />
+      <Button
+        onClick={(e) => {
+          onNext(name)(next as T)(e.currentTarget.previousElementSibling?.value);
+        }}
+      >
+        다음
+      </Button>
+    </Funnel.Step>
+  ));
+};
 
 const UserStep = ({
   title,
   children,
   api,
   funnelData,
-  updated = false,
   focus,
+  defaultData = userRegister,
 }: {
   title?: string;
   children: React.ReactNode;
   api: (obj: any, data: any) => any;
   funnelData?: RegisterFormProps;
-  updated?: boolean;
   focus?: <T extends HTMLElement>(props: T) => boolean;
+  defaultData?: typeof userRegister;
 }) => {
   const [Funnel, setStep] = useFunnel(
-    ['id', 'email', 'userinfo', 'age', 'address', 'gender', 'complete'] as const,
-    'age',
+    ['id', 'email', 'password', 'name', 'complete'] as const,
+    'id',
     title,
   );
   const addressRef = useRef<{
@@ -38,116 +81,16 @@ const UserStep = ({
       longitude: number;
     };
   } | null>(null);
-  const [funnelForm, setFunnelForm] = useState<Partial<RegisterFormProps>>(
-    funnelData
-      ? {
-          ...funnelData,
-        }
-      : {
-          gender: 'male',
-          preference: 'female',
-        },
-  );
-  const onSubmit = async (
-    e: React.FormEvent<HTMLFormElement>,
-    step?: 'id' | 'email' | 'userinfo' | 'age' | 'address' | 'gender' | 'complete',
-    nextStep?: 'id' | 'email' | 'userinfo' | 'age' | 'address' | 'gender' | 'complete',
-  ) => {
+  const [funnelForm, setFunnelForm] = useState<Partial<RegisterFormProps | undefined>>(funnelData);
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (nextStep) {
-      const data = formHandler(e.currentTarget);
-      console.log(data);
-      setFunnelForm((prev?: Partial<RegisterFormProps>) => ({ ...prev, ...data }));
-      setStep(nextStep);
-      return;
-    }
-    if (step === 'complete' && !nextStep) {
-      api(funnelForm, addressRef.current);
-    }
+    console.log(funnelForm);
   };
   return (
     <Funnel>
-      <Funnel.Step name="userinfo">
-        <Form
-          onSubmit={async (e) => {
-            if (focus && focus<HTMLFormElement>(e.currentTarget as HTMLFormElement)) return;
-            onSubmit(e, 'userinfo', 'address');
-          }}
-        >
-          <InputContainer
-            name="firstName"
-            id="firstName"
-            type="text"
-            required={true}
-            defaultValue={funnelForm?.firstName as string}
-          />
-          <InputContainer
-            name="lastName"
-            id="lastName"
-            type="text"
-            required={true}
-            defaultValue={funnelForm?.lastName as string}
-          />
-          <Button>다음</Button>
-          {children}
-        </Form>
-      </Funnel.Step>
-      <Funnel.Step name="age">
-        <Form onSubmit={(e) => onSubmit(e, 'age', 'email')}>
-          <DatePicker setFunnel={setFunnelForm} date={funnelForm.date} />
-          <Button>다음</Button>
-        </Form>
-      </Funnel.Step>
-      {/* <Funnel.Step name="id">{children}</Funnel.Step> */}
-      <Funnel.Step name="email">
-        <Form onSubmit={(e) => onSubmit(e, 'email', 'userinfo')}>
-          <BackendConnectedStep
-            setFunnel={setFunnelForm}
-            name="email"
-            data="email"
-          ></BackendConnectedStep>
-          <Button
-            type="button"
-            onClick={(e) => {
-              console.log('...."');
-            }}
-          >
-            testtest
-          </Button>
-        </Form>
-      </Funnel.Step>
-      <Funnel.Step name="address">
-        <Form onSubmit={async (e) => onSubmit(e, 'address', 'gender')}>
-          <GeoLocation addressRef={addressRef}>
-            <Button>집주소</Button>
-          </GeoLocation>
-        </Form>
-        {children}
-      </Funnel.Step>
-      <Funnel.Step name="gender">
-        <Form onSubmit={async (e) => onSubmit(e, 'gender', 'complete')}>
-          <Select name="gender" id="gender" default={funnelForm?.gender as string}>
-            {userGender.map((item) => (
-              <option key={`gender_${item}`} value={item}>
-                {item}
-              </option>
-            ))}
-          </Select>
-          <Select name="preference" id="preference" default={funnelForm?.preference as string}>
-            {userGender.map((item) => (
-              <option key={`gender_${item}`} value={item}>
-                {item}
-              </option>
-            ))}
-          </Select>
-          <div>
-            <Button>다음</Button>
-            {children}
-          </div>
-        </Form>
-      </Funnel.Step>
+      {userGen(Funnel as any, defaultData as any, setFunnelForm, setStep)}
       <Funnel.Step name="complete">
-        <Form onSubmit={async (e) => onSubmit(e, 'complete')}>
+        <Form onSubmit={onSubmit}>
           <Button>done</Button>
           {children}
         </Form>

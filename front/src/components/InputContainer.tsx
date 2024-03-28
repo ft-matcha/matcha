@@ -14,6 +14,7 @@ const InputContainer: React.FC<InputContainerProps> = ({
   readOnly,
   ...rest
 }) => {
+  console.log(rest);
   return (
     <>
       <Label htmlFor={id}>{name}</Label>

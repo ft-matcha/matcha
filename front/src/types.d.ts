@@ -87,3 +87,15 @@ export interface ModalContextProps {
     toggle: boolean;
   };
 }
+
+export interface FunnelProps<T extends readonly string[]> {
+  step: T[number];
+  children: ReactNode;
+  title?: string;
+}
+
+export interface StepProps<T extends readonly string[]> {
+  name: T[number];
+  children?: ReactNode;
+  title?: string;
+}
