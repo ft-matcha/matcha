@@ -1,4 +1,4 @@
-import { RequestHandler, Request, Response, NextFunction } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import userControllers from '../controllers/user-controllers';
 import jwt from '../utils/jwt';
 
@@ -16,7 +16,7 @@ const verifyJWT = async (req: Request, res: Response, next: NextFunction) => {
                     res.status(401).json({ success: false, error: { message: 'Invalid Token' } });
                 } else {
                     req.id = response.decoded['id'];
-                    req.data = await userControllers.getUser({ id: req.id });
+                    req.data = await userControllers.get({ id: req.id });
                     if (req.data === undefined) {
                         res.status(401).json({ success: false, error: { message: 'Invalid Token' } });
                     }

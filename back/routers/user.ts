@@ -10,7 +10,7 @@ const checkDuplication = async (req: Request, res: Response) => {
             return;
         }
         if (typeof req.query.email === 'string') {
-            const response = await userControllers.getUser({ email: req.query.email });
+            const response = await userControllers.get({ email: req.query.email });
             if (response === undefined) {
                 res.status(200).json({ success: true });
                 return;
@@ -23,7 +23,7 @@ const checkDuplication = async (req: Request, res: Response) => {
             }
         }
         if (typeof req.query.uid === 'string') {
-            const response = await userControllers.getUser({ uid: req.query.uid });
+            const response = await userControllers.get({ uid: req.query.uid });
             if (response === undefined) {
                 res.status(200).json({ success: true });
                 return;
@@ -70,7 +70,7 @@ const get = async (req: Request, res: Response) => {
         if (req.params.id === undefined) {
             res.status(200).json({ success: true, data: req.data });
         } else {
-            const user = await userControllers.getUser({ id: req.params.id });
+            const user = await userControllers.get({ id: req.params.id });
             if (user === undefined) {
                 res.status(404).json({ success: false, error: { message: 'User not found' } });
                 return;
@@ -110,7 +110,7 @@ const update = async (req: Request, res: Response) => {
             const response = await userControllers.createProfile(req.id, req.body);
             if (response) req.body['profile'] = 1;
         }
-        const data = await userControllers.updateUser(req.id, req.body);
+        const data = await userControllers.update(req.id, req.body);
         // const { password, verified, userId, profile, profileId, ...rest } = data;
         // if (verified === 1) {
         //     await elastic.update(req.id, rest);
