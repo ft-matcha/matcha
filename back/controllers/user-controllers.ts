@@ -93,10 +93,12 @@ class UserControllers {
     };
 
     createProfile = async (id?: string, body?: any) => {
-        const { phone, preferences, biography, tag, age, image } = body;
+        const { phone, preferences, biography, tag, age, image, address, gender } = body;
         try {
             const profile = await Profile.create({
                 set: {
+                    address,
+                    gender,
                     phone,
                     preferences,
                     biography,
