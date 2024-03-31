@@ -38,7 +38,6 @@ const SliderImage = ({
   children?: React.ReactNode;
   onClick?: (props: any) => void;
 }) => {
-  console.log(onClick);
   return (
     <ImageContainer>
       <img src={img} alt={img} onClick={onClick} />

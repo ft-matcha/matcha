@@ -48,7 +48,6 @@ const DesktopLayout = (props: any) => {
   const api = useApi();
   const navigator = useNavigate();
   const [profile, setProfile] = useState({ id: '', firstName: '', lastName: '', address: '' });
-  console.log('api called');
   const fetchApi = async () => {
     try {
       const { data } = await api('get', 'user');
@@ -71,6 +70,7 @@ const DesktopLayout = (props: any) => {
                 to="/profile"
                 className={({ isActive }) => (isActive ? 'actived' : 'pending')}
                 width={'fit-content'}
+                state={{ ...profile }}
               >
                 <CgProfile />
                 <Span border={'0px'} value={profile?.firstName + profile?.lastName} />

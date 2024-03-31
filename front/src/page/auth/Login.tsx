@@ -19,6 +19,7 @@ export default function Login({ onClick }: { onClick: (prev: boolean) => void })
     e.preventDefault();
     if (setFocus<HTMLDivElement>(ref.current as HTMLDivElement)) return;
     const obj = formHandler(e.currentTarget);
+    console.log(obj);
     const response = await api('post', 'login', obj, true);
     if (response) {
       navigator('/explorer');

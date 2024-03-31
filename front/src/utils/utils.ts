@@ -1,8 +1,4 @@
-export const removeEmptyValue = (
-  obj: Record<string, any>,
-  org: Record<string, any>,
-  diffAlgorithm?: (cpy: any, org: any) => boolean,
-) => {
+export const removeEmptyValue = (obj: Record<string, any>) => {
   return Object.entries(obj).reduce(
     (
       acc: {
@@ -10,11 +6,7 @@ export const removeEmptyValue = (
       },
       [key, value],
     ) => {
-      if (
-        value &&
-        (typeof diffAlgorithm === undefined ||
-          (typeof diffAlgorithm === 'function' && diffAlgorithm(value, org[key])))
-      ) {
+      if (value) {
         acc[key] = value;
       }
       return acc;

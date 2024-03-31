@@ -84,7 +84,6 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
   }, [modalProp.toggle]);
   useEffect(() => {}, [modalProp.toggle, modalProp.modalType]);
 
-  console.log(modalProp.modalType);
   return (
     <>
       <ModalContext.Provider value={{ modalProp, setModal }}>
