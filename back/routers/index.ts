@@ -9,8 +9,9 @@ import chat from './chat';
 import passport from 'passport';
 import login from './login';
 import register from './register';
-// import multer from 'multer';
-// const upload = multer({ dest: 'uploads/' });
+import multer from 'multer';
+import { Request, Response } from 'express';
+const upload = multer({ dest: 'uploads/' });
 const router = express.Router();
 // router.use(express.static('uploads'));
 
@@ -22,9 +23,13 @@ router.post('/login', passport.authenticate('local', { session: false }), login)
 router.post('/register', register);
 router.get('/googleLogin', passport.authenticate('google', { session: false, scope: ['email', 'profile', 'address'] }));
 router.get('/oauth', passport.authenticate('google', { session: false }), login);
-// router.post('/register', auth.register);
 router.get('/register', user.checkDuplication);
 router.get('/refresh', jwt.refreshJWT);
+
+router.put('/test', upload.array('image', 5), (req: Request, res: Response) => {
+    console.log(req.files);
+    res.json(req);
+});
 
 router.use(jwt.verifyJWT);
 router.get('/logout', auth.logout);

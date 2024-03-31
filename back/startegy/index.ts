@@ -6,4 +6,5 @@ const initStartegy = (passport: PassportStatic) => {
     passport.use('local', LocalStrategy);
     passport.use('google', GoogleStrategy);
 };
+
 export default initStartegy;

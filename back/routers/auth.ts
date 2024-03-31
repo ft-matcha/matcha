@@ -1,9 +1,9 @@
 import userControllers from '../controllers/user-controllers';
-import mailControllers from '../controllers/mail-controllers';
+import mailer from '../lib/mailer';
 import elastic from '../lib/elastic';
 import { Request, Response } from 'express';
 import redisClient from '../lib/redisClient';
-const mailer = new mailControllers();
+// const mailer = new mailControllers();
 import crypto from 'crypto';
 import jwt from '../utils/jwt';
 
