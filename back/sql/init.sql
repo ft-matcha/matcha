@@ -5,8 +5,6 @@ CREATE TABLE IF NOT EXISTS `user` (
     `email` varchar(255) NOT NULL,
     `firstName` varchar(255) NOT NULL,
     `lastName` varchar(255) NOT NULL,
-    `address` JSON NOT NULL,
-    `gender` varchar(255) NOT NULL,
     `status` varchar(255) NOT NULL DEFAULT 'ACTIVE',
     `verified` BOOLEAN NOT NULL DEFAULT FALSE,
     `profile` BOOLEAN NOT NULL DEFAULT FALSE,
@@ -19,6 +17,8 @@ CREATE TABLE IF NOT EXISTS `user` (
 
 CREATE TABLE IF NOT EXISTS `profile` (
     `profileId` INTEGER NOT NULL AUTO_INCREMENT,
+    `address` JSON NOT NULL,
+    `gender` varchar(255) NOT NULL,
     `phone` varchar(255) NOT NULL,
     `preferences` JSON NOT NULL,
     `biography` varchar(255) NOT NULL,

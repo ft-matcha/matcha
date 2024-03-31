@@ -69,7 +69,7 @@ const authSocket = async (socket: Socket, next: any) => {
                 if (response.decoded['id'] === undefined) {
                     next(socket, new Error('Invalid Token'));
                 } else {
-                    const user = await userControllers.getUser({ id: response.decoded['id'] });
+                    const user = await userControllers.get({ id: response.decoded['id'] });
                     if (user === undefined) {
                         next(socket, new Error('Invalid Token'));
                     }

@@ -1,7 +1,8 @@
 import { Request } from 'express';
+import { Strategy } from 'passport-local';
 import { Socket } from 'socket.io';
 
-interface User {
+interface user {
     id: string;
     uid: string;
     email: string;
@@ -27,8 +28,21 @@ interface Profile {
 declare global {
     namespace Express {
         interface Request {
-            id?: string;
-            data?: User & Profile;
+            id: string;
+            data?: user & Profile;
+        }
+        interface User {
+            id: string;
+            uid: string;
+            email: string;
+            password: string;
+            lastName: string;
+            firstName: string;
+        }
+    }
+    namespace Strategy {
+        interface IStrategyOptionsWithRequest {
+            uidField: string;
         }
     }
 }
