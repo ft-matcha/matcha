@@ -10,6 +10,9 @@ import routers from './routers/index';
 // import chat from './socket/socket';
 import cors from 'cors';
 import { Request, Response } from 'express';
+import passport from 'passport';
+import initStartegy from './startegy/index';
+import session from 'express-session';
 
 const app = express();
 
@@ -24,7 +27,13 @@ const corsOptions = {
     credentials: true,
 };
 app.use(cors(corsOptions));
-
+app.use(passport.initialize());
+initStartegy(passport);
+// app.use(passport.session());
+// passport.serializeUser((user: any, done: any) => {
+//     console.log(user);
+//     done(null, user.id);
+// });
 new crud('').migrate();
 elastic.createIndex('matcha');
 app.use(
