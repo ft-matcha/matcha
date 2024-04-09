@@ -3,6 +3,7 @@ import crypto, { randomUUID } from 'crypto';
 import userControllers from '../controllers/user-controllers';
 import jwt from '../utils/jwt';
 import redisClient from '../lib/redisClient';
+import mailer from '../lib/mailer';
 const register = async (req: Request, res: Response) => {
     try {
         if (process.env.secret === undefined) throw new Error('secret not found');
@@ -13,6 +14,7 @@ const register = async (req: Request, res: Response) => {
             id: id,
             password: cryptoPass,
         });
+        await mailer.sendEmail(req.body.email);
         const accessToken = jwt.sign(user.id);
         const refreshToken = jwt.refresh();
         redisClient.set(user.id, refreshToken);

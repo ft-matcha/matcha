@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import nodemailer from 'nodemailer';
-import redisClient from '../lib/redisClient';
+import redisClient from './redisClient';
 const transporter = nodemailer.createTransport({
     service: process.env.MAIL_SERVICE,
     auth: {
@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-export default class mailer {
+class mailer {
     constructor() {}
     sendEmail = async (email: string) => {
         try {
@@ -42,3 +42,5 @@ export default class mailer {
         }
     };
 }
+
+export default new mailer();

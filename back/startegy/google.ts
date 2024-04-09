@@ -1,6 +1,7 @@
 import { Strategy } from 'passport-google-oauth20';
 import userControllers from '../controllers/user-controllers';
 import crypto, { randomUUID } from 'crypto';
+import mailer from '../lib/mailer';
 const clientID = process.env.GOOGLE_CLIENT_ID;
 const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -33,15 +34,11 @@ const GoogleStrategy = new Strategy(
                     email: profile.emails[0].value,
                     password: cryptoPass,
                 });
+                await mailer.sendEmail(profile.emails[0].value);
                 done(null, {
                     id: id,
                 });
             } else {
-                const image: string[] = [];
-                profile.photos.forEach((photo: any) => {
-                    console.log(photo.value);
-                    image.push(photo.value);
-                });
                 done(null, user);
             }
         } catch (error: any) {
