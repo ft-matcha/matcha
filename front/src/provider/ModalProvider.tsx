@@ -1,11 +1,9 @@
-import Login from '@/page/auth/Login';
-import Register from '@/page/auth/register/Register';
 import SearchModal from '@/page/modal/SearchModal';
 import { ModalChild } from '@/page/modal/SwitchModal';
 import { ModalProps } from '@/types';
-import { createContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { cloneElement, createContext, useEffect, useState } from 'react';
 import { lazy } from 'react';
+import ProfileList from '@/page/user/ProfileOther';
 
 export const ModalContext = createContext({
   modalProp: {
@@ -18,19 +16,21 @@ export const ModalContext = createContext({
 const RecommendResult = lazy(() => import('@/page/recommend/RecommendResult'));
 
 const ModalType: {
-  [key: string]: React.ReactNode;
+  [key: string]: React.ReactElement;
 } = {
-//   loginModal: <Login />,
-//   signUpModal: <Register />,
   recommendModal: <RecommendResult />,
+  profileModal: <ProfileList />,
 };
 
 const ModalProvider: React.FC<ModalProps> = ({ children }) => {
-  const [modalProp, setModal] = useState({
+  const [modalProp, setModal] = useState<{
+    modalType: string;
+    toggle: boolean;
+    data?: Record<string, any>;
+  }>({
     modalType: '',
     toggle: false,
   });
-  const navigator = useNavigate();
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -52,7 +52,7 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
           modalType: 'searchModal',
           toggle: true,
         });
-      } 
+      }
     };
 
     window.addEventListener('keydown', onKeyDown);
@@ -93,13 +93,11 @@ const ModalProvider: React.FC<ModalProps> = ({ children }) => {
             (
             {modalProp.modalType === 'searchModal' ? (
               <SearchModal />
-            )  :
-			 (
-               <ModalChild header={modalProp.modalType} setModal={setModal}>
-                 {ModalType[modalProp.modalType]}
-               </ModalChild>
-             )
-			}
+            ) : (
+              <ModalChild header={modalProp.modalType} setModal={setModal}>
+                {cloneElement(ModalType[modalProp.modalType], modalProp.data)}
+              </ModalChild>
+            )}
             )
           </>
         )}

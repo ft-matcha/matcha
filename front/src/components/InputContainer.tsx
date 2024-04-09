@@ -7,13 +7,19 @@ const Container = styled.div`
 	width: 100%;
 `
 
-const InputContainer: React.FC<InputContainerProps> = ({ name, children, readOnly, ...rest }) => {
+const InputContainer: React.FC<InputContainerProps> = ({
+  name,
+  id,
+  children,
+  readOnly,
+  ...rest
+}) => {
   return (
-    <Container>
-      <Label htmlFor={name}>{name}</Label>
-      <Input name={name} readOnly={readOnly} {...rest}></Input>
+    <>
+      <Label htmlFor={id}>{name}</Label>
+      <Input name={name} id={id} readOnly={readOnly} {...rest}></Input>
       {children}
-    </Container>
+    </>
   );
 };
 

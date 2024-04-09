@@ -1,6 +1,7 @@
 import styled from 'styled-components';
 
 const StyledLabel = styled.label`
+  for: ${({ htmlFor }) => htmlFor};
   font-size: 13px;
 `;
 

@@ -1,17 +1,10 @@
 import Button from '@/components/ui/Button';
-import Select from '@/components/ui/Select';
-import React, { FormEvent, useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { userGender } from '@/data/AuthData';
-import FormContainer, { formHandler } from '@/components/ui/Form';
-import { Link, Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
-import Span from '@/components/ui/Span';
+import { useLocation, useNavigate } from 'react-router-dom';
 import useApi from '@/hooks/useApi';
-import GeoLocation from '@/page/location/GeoLocation';
-import Label from '@/components/ui/Label';
 import UserStep from '../step/UserStep';
 import { RegisterFormProps } from '@/types';
-import { removeEmptyValue } from '@/utils/utils';
 
 export const StyledProfile = styled.div<{ width?: string; height?: string }>`
   display: flex;
@@ -34,43 +27,27 @@ export const StyledProfile = styled.div<{ width?: string; height?: string }>`
 
 const Profile = () => {
   const navigator = useNavigate();
-  const [profile, setProfile] = useState<RegisterFormProps>();
+  const { state } = useLocation();
+  const [profile, setProfile] = useState<RegisterFormProps>(state);
   const api = useApi();
-  const fetchApi = async () => {
-    api('get', 'user').then(({ data }) => {
-      setProfile(data);
+  const fetchApi = async (data: Record<string, any>) => {
+    api('put', 'user', data).then((res) => {
+      console.log(res);
     });
   };
-  useEffect(() => {
-    fetchApi();
-  }, []);
   if (!profile) {
     return <></>;
   }
+  useEffect(() => {
+    setProfile(state);
+  }, []);
   return (
-    <UserStep
-      title="profile"
-      api={async (funnelForm, data) => {
-        console.log(
-          removeEmptyValue(funnelForm, profile as Record<string, any>, (value1: any, value2) => {
-            if (!value2) {
-              return true;
-            }
-            if (typeof value1 !== typeof value2) {
-              return false;
-            }
-            if (value1 === value2) {
-              return false;
-            }
-            return true;
-          }),
-        );
-      }}
-      updated={true}
-      funnelData={profile}
-    >
-      <Button onClick={() => navigator('/explorer')}>Home</Button>
-    </UserStep>
+    <>
+      <UserStep title="profile" defaultData={profile} status="profile" submit={fetchApi}>
+        <Button onClick={() => navigator('/explorer')}>Home</Button>
+      </UserStep>
+      profile
+    </>
   );
 };
 

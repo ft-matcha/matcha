@@ -2,8 +2,8 @@ import { InputContainerProps } from '@/types';
 
 export const userInfo: InputContainerProps[] = [
   {
-    name: 'id',
-    id: 'id',
+    name: 'uid',
+    id: 'uid',
     type: 'id',
     placeholder: 'test',
   },
@@ -13,41 +13,73 @@ export const userInfo: InputContainerProps[] = [
     type: 'password',
   },
 ];
-export const userRegister: InputContainerProps[] = [
+
+export const userRegister = [
+  {
+    name: 'email',
+    id: 'email',
+    type: 'email',
+    required: true,
+    placeholder: 'email',
+    next: 'password',
+  },
   {
     name: 'name',
     id: 'name',
     type: 'text',
     required: true,
     placeholder: 'name',
+    next: 'complete',
   },
   {
-    name: 'email',
-    id: 'email',
-    type: 'email',
+    name: 'id',
+    id: 'id',
+    type: 'id',
     required: true,
     placeholder: 'test@example.com',
+    next: 'email',
   },
   {
     name: 'password',
     id: 'password',
     type: 'password',
+    next: 'name',
+    required: true,
   },
 ];
+
+const userUpdate = userRegister.concat([
+  {
+    name: 'email',
+    id: 'email',
+    type: 'email',
+    required: true,
+    placeholder: 'email',
+    next: 'password',
+  },
+  {
+    name: 'name',
+    id: 'name',
+    type: 'text',
+    required: true,
+    placeholder: 'name',
+    next: 'complete',
+  },
+  {
+    name: 'id',
+    id: 'id',
+    type: 'id',
+    required: true,
+    placeholder: 'test@example.com',
+    next: 'email',
+  },
+  {
+    name: 'password',
+    id: 'password',
+    type: 'password',
+    next: 'name',
+    required: true,
+  },
+]);
 
 export const userGender = ['male', 'female', 'other'];
-
-export const dropData = [
-  {
-    name: '흐르는 강물을',
-    id: 'river',
-  },
-  {
-    name: '거꾸로 거슬러 오르는',
-    id: 'upstream',
-  },
-  {
-    name: '연어들의',
-    id: 'salmon',
-  },
-];

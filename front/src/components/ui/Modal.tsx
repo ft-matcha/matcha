@@ -1,6 +1,5 @@
-import { ModalContext } from '@/provider/ModalProvider';
 import { ModalBodyProps, ModalProps } from '@/types';
-import { useContext, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 const ModalWrapper = styled.div`
@@ -11,6 +10,7 @@ const ModalWrapper = styled.div`
   top: -50%;
   left: -50%;
   transform: translate(50%, 50%);
+  z-index: 100;
   justify-content: center;
   align-items: center;
 `;
@@ -55,7 +55,7 @@ export const ModalBody = styled.div<ModalBodyProps>`
   justify-content: center;
   align-items: center;
   width: 100%;
-  z-index: 50;
+  z-index: 1000;
   overflow-y: scroll;
   height: ${(props) => (props.height ? props.height : '100%')};
   max-height: 480px;

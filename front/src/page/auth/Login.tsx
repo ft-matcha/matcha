@@ -19,6 +19,7 @@ export default function Login({ onClick }: { onClick: (prev: boolean) => void })
     e.preventDefault();
     if (setFocus<HTMLDivElement>(ref.current as HTMLDivElement)) return;
     const obj = formHandler(e.currentTarget);
+    console.log(obj);
     const response = await api('post', 'login', obj, true);
     if (response) {
       navigator('/explorer');
@@ -32,8 +33,8 @@ export default function Login({ onClick }: { onClick: (prev: boolean) => void })
         <p>Enter your email below to login to your account</p>
       </div>
       <div ref={ref}>
-        {userInfo.map((item, i) => (
-          <InputContainer notFocus={i !== 0} {...item} key={`user_${item.id}`} />
+        {userInfo.map((item) => (
+          <InputContainer {...item} key={`user_${item.id}`} />
         ))}
         <Button type="submit">Sign In</Button>
         {modal.modalProp.modalType === 'loginModal' ? (

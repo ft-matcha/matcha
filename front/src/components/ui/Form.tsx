@@ -1,11 +1,6 @@
+import { FormProps } from '@/types';
+import { RefObject } from 'react';
 import styled from 'styled-components';
-
-interface FormProps {
-  width?: string;
-  height?: string;
-  children?: React.ReactNode;
-  onSubmit?: (props: any) => any;
-}
 
 const FormContainer = styled.form<FormProps>`
   display: flex;
@@ -30,9 +25,9 @@ export const formHandler = (target: HTMLFormElement) => {
   return { ...obj };
 };
 
-const Form: React.FC<FormProps> = ({ children, onSubmit, ...rest }) => {
+const Form = ({ children, onSubmit, ref, ...rest }: FormProps) => {
   return (
-    <FormContainer onSubmit={onSubmit} {...rest}>
+    <FormContainer onSubmit={onSubmit} ref={ref} {...rest}>
       {children}
     </FormContainer>
   );

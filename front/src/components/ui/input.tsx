@@ -21,23 +21,20 @@ const InputContainer = styled.input<InputProps>`
   min-height: 40px;
 `;
 
-const Input: React.FC<InputProps> = ({ onChange, notFocus, readOnly, type, value, ...rest }) => {
-
+const Input: React.FC<InputProps> = ({ onChange, name, type, value, ...rest }) => {
   const ref = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    if (notFocus) {
-      return;
-    }
-    ref.current && ref.current.focus();
-  }, []);
-  return <InputContainer
-  	onChange={onChange}
-	ref={ref}
-	type={type}
-	autoComplete={type !== 'password' ? "given-name": 'off'}
-	value={value}
-	{...rest} />;
+  return (
+    <InputContainer
+      onChange={onChange}
+      ref={ref}
+      type={type}
+      name={name}
+      autoComplete={type !== 'password' ? `given-${name}` : 'off'}
+      defaultValue={value}
+      {...rest}
+    />
+  );
 };
 
 export default Input;

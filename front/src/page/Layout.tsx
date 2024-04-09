@@ -7,10 +7,10 @@ import { CgProfile } from 'react-icons/cg';
 import { deleteToken } from '@/utils/token';
 import useApi from '@/hooks/useApi';
 import { FaUserFriends } from 'react-icons/fa';
-import useKakao from '@/hooks/useKakao';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Span from '@/components/ui/Span';
 import { useNavigate } from 'react-router-dom';
+import RecommendCard from '@/page/recommend/RecommendCard';
 
 const LayoutDefault = styled.section`
   display: grid;
@@ -70,6 +70,7 @@ const DesktopLayout = (props: any) => {
                 to="/profile"
                 className={({ isActive }) => (isActive ? 'actived' : 'pending')}
                 width={'fit-content'}
+                state={{ ...profile }}
               >
                 <CgProfile />
                 <Span border={'0px'} value={profile?.firstName + profile?.lastName} />
@@ -115,7 +116,18 @@ const DesktopLayout = (props: any) => {
           </Nav.Section>
         </Nav>
       </Aside>
-      <MainSection id="main"></MainSection>
+      <MainSection id="main">
+        <RecommendCard
+          randomData={{
+            id: '1234',
+            profileList: [
+              'https://i.namu.wiki/i/v9mjVvN1z88ez3EY_ECy3CIHXuaCmMicz_awziQW7Na5lluUpBwLMTb_2RluVPuDAjAwzazdBzSm0wLOhdJNmw.webp',
+              'https://i.namu.wiki/i/JQQdOENy3aGlgcFmecRY5D7iIWDhyS5xIB1A2Tck_28Z792LbybVgWidMlKFyJZj-OlV6TUIIbkronpdJFSNBA.webp',
+              'https://i.namu.wiki/i/PHPaxu5UjnztUXHx5OHKnYH615-z4-IFOuBSunSxPahvTCbI2JgYKQfW3j8JEEBiXEOaB40SuVLIiw3rXHeGyQ.webp',
+            ],
+          }}
+        />
+      </MainSection>
     </>
   );
 };

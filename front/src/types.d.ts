@@ -8,11 +8,19 @@ export interface IWindow extends Window {
     };
   };
 }
+export interface FormProps {
+  width?: string;
+  height?: string;
+  children?: React.ReactNode;
+  onSubmit?: (e: React.FormEvent<HTMLFormElement>) => void;
+  ref?: RefObject<HTMLFormElement>;
+}
+
 
 export interface RegisterFormProps {
-  [key: string]: string | boolean | number | undefined | null;
+  [key: keyof RegisterFormProps]: RegisterFormProps[key];
   address: string;
-  age: number | null;
+  date: string | undefined;
   email: string;
   firstName: string;
   gender: string;
@@ -34,6 +42,7 @@ export interface LocationProps {
 }
 
 export interface InputContainerProps {
+  [k: keyof InputContainer]: InputContainerProps[k];
   type: string;
   id: string;
   name: string;
@@ -77,4 +86,16 @@ export interface ModalContextProps {
     modalType: string;
     toggle: boolean;
   };
+}
+
+export interface FunnelProps<T extends readonly string[]> {
+  step: T[number];
+  children: ReactNode;
+  title?: string;
+}
+
+export interface StepProps<T extends readonly string[]> {
+  name: T[number];
+  children?: ReactNode;
+  title?: string;
 }
